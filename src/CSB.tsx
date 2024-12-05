@@ -1,35 +1,3 @@
-// // App.tsx
-// import React from 'react';
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import CSA from './CSA';
-// import CSB from './CSB';
-
-// // Components for demonstration
-
-
-
-// const App = () => {
-//   return (
-//     <Router>
-//       <div>
-//         {/* Navigation Links */}
-//         {/* <nav>
-//           <a href="/">Home</a> | <a href="/about">About</a> | <a href="/contact">Contact</a>
-//         </nav> */}
-
-//         {/* Route Definitions */}
-//         <Routes>
-//           <Route path="/csa" element={<CSA />} />
-//           <Route path="/csb" element={<CSB />} />
-          
-//         </Routes>
-//       </div>
-//     </Router>
-//   );
-// };
-
-// export default App;
-
 import { useState, useEffect } from 'react';
 import { Timetable } from './TimeTable.tsx';
 import { schedule } from './data.ts';
@@ -37,7 +5,7 @@ import { schedule } from './data.ts';
 
 const timetableData: any = schedule;
 
-const App = () => {
+const CSB = () => {
   if (timetableData == null || timetableData.length < 1) {
     return <></>;
   }
@@ -50,27 +18,30 @@ const App = () => {
   const getNext = (current: any) => {
     switch (current) {
       case 'cs_1a':
-        setData(timetableData[0]?.cs_1st[1]?.cs_1b);
+        setData(timetableData[0]?.cs_1st[0]?.cs_1b);
+        console.log('hello')
+        console.log(data)
         setCurrent('cs_1b');
         break;
       case 'cs_1b':
-        setData(timetableData[1]?.it_1st[0]?.it_1a);
+        setData(timetableData[0]?.it_1st[0]?.it_1a);
+        console.log('hello')
         setCurrent('it_1a');
         break;
       case 'it_1a':
-        setData(timetableData[1]?.it_1st[1]?.it_1b);
+        setData(timetableData[0]?.it_1st[0]?.it_1b);
         setCurrent('it_1b');
         break;
       case 'it_1b':
-        setData(timetableData[2]?.is_1st[0]?.is_1a);
+        setData(timetableData[0]?.is_1st[0]?.is_1a);
         setCurrent('is_1a');
         break;
       case 'is_1a':
-        setData(timetableData[2]?.is_1st[1]?.is_1b);
+        setData(timetableData[0]?.is_1st[0]?.is_1b);
         setCurrent('is_1b');
         break;
       case 'is_1b':
-        setData(timetableData[1]?.cs_1st[0]?.cs_1a);
+        setData(timetableData[0]?.cs_1st[0]?.cs_1a);
         setCurrent('cs_1a');
         break;
     }
@@ -82,27 +53,27 @@ const App = () => {
   const getPrevious = (current: any) => {
     switch (current) {
       case 'cs_1a':
-        setData(timetableData[1]?.it_1st[1]?.it_1b);
+        setData(timetableData[0]?.it_1b ?? []);
         setCurrent('it_1b');
         break;
       case 'cs_1b':
-        setData(timetableData[1]?.cs_1st[0]?.cs_1a);
+        setData(timetableData[0]?.cs_1a ?? []);
         setCurrent('cs_1a');
         break;
       case 'it_1a':
-        setData(timetableData[0]?.cs_1st[1]?.cs_1b);
+        setData(timetableData[0]?.cs_1b ?? []);
         setCurrent('cs_1b');
         break;
       case 'it_1b':
-        setData(timetableData[1]?.it_1st[0]?.it_1a);
+        setData(timetableData[0]?.it_1a ?? []);
         setCurrent('it_1a');
         break;
       case 'is_1a':
-        setData(timetableData[1]?.it_1st[1]?.it_1b);
+        setData(timetableData[0]?.it_1b ?? []);
         setCurrent('it_1b');
         break;
       case 'is_1b':
-        setData(timetableData[2]?.is_1st[1]?.is_1b);
+        setData(timetableData[0]?.is_1a ?? []);
         setCurrent('is_1a');
         break;
     }
@@ -119,17 +90,16 @@ const App = () => {
         <h1 className='font-bold text-xl'>{current}</h1>
         <Timetable data={data} />
       </div>
-      <div className='flex w-full justify-between'>
+      {/* <div className='flex w-full justify-between'>
         <button onClick={() => getPrevious(current)}>
           <p className='hover:text-blue-500'>Previous</p>
         </button>
         <button onClick={() => getNext(current)}>
           <p className='hover:text-blue-500'>Next</p>
         </button>
-      </div>
+      </div> */}
     </div>
   );
 };
 
-export default App;
-
+export default CSB;
