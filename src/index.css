@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: "Akira-Expanded";
+    src: url(/fonts/Akira-Expanded.woff) format(woff);
+  }
+  @font-face {
+    font-family: "Helvetica-Neue-Heavy";
+    src: url(/fonts/HelveticaNeueHeavy.woff) format(woff);
+  }
+}
