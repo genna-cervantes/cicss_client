@@ -4,6 +4,8 @@ import Semester from "../../components/Semester";
 import GenerateButton from "../../components/GenerateButton";
 import DashboardButtons from "../../components/DashboardButtons";
 import DashboardButtonsSC from "../../components/DashboardButtonsSC";
+import Footer from "../../components/Footer";
+import StudentChartCard from "../../components/StudentChartCard";
 
 const Dashboard = () => {
   return (
@@ -24,9 +26,14 @@ const Dashboard = () => {
             <DashboardButtonsSC Label="Year Level Day Constraints" />
             <DashboardButtonsSC Label="Year Level Time Constraints" />
           </div>
-          <GenerateButton />
+          <div className="flex flex-col gap-6">
+            <GenerateButton />
+            <StudentChartCard />
+          </div>
         </div>
       </section>
+
+      <Footer />
     </div>
   );
 };
