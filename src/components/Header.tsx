@@ -9,7 +9,7 @@ const Header = () => {
           <img src={cicss_logo} alt="" className="w-32" />
         </a>
         <nav>
-          <ul className="flex space-x-4 text-sm font-Akira-Expanded items-center">
+          <ul className="flex gap-8 text-sm font-Akira-Expanded items-center">
             <li className=" text-primary">Dashboard</li>
             <div className=" bg-primary rounded-md w-32">
               <div className="flex px-3 py-1 items-center justify-between">
