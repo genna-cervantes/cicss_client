@@ -6,17 +6,18 @@ import DashboardButtons from "../../components/DashboardButtons";
 import DashboardButtonsSC from "../../components/DashboardButtonsSC";
 import Footer from "../../components/Footer";
 import StudentChartCard from "../../components/StudentChartCard";
+import TeacherChartCard from "../../components/TeacherChartCard";
 
 const Dashboard = () => {
   return (
     <div className="bg-cover bg-no-repeat bg-gradient-to-b from-[#F1FAFF] via-[#BFDDF6] to-[#9FCEF5] min-h-screen">
       <Header />
-      <section className="flex items-center justify-between py-7 px-12">
+      <section className="flex items-center justify-between py-7 px-16">
         <Greeting userName="Cherry Rose" />
         <Semester />
       </section>
       <section>
-        <div className="flex justify-between py-3 px-12">
+        <div className="flex justify-between py-3 px-16">
           <div className="flex flex-col gap-5">
             <DashboardButtons Label="Section Counts" />
             <DashboardButtons Label="Teaching Academic Staff" />
@@ -28,7 +29,10 @@ const Dashboard = () => {
           </div>
           <div className="flex flex-col gap-6">
             <GenerateButton />
-            <StudentChartCard />
+            <div className="flex justify-between">
+              <StudentChartCard />
+              <TeacherChartCard />
+            </div>
           </div>
         </div>
       </section>

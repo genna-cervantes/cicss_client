@@ -3,7 +3,7 @@ import React from "react";
 const Footer = () => {
   return (
     <div>
-      <div className="flex justify-between items-center py-3 px-12 mt-4  text-primary font-Manrope">
+      <div className="flex justify-between items-center py-3 px-16 mt-4  text-primary font-Manrope">
         <div>
           © Copyright 2024. University of Santo Tomas. All Rights reserved.
         </div>

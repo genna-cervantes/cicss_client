@@ -4,7 +4,7 @@ import logout_logo from "../assets/logout_logo.png";
 const Header = () => {
   return (
     <header>
-      <div className="flex justify-between items-center py-3 px-12">
+      <div className="flex justify-between items-center py-3 px-16">
         <a href="#">
           <img src={cicss_logo} alt="" className="w-32" />
         </a>
@@ -20,7 +20,7 @@ const Header = () => {
           </ul>
         </nav>
       </div>
-      <div className="mx-auto h-[1px] w-[93.5%] bg-primary"></div>
+      <div className="mx-auto h-[1px] w-[91.5%] bg-primary"></div>
     </header>
   );
 };

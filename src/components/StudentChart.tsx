@@ -24,25 +24,43 @@ const StudentChart: React.FC<StudentChartProps> = ({
     datasets: [
       {
         label: "Ratings",
-        data: [five_count, four_count, three_count, two_count, one_count],
+        data: [
+          0.5,
+          five_count,
+          0.5,
+          four_count,
+          0.5,
+          three_count,
+          0.5,
+          two_count,
+          0.5,
+          one_count,
+        ],
         backgroundColor: [
+          "transparent",
           "#FFBA21",
+          "transparent",
           "#0350D3",
+          "transparent",
           "#1972E4",
+          "transparent",
           "#3C96F1",
+          "transparent",
           "#77B9F4",
         ],
         borderColor: "transparent",
+        borderWidth: 6,
+        borderRadius: 15,
       },
     ],
   };
 
   const options = {
-    cutout: "71%",
+    cutout: "78%",
   };
 
   return (
-    <div className="w-[80%] h-[80%] mx-auto">
+    <div className="w-[90%] h-[90%] mx-auto">
       <Doughnut data={data} options={options} />
     </div>
   );
