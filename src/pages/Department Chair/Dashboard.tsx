@@ -1,17 +1,14 @@
-import Header from "../../components/Header";
 import Greeting from "../../components/Greeting";
 import Semester from "../../components/Semester";
 import GenerateButton from "../../components/GenerateButton";
 import DashboardButtons from "../../components/DashboardButtons";
 import DashboardButtonsSC from "../../components/DashboardButtonsSC";
-import Footer from "../../components/Footer";
 import StudentChartCard from "../../components/StudentChartCard";
 import TeacherChartCard from "../../components/TeacherChartCard";
 
 const Dashboard = () => {
   return (
-    <div className="bg-cover bg-no-repeat bg-gradient-to-b from-[#F1FAFF] via-[#BFDDF6] to-[#9FCEF5] min-h-screen">
-      <Header />
+    <div>
       <section className="flex items-center justify-between py-7 px-16">
         <Greeting userName="Cherry Rose" />
         <Semester />
@@ -19,10 +16,13 @@ const Dashboard = () => {
       <section>
         <div className="flex justify-between py-3 px-16">
           <div className="flex flex-col gap-5">
-            <DashboardButtons Label="Section Counts" />
-            <DashboardButtons Label="Teaching Academic Staff" />
-            <DashboardButtons Label="Rooms" />
-            <DashboardButtons Label="Course Offerings" />
+            <DashboardButtons Label="Section Counts" Path="section-counts" />
+            <DashboardButtons
+              Label="Teaching Academic Staff"
+              Path="section-counts"
+            />
+            <DashboardButtons Label="Rooms" Path="section-counts" />
+            <DashboardButtons Label="Course Offerings" Path="section-counts" />
             <DashboardButtonsSC Label="Gen Ed Constraints" />
             <DashboardButtonsSC Label="Year Level Day Constraints" />
             <DashboardButtonsSC Label="Year Level Time Constraints" />
@@ -36,8 +36,6 @@ const Dashboard = () => {
           </div>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 };

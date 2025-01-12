@@ -1,5 +1,6 @@
 import cicss_logo from "../assets/cicss_logo.png";
 import logout_logo from "../assets/logout_logo.png";
+import { NavLink } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -10,10 +11,22 @@ const Header = () => {
         </a>
         <nav>
           <ul className="flex gap-8 text-sm font-Akira-Expanded items-center">
-            <li className=" text-primary">Dashboard</li>
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive
+                  ? "text-primary underline decoration-2"
+                  : "text-primary hover:text-secondary"
+              }
+            >
+              Dashboard
+            </NavLink>
+
             <div className=" bg-primary rounded-md w-32">
               <div className="flex px-3 py-1 items-center justify-between">
-                <li className="text-white">Logout</li>
+                <NavLink to="logout" className="text-white">
+                  Logout
+                </NavLink>
                 <img src={logout_logo} alt="" className="w-5 h-4" />
               </div>
             </div>
