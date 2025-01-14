@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import SectionCounts from "../pages/Department Chair/SectionCounts";
+import SectionCounts from "../pages/Department Chair/InputSectionCounts";
 
 const AppRoutes = () => {
   return (

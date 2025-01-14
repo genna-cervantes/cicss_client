@@ -16,16 +16,28 @@ const Dashboard = () => {
       <section>
         <div className="flex justify-between py-3 px-16">
           <div className="flex flex-col gap-5">
-            <DashboardButtons Label="Section Counts" Path="section-counts" />
+            <DashboardButtons
+              Label="Section Counts"
+              Path="input-section-counts"
+            />
             <DashboardButtons
               Label="Teaching Academic Staff"
-              Path="section-counts"
+              Path="input-TAS"
             />
-            <DashboardButtons Label="Rooms" Path="section-counts" />
-            <DashboardButtons Label="Course Offerings" Path="section-counts" />
-            <DashboardButtonsSC Label="Gen Ed Constraints" />
-            <DashboardButtonsSC Label="Year Level Day Constraints" />
-            <DashboardButtonsSC Label="Year Level Time Constraints" />
+            <DashboardButtons Label="Rooms" Path="input-rooms" />
+            <DashboardButtons
+              Label="Course Offerings"
+              Path="input-course-offerings"
+            />
+            <DashboardButtonsSC Label="Gen Ed Constraints" Path="input-gened" />
+            <DashboardButtonsSC
+              Label="Year Level Day Constraints"
+              Path="input-YLD"
+            />
+            <DashboardButtonsSC
+              Label="Year Level Time Constraints"
+              Path="input-YLT"
+            />
           </div>
           <div className="flex flex-col gap-6">
             <GenerateButton />

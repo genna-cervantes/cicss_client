@@ -6,7 +6,7 @@ const Header = () => {
   return (
     <header>
       <div className="flex justify-between items-center py-3 px-16">
-        <a href="#">
+        <a href="/">
           <img src={cicss_logo} alt="" className="w-32" />
         </a>
         <nav>
