@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -9,9 +10,9 @@ const Footer = () => {
         </div>
         <nav>
           <ul className="flex gap-10 font-bold underline decoration-primary">
-            <li>Help</li>
-            <li>Terms and Conditions</li>
-            <li>Send Feedback</li>
+            <NavLink to="#">Help</NavLink>
+            <NavLink to="#">Terms and Conditions</NavLink>
+            <NavLink to="#">Send Feedback</NavLink>
           </ul>
         </nav>
       </div>

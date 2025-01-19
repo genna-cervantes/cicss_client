@@ -1,7 +1,28 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 
 const InputSectionCounts = () => {
+  const [inputValues, setInputValues] = useState<(number | "")[]>(() =>
+    JSON.parse(localStorage.getItem("inputValues") || '["", "", "", ""]')
+  );
+
+  useEffect(() => {
+    localStorage.setItem("inputValues", JSON.stringify(inputValues));
+  }, [inputValues]);
+
+  const handleInputChange = (index: number, value: string) => {
+    const newValues = [...inputValues];
+    newValues[index] = value === "" ? "" : parseInt(value);
+    setInputValues(newValues);
+  };
+
+  const handleSave = () => {
+    console.log("First Year: ", inputValues[0]);
+    console.log("Second Year: ", inputValues[1]);
+    console.log("Third Year: ", inputValues[2]);
+    console.log("Fourth Year: ", inputValues[3]);
+  };
+
   return (
     <div className="flex flex-col">
       <div className="mx-auto py-10">
@@ -24,42 +45,26 @@ const InputSectionCounts = () => {
       <section className="flex justify-center">
         <div className="bg-[rgba(241,250,255,0.5)] rounded-xl shadow-[0px_2px_8px_0px_rgba(30,30,30,0.25)]">
           <div className="p-6 flex gap-32">
-            <input
-              type="number"
-              min="0"
-              max="100"
-              step="1"
-              placeholder="0"
-              className="border border-primary rounded-md w-20 p-2"
-            />
-            <input
-              type="number"
-              min="0"
-              max="100"
-              step="1"
-              placeholder="0"
-              className="border border-primary rounded-md w-20 p-2"
-            />
-            <input
-              type="number"
-              min="0"
-              max="100"
-              step="1"
-              placeholder="0"
-              className="border border-primary rounded-md w-20 p-2"
-            />
-            <input
-              type="number"
-              min="0"
-              max="100"
-              step="1"
-              placeholder="0"
-              className="border border-primary rounded-md w-20 p-2"
-            />
+            {inputValues.map((value, index) => (
+              <input
+                key={index}
+                type="number"
+                min="0"
+                max="100"
+                step="1"
+                placeholder="0"
+                className="border border-primary rounded-md w-20 p-2"
+                value={value}
+                onChange={(e) => handleInputChange(index, e.target.value)}
+              />
+            ))}
           </div>
         </div>
       </section>
-      <button className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mx-auto mt-20 mb-24">
+      <button
+        onClick={handleSave}
+        className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mx-auto mt-20 mb-24 rounded-sm"
+      >
         Save
       </button>
     </div>

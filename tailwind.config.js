@@ -16,6 +16,7 @@ export default {
         custom_yellow: "#FFCC1D",
         custom_black: "#1E1E1E",
         custom_lightblue: "rgba(241, 250, 255, 0.50)",
+        custom_skyblue: "#BFDDF6",
       },
     },
   },
