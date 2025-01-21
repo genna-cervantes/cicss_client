@@ -1,103 +1,50 @@
-import { useState, useEffect } from 'react';
-import { Timetable } from './TimeTable.tsx';
-import { schedule } from './data.ts';
+import React, { useState } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Home from "./pages/general/Home";
+import Sample from "./pages/department_chair/Sample";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { useAppContext } from "./context/AppContext";
 
-const timetableData: any = schedule;
+const App: React.FC = () => {
+  const { role } = useAppContext();
 
-const App = () => {
-  if (timetableData == null || timetableData.length < 1) {
-    return <></>;
-  }
+  const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
 
-  const [current, setCurrent] = useState('cs_1a');
-  const [data, setData] = useState<any>(timetableData[0]?.cs_1st[0]?.cs_1a ?? []);
-  console.log(data)
-  console.log(timetableData[0].cs_1st[1].cs_1a)
+  // Higher-Order Component for Authorization
+  const withAuth = <P extends object>(
+    Component: React.ComponentType<P>,
+    role: string | null,
+    redirectTo: string = "/"
+  ): React.FC<P> => {
+    return (props: P) => {
+      // Role check
+      if (role !== "department-chair") {
+        return <Navigate to={redirectTo} replace />;
+      }
 
-  const getNext = (current: any) => {
-    switch (current) {
-      case 'cs_1a':
-        console.log('hellaur')
-        setData(timetableData[0]?.cs_1st[1]?.cs_1b);
-        setCurrent('cs_1b');
-        break;
-      case 'cs_1b':
-        setData(timetableData[1]?.it_1st[0]?.it_1a);
-        setCurrent('it_1a');
-        break;
-      case 'it_1a':
-        setData(timetableData[1]?.it_1st[1]?.it_1b);
-        setCurrent('it_1b');
-        break;
-      case 'it_1b':
-        setData(timetableData[2]?.is_1st[0]?.is_1a);
-        setCurrent('is_1a');
-        break;
-      case 'is_1a':
-        setData(timetableData[2]?.is_1st[1]?.is_1b);
-        setCurrent('is_1b');
-        break;
-      case 'is_1b':
-        setData(timetableData[1]?.cs_1st[0]?.cs_1a);
-        setCurrent('cs_1a');
-        break;
-    }
-    console.log(data) 
+      return <Component {...props} />;
+    };
   };
 
-  console.log(data)
-
-  const getPrevious = (current: any) => {
-    switch (current) {
-      case 'cs_1a':
-        setData(timetableData[1]?.it_1st[1]?.it_1b);
-        setCurrent('it_1b');
-        break;
-      case 'cs_1b':
-        setData(timetableData[0]?.cs_1st[0]?.cs_1a);
-        setCurrent('cs_1a');
-        break;
-      case 'it_1a':
-        setData(timetableData[0]?.cs_1st[1]?.cs_1b);
-        setCurrent('cs_1b');
-        break;
-      case 'it_1b':
-        setData(timetableData[1]?.it_1st[0]?.it_1a);
-        setCurrent('it_1a');
-        break;
-      case 'is_1a':
-        setData(timetableData[1]?.it_1st[1]?.it_1b);
-        setCurrent('it_1b');
-        break;
-      case 'is_1b':
-        setData(timetableData[2]?.is_1st[1]?.is_1b);
-        setCurrent('is_1a');
-        break;
-    }
-  };
-
-  // Log data when it changes
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+  // Wrap the `Sample` component with `withAuth`
+  const ProtectedSample = withAuth(Sample, role);
 
   return (
-    <div className='mx-10 my-10 flex flex-col justify-between h-[600px]'>
-      <div>
-        <h1 className='font-bold text-xl'>{current}</h1>
-        <Timetable data={data} />
-      </div>
-      <div className='flex w-full justify-between'>
-        <button onClick={() => getPrevious(current)}>
-          <p className='hover:text-blue-500'>Previous</p>
-        </button>
-        <button onClick={() => getNext(current)}>
-          <p className='hover:text-blue-500'>Next</p>
-        </button>
-      </div>
-    </div>
+    <GoogleOAuthProvider clientId={clientId ?? ""}>
+      <Router>
+        <Routes>
+          {/* Protect the sample route */}
+          <Route path="/" element={<Home />} />
+          <Route path="/departmentchair" element={<ProtectedSample />} />
+        </Routes>
+      </Router>
+    </GoogleOAuthProvider>
   );
 };
 
 export default App;
-
