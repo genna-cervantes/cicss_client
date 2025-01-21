@@ -10,7 +10,9 @@ const CSB = () => {
     return <></>;
   }
 
-  const [current, setCurrent] = useState('cs_1a');
+  console.log('csb')
+
+  const [current, setCurrent] = useState('cs_1b');
   const [data, setData] = useState<any>(timetableData[0]?.cs_1st[1]?.cs_1b ?? []);
   console.log(data)
   console.log(timetableData[0].cs_1st[1].cs_1b)

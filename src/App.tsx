@@ -1,39 +1,6 @@
-// // App.tsx
-// import React from 'react';
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// import CSA from './CSA';
-// import CSB from './CSB';
-
-// // Components for demonstration
-
-
-
-// const App = () => {
-//   return (
-//     <Router>
-//       <div>
-//         {/* Navigation Links */}
-//         {/* <nav>
-//           <a href="/">Home</a> | <a href="/about">About</a> | <a href="/contact">Contact</a>
-//         </nav> */}
-
-//         {/* Route Definitions */}
-//         <Routes>
-//           <Route path="/csa" element={<CSA />} />
-//           <Route path="/csb" element={<CSB />} />
-          
-//         </Routes>
-//       </div>
-//     </Router>
-//   );
-// };
-
-// export default App;
-
 import { useState, useEffect } from 'react';
 import { Timetable } from './TimeTable.tsx';
 import { schedule } from './data.ts';
-
 
 const timetableData: any = schedule;
 
@@ -43,13 +10,14 @@ const App = () => {
   }
 
   const [current, setCurrent] = useState('cs_1a');
-  const [data, setData] = useState<any>(timetableData[0]?.cs_1st[1]?.cs_1b ?? []);
+  const [data, setData] = useState<any>(timetableData[0]?.cs_1st[0]?.cs_1a ?? []);
   console.log(data)
-  console.log(timetableData[0].cs_1st[1].cs_1b)
+  console.log(timetableData[0].cs_1st[1].cs_1a)
 
   const getNext = (current: any) => {
     switch (current) {
       case 'cs_1a':
+        console.log('hellaur')
         setData(timetableData[0]?.cs_1st[1]?.cs_1b);
         setCurrent('cs_1b');
         break;
@@ -86,7 +54,7 @@ const App = () => {
         setCurrent('it_1b');
         break;
       case 'cs_1b':
-        setData(timetableData[1]?.cs_1st[0]?.cs_1a);
+        setData(timetableData[0]?.cs_1st[0]?.cs_1a);
         setCurrent('cs_1a');
         break;
       case 'it_1a':

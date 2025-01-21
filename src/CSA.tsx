@@ -132,13 +132,9 @@ const CSA = () => {
         <Timetable data={data} />
       </div>
       <div className='flex w-full justify-between'>
-        {/* <button onClick={() => getPrevious(current)}>
-          <p className='hover:text-blue-500'>Previous</p>
-        </button> */}
+        
         <a href='/csa' className='hover:text-blue-500'>Previous</a>
-        {/* <button onClick={() => getNext(current)}>
-          <p className='hover:text-blue-500'>Next</p>
-        </button> */}
+        
         <a href='/csb' className='hover:text-blue-500'>Next</a>
       </div>
     </div>
