@@ -1,38 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
-  Route,
-  Navigate,
+  Route
 } from "react-router-dom";
 import Home from "./pages/general/Home";
-import Sample from "./pages/department_chair/Sample";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { useAppContext } from "./context/AppContext";
+import DCDashboard from "./pages/department_chair/DCDashboard";
+import StudentDashboard from "./pages/student/StudentDashboard";
+import TASDashboard from "./pages/tas/TASDashboard";
+import DCAuth from "./pages/department_chair/DCAuth";
+import TASAuth from "./pages/tas/TASAuth";
+import StudentAuth from "./pages/student/StudentAuth";
 
 const App: React.FC = () => {
-  const { role } = useAppContext();
 
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
-
-  // Higher-Order Component for Authorization
-  const withAuth = <P extends object>(
-    Component: React.ComponentType<P>,
-    role: string | null,
-    redirectTo: string = "/"
-  ): React.FC<P> => {
-    return (props: P) => {
-      // Role check
-      if (role !== "department-chair") {
-        return <Navigate to={redirectTo} replace />;
-      }
-
-      return <Component {...props} />;
-    };
-  };
-
-  // Wrap the `Sample` component with `withAuth`
-  const ProtectedSample = withAuth(Sample, role);
 
   return (
     <GoogleOAuthProvider clientId={clientId ?? ""}>
@@ -40,7 +23,29 @@ const App: React.FC = () => {
         <Routes>
           {/* Protect the sample route */}
           <Route path="/" element={<Home />} />
-          <Route path="/departmentchair" element={<ProtectedSample />} />
+          <Route path="/login" element={<Home />} />
+
+          <Route path='/departmentchair' element={<DCAuth />}>
+            <Route index element={<DCDashboard />}/>
+
+            {/* add routes for dc here */}
+            <Route path=":sectioncount" element={<div>hello</div>} />
+          </Route>
+
+          <Route path='/tas' element={<TASAuth />}>
+            <Route index element={<TASDashboard />}/>
+
+            {/* add routes for tas here */}
+            <Route path=":schedule" element={<div>tas schedule</div>} />
+          </Route>
+
+          <Route path='/student' element={<StudentAuth />}>
+            <Route index element={<StudentDashboard />}/>
+
+            {/* add routes for student here */}
+            <Route path=":schedule" element={<div>student schedule</div>} />
+          </Route>
+
         </Routes>
       </Router>
     </GoogleOAuthProvider>

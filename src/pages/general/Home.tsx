@@ -24,17 +24,19 @@ const Home = () => {
       } else {
         // redirect to dept chair view
         // write sa local storage
-        console.log('department chair')
         setRole("department-chair");
         localStorage.setItem('role', 'department-chair');
         navigate('/departmentchair')
-      }
-
-      // if prof
-      if (!checkIfCICSTAS(userInfo.email)) {
-        console.log("not cics");
-      } else {
+    }
+    
+    // if prof
+    if (!checkIfCICSTAS(userInfo.email)) {
+        console.log('not cics')
+    } else {
         // redirect to dept chair view
+        setRole("tas");
+        localStorage.setItem('role', 'tas');
+        navigate('/tas')
       }
 
       // if student
@@ -42,6 +44,9 @@ const Home = () => {
         console.log("not cics");
       } else {
         // redirect to dept chair view
+        setRole("student");
+        localStorage.setItem('role', 'student');
+        navigate('/student');
       }
     },
   });

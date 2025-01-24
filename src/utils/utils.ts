@@ -31,14 +31,23 @@ export const checkIfCICSStudent = (email: string) => {
     }
 }
 
-export const checkIfCICSTAS = (email: string) => {
+export const checkIfCICSTAS = async (email: string) => {
     try{
 
         // POST /api/tas/email 
-        // {email: email}
+        let rqBody = JSON.stringify({email})// {email: email}
 
-        // return true if may return ung query false if wala
-        // SELECT id FROM professors WHERE email = 'email'
+        let response = await fetch("localhost:8080/departmentchair/authenticate", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: rqBody
+        })
+
+        let jsRes = await response.json();
+
+        console.log(jsRes);
 
         return true;
 
@@ -47,7 +56,7 @@ export const checkIfCICSTAS = (email: string) => {
     }
 }
 
-export const checkIfCICSDepartmentChair = (email: string) => {
+export const checkIfCICSDepartmentChair = async (email: string) => {
     try{
 
         // POST /api/department-chair/email 
@@ -55,6 +64,20 @@ export const checkIfCICSDepartmentChair = (email: string) => {
 
         // return true if may return ung query false if wala
         // SELECT id FROM department_chairs WHERE email = 'email'
+
+        let rqBody = JSON.stringify({email})// {email: email}
+
+        let response = await fetch("http://localhost:8080/departmentchair/authenticate", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: rqBody
+        })
+
+        let jsRes = await response.json();
+
+        console.log(jsRes);
 
         return true;
 
