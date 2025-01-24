@@ -37,7 +37,7 @@ export const checkIfCICSTAS = async (email: string) => {
         // POST /api/tas/email 
         let rqBody = JSON.stringify({email})// {email: email}
 
-        let response = await fetch("localhost:8080/departmentchair/authenticate", {
+        let response = await fetch("http://localhost:8080/departmentchair/authenticate", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -47,9 +47,7 @@ export const checkIfCICSTAS = async (email: string) => {
 
         let jsRes = await response.json();
 
-        console.log(jsRes);
-
-        return true;
+        return jsRes.auth;
 
     }catch (error){
         console.error("Error with checking email: ", error);
@@ -77,9 +75,7 @@ export const checkIfCICSDepartmentChair = async (email: string) => {
 
         let jsRes = await response.json();
 
-        console.log(jsRes);
-
-        return true;
+        return jsRes.auth;
 
     }catch (error){
         console.error("Error with checking email: ", error);

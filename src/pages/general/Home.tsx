@@ -14,39 +14,31 @@ const Home = () => {
 
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
-      console.log(tokenResponse);
-
       let userInfo = await fetchUserInfo(tokenResponse.access_token);
 
-      // if prof
-      if (!checkIfCICSDepartmentChair(userInfo.email)) {
-        console.log("not cics");
-      } else {
+      // if department chair
+      if (await checkIfCICSDepartmentChair(userInfo.email)) {
         // redirect to dept chair view
         // write sa local storage
         setRole("department-chair");
-        localStorage.setItem('role', 'department-chair');
-        navigate('/departmentchair')
-    }
-    
-    // if prof
-    if (!checkIfCICSTAS(userInfo.email)) {
-        console.log('not cics')
-    } else {
+        localStorage.setItem("role", "department-chair");
+        navigate("/departmentchair");
+      }
+
+      // if prof
+      if (await checkIfCICSTAS(userInfo.email)) {
         // redirect to dept chair view
         setRole("tas");
-        localStorage.setItem('role', 'tas');
-        navigate('/tas')
+        localStorage.setItem("role", "tas");
+        navigate("/tas");
       }
 
       // if student
-      if (!checkIfCICSStudent(userInfo.email)) {
-        console.log("not cics");
-      } else {
+      if (checkIfCICSStudent(userInfo.email)) {
         // redirect to dept chair view
         setRole("student");
-        localStorage.setItem('role', 'student');
-        navigate('/student');
+        localStorage.setItem("role", "student");
+        navigate("/student");
       }
     },
   });

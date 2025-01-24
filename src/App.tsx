@@ -2,7 +2,8 @@ import React from "react";
 import {
   BrowserRouter as Router,
   Routes,
-  Route
+  Route,
+  Navigate
 } from "react-router-dom";
 import Home from "./pages/general/Home";
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -30,6 +31,8 @@ const App: React.FC = () => {
 
             {/* add routes for dc here */}
             <Route path=":sectioncount" element={<div>hello</div>} />
+
+            <Route path="*" element={<Navigate to="/departmentchair" replace />} />
           </Route>
 
           <Route path='/tas' element={<TASAuth />}>
@@ -37,13 +40,17 @@ const App: React.FC = () => {
 
             {/* add routes for tas here */}
             <Route path=":schedule" element={<div>tas schedule</div>} />
+
+            <Route path="*" element={<Navigate to="/tas" replace />} />
           </Route>
 
           <Route path='/student' element={<StudentAuth />}>
             <Route index element={<StudentDashboard />}/>
 
             {/* add routes for student here */}
-            <Route path=":schedule" element={<div>student schedule</div>} />
+            <Route path="schedule" element={<div>student schedule</div>} />
+
+            <Route path="*" element={<Navigate to="/student" replace />} />
           </Route>
 
         </Routes>
