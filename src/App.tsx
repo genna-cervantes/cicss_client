@@ -30,8 +30,9 @@ const App: React.FC = () => {
             <Route index element={<DCDashboard />}/>
 
             {/* add routes for dc here */}
-            <Route path=":sectioncount" element={<div>hello</div>} />
+            <Route path="sectioncount" element={<div>hello</div>} />
 
+            {/* catch all */}
             <Route path="*" element={<Navigate to="/departmentchair" replace />} />
           </Route>
 
@@ -39,7 +40,7 @@ const App: React.FC = () => {
             <Route index element={<TASDashboard />}/>
 
             {/* add routes for tas here */}
-            <Route path=":schedule" element={<div>tas schedule</div>} />
+            <Route path="schedule" element={<div>tas schedule</div>} />
 
             <Route path="*" element={<Navigate to="/tas" replace />} />
           </Route>
