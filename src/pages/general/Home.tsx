@@ -64,7 +64,7 @@ const Home = () => {
       className="w-full bg-cover bg-repeat-y bg-center h-screen overflow-hidden"
       style={{ backgroundImage: `url(${HomeBg})` }}
     >
-      <div className="flex px-36 py-[7.5rem] justify-around items-start">
+      <div className="flex px-36 py-28 justify-around items-start">
         <div>
           <div className="flex mb-10">
             <img src={USTLogo} alt="UST Logo" className="w-auto h-10" />
@@ -95,7 +95,7 @@ const Home = () => {
           </button>
         </div>
         <div>
-          <img src={CICSSLogo} alt="CICSS Logo" className="w-auto h-[470px]" />
+          <img src={CICSSLogo} alt="CICSS Logo" className="w-auto h-[480px]" />
         </div>
       </div>
       <Footer />
