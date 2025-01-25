@@ -58,13 +58,10 @@ const InputRooms = () => {
 
   const deleteRoom = (id: number) => {
     setRooms((prevRooms) => {
-      // Remove the room by ID
       const updatedRooms = prevRooms.filter((room) => room.id !== id);
-
-      // Reassign IDs based on their new position in the array
       return updatedRooms.map((room, index) => ({
         ...room,
-        id: index + 1, // Reassign id based on the new index
+        id: index + 1,
       }));
     });
   };

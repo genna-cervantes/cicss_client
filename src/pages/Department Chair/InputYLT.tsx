@@ -58,7 +58,7 @@ const InputYLT = () => {
               key={index}
               className="flex items-center gap-11 mx-auto bg-[#F1FAFF] p-5 rounded-xl shadow-md font-Manrope font-bold"
             >
-              <p>{`${index + 1}st Year`}</p>
+              <p>{`${index + 1}`}</p>
               <div>
                 <div className="flex gap-3 items-center font-Manrope font-semibold text-sm">
                   <div>Class Start</div>

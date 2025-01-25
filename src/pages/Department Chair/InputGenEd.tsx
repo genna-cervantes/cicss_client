@@ -120,17 +120,15 @@ const InputGenEd = () => {
   ) => {
     setGenEdCards((prev) =>
       prev.map((card) =>
-        card.id === profId // Find the specific card
+        card.id === profId
           ? {
               ...card,
               days: card.days.map((day) =>
-                day.id === dayId // Find the specific day
+                day.id === dayId
                   ? {
                       ...day,
                       startEndTimes: day.startEndTimes.map((se, i) =>
-                        i === index // Find the specific start-end pair
-                          ? { ...se, [field]: value } // Update either start or end
-                          : se
+                        i === index ? { ...se, [field]: value } : se
                       ),
                     }
                   : day

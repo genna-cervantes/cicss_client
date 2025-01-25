@@ -51,13 +51,10 @@ const InputCourseOfferings = () => {
 
   const removeCourse = (id: number) => {
     setCourses((prevCourses) => {
-      // Remove the course by id
       const updatedCourses = prevCourses.filter((course) => course.id !== id);
-
-      // Reassign ids to the remaining courses
       return updatedCourses.map((course, index) => ({
         ...course,
-        id: index + 1, // Reassign id based on new index
+        id: index + 1,
       }));
     });
   };
