@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 
-const InputSectionCounts = () => {
-  const [inputValues, setInputValues] = useState<(number | "")[]>(() =>
-    JSON.parse(localStorage.getItem("inputValues") || '["", "", "", ""]')
-  );
+const InputSectionCounts: React.FC = () => {
+  const [inputValues, setInputValues] = useState<(number | "")[]>(() => {
+    const storedValues = localStorage.getItem("inputValues");
+    return storedValues ? JSON.parse(storedValues) : ["", "", "", ""];
+  });
 
   useEffect(() => {
     localStorage.setItem("inputValues", JSON.stringify(inputValues));
@@ -12,15 +13,15 @@ const InputSectionCounts = () => {
 
   const handleInputChange = (index: number, value: string) => {
     const newValues = [...inputValues];
-    newValues[index] = value === "" ? "" : parseInt(value);
+    newValues[index] = value === "" ? "" : parseInt(value, 10);
     setInputValues(newValues);
   };
 
   const handleSave = () => {
-    console.log("First Year: ", inputValues[0]);
-    console.log("Second Year: ", inputValues[1]);
-    console.log("Third Year: ", inputValues[2]);
-    console.log("Fourth Year: ", inputValues[3]);
+    console.log("First Year:", inputValues[0] || "Not Set");
+    console.log("Second Year:", inputValues[1] || "Not Set");
+    console.log("Third Year:", inputValues[2] || "Not Set");
+    console.log("Fourth Year:", inputValues[3] || "Not Set");
   };
 
   return (
@@ -63,7 +64,7 @@ const InputSectionCounts = () => {
       </section>
       <button
         onClick={handleSave}
-        className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mx-auto mt-20 mb-24 rounded-sm"
+        className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mx-auto mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white"
       >
         Save
       </button>
