@@ -21,9 +21,13 @@ const App = () => {
         setData(timetableData[0]?.cs_1st[1]?.cs_1b);
         setCurrent('cs_1b');
         break;
+      // case 'cs_1b':
+      //   setData(timetableData[1]?.it_1st[0]?.it_1a);
+      //   setCurrent('it_1a');
+      //   break;
       case 'cs_1b':
-        setData(timetableData[1]?.it_1st[0]?.it_1a);
-        setCurrent('it_1a');
+        setData(timetableData[1]?.cs_2nd[0]?.cs_2a);
+        setCurrent('cs_2a');
         break;
       case 'it_1a':
         setData(timetableData[1]?.it_1st[1]?.it_1b);
@@ -38,9 +42,17 @@ const App = () => {
         setCurrent('is_1b');
         break;
       case 'is_1b':
-        setData(timetableData[1]?.cs_1st[0]?.cs_1a);
-        setCurrent('cs_1a');
+        setData(timetableData[2]?.cs_2nd[0]?.cs_2a);
+        setCurrent('cs_2a');
         break;
+      case 'cs_2a':
+        setData(timetableData[1]?.cs_2nd[1]?.cs_2b);
+        setCurrent('cs_2b');
+        break;
+      case 'cs_2b':
+          setData(timetableData[0]?.cs_1st[0]?.cs_1a);
+          setCurrent('cs_1a');
+          break;
     }
     console.log(data) 
   };

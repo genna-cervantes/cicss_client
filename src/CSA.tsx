@@ -82,8 +82,8 @@ const CSA = () => {
         setCurrent('is_1b');
         break;
       case 'is_1b':
-        setData(timetableData[0]?.cs_1st[0]?.cs_1a);
-        setCurrent('cs_1a');
+        setData(timetableData[0]?.cs_2nd[0]?.cs_2a);
+        setCurrent('cs_2a');
         break;
     }
     console.log(data) 
