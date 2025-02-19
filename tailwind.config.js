@@ -8,6 +8,7 @@ export default {
         "Akira-Expanded": ["Akira-Expanded", "sans-serif"],
         "Helvetica-Neue-Heavy": ["Helvetica-Neue-Heavy", "sans-serif"],
         Manrope: ["Manrope", "sans-serif"],
+        CyGrotesk: ["CyGrotesk", "sans-serif"],
       },
       colors: {
         primary: "#02296D",

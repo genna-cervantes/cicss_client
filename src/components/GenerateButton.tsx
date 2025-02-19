@@ -1,12 +1,15 @@
-import React from "react";
+import { NavLink } from "react-router-dom";
 
 function GenerateButton() {
   return (
     <div>
       <div>
-        <button className="w-[700px] h-[68px] bg-secondary rounded-md font-Manrope font-bold text-[30px] text-white shadow-md hover:bg-primary">
+        <NavLink
+          to="manual-edit"
+          className="px-56 py-2.5 bg-secondary rounded-md font-Manrope font-bold text-[30px] text-white shadow-md hover:bg-primary"
+        >
           Generate Schedule
-        </button>
+        </NavLink>
       </div>
     </div>
   );

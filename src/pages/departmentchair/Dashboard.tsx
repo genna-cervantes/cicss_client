@@ -39,7 +39,7 @@ const Dashboard = () => {
               Path="input-YLT"
             />
           </div>
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-10 mt-2">
             <GenerateButton />
             <div className="flex justify-between">
               <StudentChartCard />
