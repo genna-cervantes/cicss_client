@@ -1,31 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import Navbar from "../../components/Navbar";
 
+interface SectionCounts {
+  firstSC: number | "";
+  secondSC: number | "";
+  thirdSC: number | "";
+  fourthSC: number | "";
+}
+
 const InputSectionCounts: React.FC = () => {
-  const [inputValues, setInputValues] = useState<(number | "")[]>(() => {
-    const storedValues = localStorage.getItem("inputValues");
-    return storedValues ? JSON.parse(storedValues) : ["", "", "", ""];
+  const [sectionCounts, setSectionCounts] = useState<SectionCounts>({
+    firstSC: "",
+    secondSC: "",
+    thirdSC: "",
+    fourthSC: "",
   });
 
-  useEffect(() => {
-    localStorage.setItem("inputValues", JSON.stringify(inputValues));
-  }, [inputValues]);
-
-  const handleInputChange = (index: number, value: string) => {
-    const newValues = [...inputValues];
-    newValues[index] = value === "" ? "" : parseInt(value, 10);
-    setInputValues(newValues);
+  const handleSectionCountChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setSectionCounts((prevCounts) => ({
+      ...prevCounts,
+      [name]: value ? parseInt(value, 10) : "",
+    }));
   };
 
-  const handleSave = () => {
-    console.log("First Year:", inputValues[0] || "Not Set");
-    console.log("Second Year:", inputValues[1] || "Not Set");
-    console.log("Third Year:", inputValues[2] || "Not Set");
-    console.log("Fourth Year:", inputValues[3] || "Not Set");
+  const handleSave = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // get the data here
+    console.log("Submitted section counts:", sectionCounts);
   };
 
   return (
-    <div className="flex flex-col">
+    <form onSubmit={handleSave} className="flex flex-col">
       <div className="mx-auto py-10">
         <Navbar />
       </div>
@@ -43,32 +49,63 @@ const InputSectionCounts: React.FC = () => {
           <p>4th Year</p>
         </div>
       </section>
-      <section className="flex justify-center">
+      <section className="flex justify-center font-Manrope font-semibold">
         <div className="bg-[rgba(241,250,255,0.5)] rounded-xl shadow-[0px_2px_8px_0px_rgba(30,30,30,0.25)]">
           <div className="p-6 flex gap-32">
-            {inputValues.map((value, index) => (
+            <div>
               <input
-                key={index}
                 type="number"
-                min="0"
-                max="100"
-                step="1"
-                placeholder="0"
+                id="firstSC"
+                name="firstSC"
+                value={sectionCounts.firstSC}
+                onChange={handleSectionCountChange}
                 className="border border-primary rounded-md w-20 p-2"
-                value={value}
-                onChange={(e) => handleInputChange(index, e.target.value)}
+                placeholder="0"
               />
-            ))}
+            </div>
+            <div>
+              <input
+                type="number"
+                id="secondSC"
+                name="secondSC"
+                value={sectionCounts.secondSC}
+                onChange={handleSectionCountChange}
+                className="border border-primary rounded-md w-20 p-2"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <input
+                type="number"
+                id="thirdSC"
+                name="thirdSC"
+                value={sectionCounts.thirdSC}
+                onChange={handleSectionCountChange}
+                className="border border-primary rounded-md w-20 p-2"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <input
+                type="number"
+                id="fourthSC"
+                name="fourthSC"
+                value={sectionCounts.fourthSC}
+                onChange={handleSectionCountChange}
+                className="border border-primary rounded-md w-20 p-2"
+                placeholder="0"
+              />
+            </div>
           </div>
         </div>
       </section>
       <button
-        onClick={handleSave}
-        className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mx-auto mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white"
+        type="submit"
+        className="border-2 border-primary py-1 px-1 w-36 text-primary mx-auto mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white font-Manrope font-semibold"
       >
         Save
       </button>
-    </div>
+    </form>
   );
 };
 
