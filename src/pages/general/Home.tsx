@@ -10,7 +10,7 @@ import { Navigate, redirect, useNavigate } from "react-router-dom";
 
 import USTLogo from "../../assets/ust_logo.png";
 import CICSLogo from "../../assets/cics_logo.png";
-import CICSSLogo from "../../assets/cicss_logo.png";
+import CICSSLogo from "../../assets/cicss_logo_login.png";
 import HomeBg from "../../assets/home_bg.png";
 import GoogleLogo from "../../assets/google_logo.png";
 import Footer from "../../components/Footer";
@@ -39,6 +39,8 @@ const Home = () => {
         setRole("department-chair");
         localStorage.setItem("role", "department-chair");
         navigate("/departmentchair");
+
+        return;
       }
 
       // if prof
@@ -47,6 +49,8 @@ const Home = () => {
         setRole("tas");
         localStorage.setItem("role", "tas");
         navigate("/tas");
+
+        return;
       }
 
       // if student
@@ -55,6 +59,8 @@ const Home = () => {
         setRole("student");
         localStorage.setItem("role", "student");
         navigate("/student");
+
+        return;
       }
     },
   });
@@ -64,7 +70,7 @@ const Home = () => {
       className="w-full bg-cover bg-repeat-y bg-center h-screen overflow-hidden"
       style={{ backgroundImage: `url(${HomeBg})` }}
     >
-      <div className="flex px-36 py-28 justify-around items-start flex-wrap">
+      <div className="flex px-36 py-28 justify-around items-start">
         <div>
           <div className="flex mb-10">
             <img src={USTLogo} alt="UST Logo" className="w-auto h-10" />
