@@ -5,7 +5,7 @@ function GenerateButton() {
     <div>
       <div>
         <NavLink
-          to="manual-edit"
+          to="schedule-view"
           className="px-56 py-2.5 bg-secondary rounded-md font-Manrope font-bold text-[30px] text-white shadow-md hover:bg-primary"
         >
           Generate Schedule

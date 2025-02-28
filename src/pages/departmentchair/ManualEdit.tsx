@@ -133,7 +133,7 @@ const ManualEdit = () => {
           <p className="font-Helvetica-Neue-Heavy bg-custom_yellow px-3 py-1 rounded-3xl">
             Data Science
           </p>
-          <button className="">
+          <button>
             <SlArrowLeft />
           </button>
           <button>

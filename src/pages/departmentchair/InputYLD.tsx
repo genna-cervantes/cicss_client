@@ -1,41 +1,155 @@
-import React, { useRef } from "react";
+import React, { useState, FormEvent } from "react";
 import Navbar from "../../components/Navbar";
 
-const InputYLD: React.FC = () => {
-  const formRef = useRef<HTMLDivElement | null>(null);
+interface YearLevelData {
+  year: number;
+  allowedDays: {
+    M: boolean;
+    T: boolean;
+    W: boolean;
+    TH: boolean;
+    F: boolean;
+    SA: boolean;
+  };
+  maxDays: string;
+}
 
-  const handleSave = () => {
-    //get the values here
-    if (!formRef.current) return;
-    const yearLevels = Array.from(
-      formRef.current.querySelectorAll<HTMLDivElement>(".year-level")
-    );
+const InputYLD: React.FC = () => {
+  // Initialize form state
+  const [yearLevels, setYearLevels] = useState<YearLevelData[]>([
+    {
+      year: 1,
+      allowedDays: {
+        M: false,
+        T: false,
+        W: false,
+        TH: false,
+        F: false,
+        SA: false,
+      },
+      maxDays: "",
+    },
+    {
+      year: 2,
+      allowedDays: {
+        M: false,
+        T: false,
+        W: false,
+        TH: false,
+        F: false,
+        SA: false,
+      },
+      maxDays: "",
+    },
+    {
+      year: 3,
+      allowedDays: {
+        M: false,
+        T: false,
+        W: false,
+        TH: false,
+        F: false,
+        SA: false,
+      },
+      maxDays: "",
+    },
+    {
+      year: 4,
+      allowedDays: {
+        M: false,
+        T: false,
+        W: false,
+        TH: false,
+        F: false,
+        SA: false,
+      },
+      maxDays: "",
+    },
+  ]);
+
+  // Handle checkbox change
+  const handleDayChange = (
+    yearIndex: number,
+    day: keyof YearLevelData["allowedDays"]
+  ) => {
+    setYearLevels((prevState) => {
+      const newState = [...prevState];
+      newState[yearIndex] = {
+        ...newState[yearIndex],
+        allowedDays: {
+          ...newState[yearIndex].allowedDays,
+          [day]: !newState[yearIndex].allowedDays[day],
+        },
+      };
+      return newState;
+    });
+  };
+
+  // Handle max days input change
+  const handleMaxDaysChange = (yearIndex: number, value: string) => {
+    setYearLevels((prevState) => {
+      const newState = [...prevState];
+      newState[yearIndex] = {
+        ...newState[yearIndex],
+        maxDays: value,
+      };
+      return newState;
+    });
+  };
+
+  // Handle form submission
+  const handleSave = (e: FormEvent) => {
+    e.preventDefault();
 
     const results = yearLevels.map((level) => {
-      const year =
-        level.querySelector<HTMLParagraphElement>(".year-label")?.textContent ||
-        "Unknown";
-      const checkboxes = Array.from(
-        level.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')
-      );
-      const maxInput = level.querySelector<HTMLInputElement>(
-        'input[type="number"]'
-      );
+      const checkedDays = Object.entries(level.allowedDays)
+        .filter(([_, isChecked]) => isChecked)
+        .map(([day]) => day);
 
-      const checkedDays = checkboxes
-        .filter((checkbox) => checkbox.checked)
-        .map(
-          (checkbox) =>
-            checkbox.previousElementSibling?.textContent?.trim() || "Unknown"
-        );
-
-      const maxValue = maxInput?.value || "Not Set";
-
-      return { year, checkedDays, maxValue };
+      return {
+        year: `Year Level ${level.year}`,
+        checkedDays,
+        maxValue: level.maxDays || "Not Set",
+      };
     });
 
-    console.log("Results:", results);
+    console.log("Year Level 1: ");
+    console.log(
+      "   Checked Days: ",
+      results[0].checkedDays.join(", ") || "None"
+    );
+    console.log("   Max Days: ", results[0].maxValue);
+
+    console.log("Year Level 2: ");
+    console.log(
+      "   Checked Days: ",
+      results[1].checkedDays.join(", ") || "None"
+    );
+    console.log("   Max Days: ", results[1].maxValue);
+
+    console.log("Year Level 3: ");
+    console.log(
+      "   Checked Days: ",
+      results[2].checkedDays.join(", ") || "None"
+    );
+    console.log("   Max Days: ", results[2].maxValue);
+
+    console.log("Year Level 4: ");
+    console.log(
+      "   Checked Days: ",
+      results[3].checkedDays.join(", ") || "None"
+    );
+    console.log("   Max Days: ", results[3].maxValue);
   };
+  // Array of day labels
+  const days: Array<keyof YearLevelData["allowedDays"]> = [
+    "M",
+    "T",
+    "W",
+    "TH",
+    "F",
+    "SA",
+  ];
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -58,44 +172,55 @@ const InputYLD: React.FC = () => {
           Maximum Days Of <br /> Recurrence
         </p>
       </div>
-      <section ref={formRef} className="flex flex-col mx-auto">
-        {[1, 2, 3, 4].map((level) => (
-          <div
-            key={level}
-            className="flex gap-20 items-center bg-[rgba(241,250,255,0.5)] rounded-xl p-9 shadow-lg mb-5 year-level"
-          >
-            <p className="year-label">Year Level {level}</p>
-            <div className="flex">
-              <div className="flex gap-5 font-Manrope font-semibold">
-                {["M", "T", "W", "TH", "F", "SA"].map((day) => (
-                  <div key={day} className="flex gap-2 items-center">
-                    <p>{day}</p>
-                    <input
-                      type="checkbox"
-                      className="w-7 h-7 border border-primary"
-                    />
-                  </div>
-                ))}
+
+      <form onSubmit={handleSave} className="flex flex-col mx-auto">
+        <section>
+          {yearLevels.map((level, index) => (
+            <div
+              key={index}
+              className="flex gap-20 items-center bg-[rgba(241,250,255,0.5)] rounded-xl p-9 shadow-lg mb-5 year-level"
+            >
+              <p className="year-label">Year Level {level.year}</p>
+              <div className="flex">
+                <div className="flex gap-5 font-Manrope font-semibold">
+                  {days.map((day) => (
+                    <div key={day} className="flex gap-2 items-center">
+                      <p>{day}</p>
+                      <input
+                        type="checkbox"
+                        className="w-7 h-7 border border-primary"
+                        checked={level.allowedDays[day]}
+                        onChange={() => handleDayChange(index, day)}
+                        id={`checkbox-${level.year}-${day}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-2 items-center">
+                <p>Max</p>
+                <input
+                  type="number"
+                  className="w-24 h-7 border border-primary rounded-sm p-2"
+                  value={level.maxDays}
+                  onChange={(e) => handleMaxDaysChange(index, e.target.value)}
+                  min="0"
+                  max="7"
+                />
               </div>
             </div>
-            <div className="flex gap-2 items-center">
-              <p>Max</p>
-              <input
-                type="number"
-                className="w-24 h-7 border border-primary rounded-sm p-2"
-              />
-            </div>
-          </div>
-        ))}
-      </section>
-      <div className="flex mx-auto">
-        <button
-          className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-11 mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md"
-          onClick={handleSave}
-        >
-          Save
-        </button>
-      </div>
+          ))}
+        </section>
+
+        <div className="flex mx-auto">
+          <button
+            type="submit"
+            className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-11 mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md"
+          >
+            Save
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

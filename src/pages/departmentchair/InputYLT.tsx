@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import Navbar from "../../components/Navbar";
 
 type YearLevels = {
@@ -6,6 +6,13 @@ type YearLevels = {
   secondYear: { startTime: string; endTime: string };
   thirdYear: { startTime: string; endTime: string };
   fourthYear: { startTime: string; endTime: string };
+};
+
+const yearLevelNames: Record<keyof YearLevels, string> = {
+  firstYear: "1st Year",
+  secondYear: "2nd Year",
+  thirdYear: "3rd Year",
+  fourthYear: "4th Year",
 };
 
 const InputYLT = () => {
@@ -27,15 +34,18 @@ const InputYLT = () => {
     });
   };
 
-  const handleSave = () => {
-    //get the values here
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+
     console.log("Year Level Times:");
-    Object.keys(yearLevels).forEach((year) => {
-      const yearKey = year as keyof YearLevels; // Cast to keyof YearLevels
+    Object.entries(yearLevels).forEach(([year, times]) => {
+      const yearKey = year as keyof YearLevels;
       console.log(
-        `${yearKey}: Start Time - ${yearLevels[yearKey].startTime}, End Time - ${yearLevels[yearKey].endTime}`
+        `${yearLevelNames[yearKey]}: Start Time - ${times.startTime}, End Time - ${times.endTime}`
       );
     });
+
+    // Here you would typically send the data to your backend
   };
 
   return (
@@ -51,57 +61,56 @@ const InputYLT = () => {
           1st Semester A.Y 2025-2026
         </div>
       </section>
-      <section className="flex flex-col gap-5 mt-11">
-        {["firstYear", "secondYear", "thirdYear", "fourthYear"].map(
-          (year, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-11 mx-auto bg-[#F1FAFF] p-5 rounded-xl shadow-md font-Manrope font-bold"
-            >
-              <p>{`${index + 1}`}</p>
-              <div>
-                <div className="flex gap-3 items-center font-Manrope font-semibold text-sm">
-                  <div>Class Start</div>
-                  <input
-                    type="time"
-                    value={yearLevels[year as keyof YearLevels].startTime}
-                    onChange={(e) =>
-                      handleTimeChange(
-                        year as keyof YearLevels,
-                        "startTime",
-                        e.target.value
-                      )
-                    }
-                    className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                  />
-                  <div>Class End</div>
-                  <input
-                    type="time"
-                    value={yearLevels[year as keyof YearLevels].endTime}
-                    onChange={(e) =>
-                      handleTimeChange(
-                        year as keyof YearLevels,
-                        "endTime",
-                        e.target.value
-                      )
-                    }
-                    className="h-[38px] w-[130px] border border-primary rounded-[5px] py-1 px-2"
-                  />
+
+      <form onSubmit={handleSubmit}>
+        <section className="flex flex-col gap-5 mt-11">
+          {(Object.keys(yearLevels) as Array<keyof YearLevels>).map(
+            (year, index) => (
+              <div
+                key={year}
+                className="flex items-center gap-11 mx-auto bg-[#F1FAFF] p-5 rounded-xl shadow-md font-Manrope font-bold"
+              >
+                <p className="w-8">{index + 1}</p>
+                <div>
+                  <div className="flex gap-3 items-center font-Manrope font-semibold text-sm">
+                    <label htmlFor={`${year}-start`}>Class Start</label>
+                    <input
+                      id={`${year}-start`}
+                      type="time"
+                      value={yearLevels[year].startTime}
+                      onChange={(e) =>
+                        handleTimeChange(year, "startTime", e.target.value)
+                      }
+                      className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                      required
+                    />
+                    <label htmlFor={`${year}-end`}>Class End</label>
+                    <input
+                      id={`${year}-end`}
+                      type="time"
+                      value={yearLevels[year].endTime}
+                      onChange={(e) =>
+                        handleTimeChange(year, "endTime", e.target.value)
+                      }
+                      className="h-[38px] w-[130px] border border-primary rounded-[5px] py-1 px-2"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
-            </div>
-          )
-        )}
-      </section>
+            )
+          )}
+        </section>
 
-      <div className="flex mx-auto">
-        <button
-          onClick={handleSave}
-          className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-11 mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md"
-        >
-          Save
-        </button>
-      </div>
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-11 mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md"
+          >
+            Save
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
