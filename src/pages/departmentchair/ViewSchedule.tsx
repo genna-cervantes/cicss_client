@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
+import GeneratedScheduleCalendar from "./GeneratedScheduleCalendar";
 
 const ViewSchedule = () => {
+  //Section Info
   const sections = [
     { code: "3CSA", label: "Core Computer Science" },
     { code: "3CSB", label: "Game Development" },
@@ -11,24 +13,63 @@ const ViewSchedule = () => {
     { code: "3CSF", label: "Data Science" },
   ];
 
-  // State to track the current section index
-  const [currentIndex, setCurrentIndex] = useState(0);
+  //Room Info
+  const rooms = [
+    { roomCode: "1901" },
+    { roomCode: "1902" },
+    { roomCode: "1903" },
+    { roomCode: "1904" },
+    { roomCode: "1905" },
+    { roomCode: "1906" },
+  ];
+
+  const professors = [
+    { profName: "Jonathan Cabero" },
+    { profName: "Jessie James Suarez" },
+    { profName: "Mia Eleazar" },
+    { profName: "Lawrence Decamora" },
+  ];
 
   // State to track the current filter
   const [currentFilter, setCurrentFilter] = useState("Section");
 
-  // Navigate to the previous section
+  // State to track indices for each category
+  const [sectionIndex, setSectionIndex] = useState(0);
+  const [roomIndex, setRoomIndex] = useState(0);
+  const [professorIndex, setProfessorIndex] = useState(0);
+
+  // Helper function to navigate to previous item based on current filter
   const goToPrevious = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex > 0 ? prevIndex - 1 : sections.length - 1
-    );
+    if (currentFilter === "Section") {
+      setSectionIndex((prevIndex) =>
+        prevIndex > 0 ? prevIndex - 1 : sections.length - 1
+      );
+    } else if (currentFilter === "Room") {
+      setRoomIndex((prevIndex) =>
+        prevIndex > 0 ? prevIndex - 1 : rooms.length - 1
+      );
+    } else if (currentFilter === "Professor") {
+      setProfessorIndex((prevIndex) =>
+        prevIndex > 0 ? prevIndex - 1 : professors.length - 1
+      );
+    }
   };
 
-  // Navigate to the next section
+  // Helper function to navigate to next item based on current filter
   const goToNext = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex < sections.length - 1 ? prevIndex + 1 : 0
-    );
+    if (currentFilter === "Section") {
+      setSectionIndex((prevIndex) =>
+        prevIndex < sections.length - 1 ? prevIndex + 1 : 0
+      );
+    } else if (currentFilter === "Room") {
+      setRoomIndex((prevIndex) =>
+        prevIndex < rooms.length - 1 ? prevIndex + 1 : 0
+      );
+    } else if (currentFilter === "Professor") {
+      setProfessorIndex((prevIndex) =>
+        prevIndex < professors.length - 1 ? prevIndex + 1 : 0
+      );
+    }
   };
 
   // Change the current filter
@@ -36,37 +77,83 @@ const ViewSchedule = () => {
     setCurrentFilter(filter);
   };
 
-  // Get the current section data
-  const currentSection = sections[currentIndex];
+  // Determine what to display based on the current filter
+  const getCurrentDisplayInfo = () => {
+    if (currentFilter === "Section") {
+      return {
+        code: sections[sectionIndex].code,
+        label: sections[sectionIndex].label,
+      };
+    } else if (currentFilter === "Room") {
+      return {
+        code: `Room ${rooms[roomIndex].roomCode}`,
+        label: "", // Empty label for Room view
+      };
+    } else {
+      return {
+        code: professors[professorIndex].profName,
+        label: "", // Empty label for Professor view
+      };
+    }
+  };
 
-  interface SelectOption {
-    value: number;
-    label: string;
-  }
+  // Get appropriate options for the dropdown based on current filter
+  const getDropdownOptions = () => {
+    if (currentFilter === "Section") {
+      return sections.map((section, index) => ({
+        value: index,
+        label: section.code,
+      }));
+    } else if (currentFilter === "Room") {
+      return rooms.map((room, index) => ({
+        value: index,
+        label: `Room ${room.roomCode}`,
+      }));
+    } else {
+      return professors.map((prof, index) => ({
+        value: index,
+        label: prof.profName,
+      }));
+    }
+  };
 
-  const selectOptions: SelectOption[] = sections.map((section, index) => ({
-    value: index,
-    label: section.code,
-  }));
+  // Handler for dropdown change
+  const handleDropdownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = Number(e.target.value);
+    if (currentFilter === "Section") {
+      setSectionIndex(value);
+    } else if (currentFilter === "Room") {
+      setRoomIndex(value);
+    } else if (currentFilter === "Professor") {
+      setProfessorIndex(value);
+    }
+  };
+
+  const currentDisplayInfo = getCurrentDisplayInfo();
+  const dropdownOptions = getDropdownOptions();
 
   return (
-    <div className="w-full bg-transparent py-4 px-16">
+    <div className="w-full bg-transparent py-4 px-16 ">
       <div className="flex items-center justify-between">
-        {/* Section Code and Label */}
+        {/* Display Info Based on Current Filter */}
         <div className="flex items-center gap-3">
           <div className="font-CyGrotesk text-primary text-[40px]">
-            {currentSection.code}
+            {currentDisplayInfo.code}
           </div>
-          <div className="font-Helvetica-Neue-Heavy bg-custom_yellow px-3 py-1 rounded-3xl">
-            {currentSection.label}
-          </div>
+
+          {/* Only show label for Section view */}
+          {currentFilter === "Section" && (
+            <div className="font-Helvetica-Neue-Heavy bg-custom_yellow px-3 py-1 rounded-3xl">
+              {currentDisplayInfo.label}
+            </div>
+          )}
 
           {/* Navigation Arrows */}
           <div className="flex items-center space-x-2">
             <button
               className="flex items-center justify-center text-primary"
               onClick={goToPrevious}
-              aria-label="Previous section"
+              aria-label="Previous item"
             >
               <span aria-hidden="true">
                 <SlArrowLeft style={{ strokeWidth: "3" }} />
@@ -75,7 +162,7 @@ const ViewSchedule = () => {
             <button
               className="flex items-center justify-center text-primary font-extrabold"
               onClick={goToNext}
-              aria-label="Next section"
+              aria-label="Next item"
             >
               <span aria-hidden="true">
                 <SlArrowRight style={{ strokeWidth: "3" }} />
@@ -109,7 +196,7 @@ const ViewSchedule = () => {
               By Professor
             </button>
             <button
-              className={`px-3 py-1 text-sm rounded-md  ${
+              className={`px-3 py-1 text-sm rounded-md ${
                 currentFilter === "Room"
                   ? "bg-white text-primary"
                   : "text-white"
@@ -120,19 +207,29 @@ const ViewSchedule = () => {
             </button>
           </div>
 
-          {/* Dropdown Selector */}
+          {/* Dropdown Selector - Dynamic based on current filter */}
           <div className="relative inline-block">
             <select
               className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
-              value={currentIndex}
-              onChange={(e) => setCurrentIndex(Number(e.target.value))}
+              value={
+                currentFilter === "Section"
+                  ? sectionIndex
+                  : currentFilter === "Room"
+                  ? roomIndex
+                  : professorIndex
+              }
+              onChange={handleDropdownChange}
             >
               <option value="" disabled>
-                Select a Section
+                {`Select a ${currentFilter}`}
               </option>
-              {sections.map((section, index) => (
-                <option key={index} value={index} className="py-2">
-                  {section.code}
+              {dropdownOptions.map((option, index) => (
+                <option
+                  key={index}
+                  value={option.value}
+                  className="py-2 font-Manrope font-semibold"
+                >
+                  {option.label}
                 </option>
               ))}
             </select>
@@ -148,6 +245,20 @@ const ViewSchedule = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <GeneratedScheduleCalendar />
+      </div>
+      <div className="flex space-x-4 font-Manrope font-semibold justify-center mt-[500px]">
+        <button className="bg-primary text-white w-[150px] py-1 rounded-md">
+          Regenerate
+        </button>
+        <button className="bg-primary text-white w-[150px] py-1 rounded-md">
+          Draft
+        </button>
+        <button className="bg-[#FFBA21] text-[#444444] border border-[#444444] w-[150px] py-1 rounded-md">
+          Lock Schedule
+        </button>
       </div>
     </div>
   );

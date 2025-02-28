@@ -13,7 +13,6 @@ const Dashboard = () => {
   // Check screen width on mount and when window resizes
   useEffect(() => {
     const checkScreenSize = () => {
-      // Based on your screenshot, we need to detect when width is below a certain threshold
       setIsMinimized(window.innerWidth < 1500);
     };
 

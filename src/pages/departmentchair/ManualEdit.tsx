@@ -127,51 +127,6 @@ const ManualEdit = () => {
 
   return (
     <div>
-      <div className="flex ml-16 mr-16 items-center justify-between">
-        <div className="flex items-center gap-8">
-          <p className="font-CyGrotesk text-primary text-[40px]">3CSF</p>
-          <p className="font-Helvetica-Neue-Heavy bg-custom_yellow px-3 py-1 rounded-3xl">
-            Data Science
-          </p>
-          <button>
-            <SlArrowLeft />
-          </button>
-          <button>
-            <SlArrowRight />
-          </button>
-        </div>
-        <div className="flex items-center gap-s">
-          <div className="bg-primary font-Manrope p-2 space-x-5 text-[13px] rounded-lg">
-            <NavLink
-              to="/departmentchair/input-ylt"
-              className={({ isActive }) =>
-                isActive ? "text-primary bg-white p-1 rounded-sm" : "text-white"
-              }
-            >
-              By Section
-            </NavLink>
-            <NavLink
-              to="/departmentchair/input-ylt"
-              className={({ isActive }) =>
-                isActive ? "text-primary bg-white p-1 rounded-sm" : "text-white"
-              }
-            >
-              By Professor
-            </NavLink>
-            <NavLink
-              to="/departmentchair/input-ylt"
-              className={({ isActive }) =>
-                isActive ? "text-primary bg-white p-1 rounded-sm" : "text-white"
-              }
-            >
-              By Room
-            </NavLink>
-          </div>
-          <div>
-            <Select />
-          </div>
-        </div>
-      </div>
       <ScheduleXCalendar calendarApp={calendar} />
     </div>
   );
