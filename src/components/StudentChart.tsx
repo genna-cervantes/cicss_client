@@ -60,7 +60,7 @@ const StudentChart: React.FC<StudentChartProps> = ({
   };
 
   return (
-    <div className="w-[90%] h-[90%] mx-auto">
+    <div className="w-48 h-48 mx-auto">
       <Doughnut data={data} options={options} />
     </div>
   );

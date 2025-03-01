@@ -121,7 +121,7 @@ const InputRooms = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-hidden">
       <div className="mx-auto py-10">
         <Navbar />
       </div>

@@ -71,7 +71,7 @@ const TeacherChart: React.FC<TeacherChartProps> = ({
 
   return (
     <div>
-      <div className="w-[180px] h-[173.5px] mx-auto">
+      <div className="w-48 h-48 mx-auto">
         <Bar data={data} options={options}></Bar>
       </div>
     </div>

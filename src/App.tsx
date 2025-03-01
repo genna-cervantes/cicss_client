@@ -23,6 +23,8 @@ import InputYLD from "./pages/departmentchair/InputYLD";
 import InputYLT from "./pages/departmentchair/InputYLT";
 import ManualEdit from "./pages/departmentchair/ManualEdit";
 import ViewSchedule from "./pages/departmentchair/ViewSchedule";
+import SchedulePublishing from "./pages/departmentchair/SchedulePublishing";
+import ScheduleReadiness from "./pages/departmentchair/ScheduleReadiness";
 
 const App: React.FC = () => {
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
@@ -53,7 +55,11 @@ const App: React.FC = () => {
             <Route path="input-yld" element={<InputYLD />} />
             <Route path="input-ylt" element={<InputYLT />} />
             <Route path="schedule-view" element={<ViewSchedule />} />
-            <Route path="manual-edit" element={<ManualEdit />} />
+            <Route
+              path="schedule-publishing"
+              element={<SchedulePublishing />}
+            />
+            <Route path="schedule-readiness" element={<ScheduleReadiness />} />
 
             {/* catch all */}
             <Route

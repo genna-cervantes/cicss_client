@@ -166,7 +166,6 @@ const CourseSchedule: React.FC = () => {
   const days: string[] = ["MON", "TUE", "WED", "THURS", "FRI", "SAT"];
   const hours: TimeFormat[] = [];
   const cellHeight = 32; // Each cell is 32px high
-  const errorLogLimit = 10; // Maximum number of error logs to show
 
   // Generate hours from 7am to 9pm
   for (let hour = 7; hour <= 21; hour++) {
@@ -196,19 +195,27 @@ const CourseSchedule: React.FC = () => {
 
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // Convert time string to position
+  // Convert time string to position in cells (key updated function)
   const getPositionFromTime = (time: string): number => {
     const [hours, minutes] = time.split(":").map(Number);
-    // Calculate blocks position precisely based on hours and minutes
+    // Calculate position in half-hour increments (cells)
     return (hours - 7) * 2 + minutes / 30;
   };
 
-  // Get height based on time difference (adjusted to include the exact end time cell)
+  // Get top position in pixels
+  const getTopPosition = (time: string): number => {
+    return getPositionFromTime(time) * cellHeight;
+  };
+
+  // FIXED: Calculate proper height for blocks that ends exactly at the cell
   const getBlockHeight = (startTime: string, endTime: string): number => {
-    const startPosition = getPositionFromTime(startTime);
-    // Calculate to include the end time exactly
-    const endPosition = getPositionFromTime(endTime);
-    return endPosition * cellHeight - startPosition * cellHeight;
+    // Calculate the difference in half-hour increments
+    const startTimeValue = getPositionFromTime(startTime);
+    const endTimeValue = getPositionFromTime(endTime);
+
+    // The key fix: use exact cell positions rather than calculating differences
+    // This ensures blocks end exactly at the grid line of their end time
+    return (endTimeValue - startTimeValue) * cellHeight;
   };
 
   // Get time from grid position, snapped to half-hour increments
@@ -245,8 +252,8 @@ const CourseSchedule: React.FC = () => {
         timestamp: new Date(),
       };
 
-      // Add to beginning of array and limit number of logs
-      const updatedLogs = [newLog, ...prevLogs].slice(0, errorLogLimit);
+      // Add to beginning of array
+      const updatedLogs = [newLog, ...prevLogs].slice(0);
 
       // Show terminal
       setShowTerminal(true);
@@ -255,14 +262,13 @@ const CourseSchedule: React.FC = () => {
     });
   };
 
-  // Check for time overlap
-  const hasOverlap = (
+  // Check for time overlap and return conflict blocks if any
+  const checkOverlap = (
     day: string,
     startTime: string,
     endTime: string,
     blockId: number
-  ): boolean => {
-    let hasConflict = false;
+  ): CourseBlock[] => {
     let conflictBlocks: CourseBlock[] = [];
 
     scheduleBlocks.forEach((block) => {
@@ -279,28 +285,11 @@ const CourseSchedule: React.FC = () => {
         (newStart <= blockStart && newEnd >= blockEnd);
 
       if (overlap) {
-        hasConflict = true;
         conflictBlocks.push(block);
       }
     });
 
-    // Log errors for conflicts
-    if (hasConflict) {
-      const errorInfo = conflictBlocks
-        .map(
-          (block) =>
-            `Block #${block.id} <${block.courseCode}> (${
-              block.day
-            } ${formatTimeForDisplay(block.startTime)}-${formatTimeForDisplay(
-              block.endTime
-            )})`
-        )
-        .join(", ");
-
-      logError(`Overlap detected: Schedule block conflicts with ${errorInfo}`);
-    }
-
-    return hasConflict;
+    return conflictBlocks;
   };
 
   const handleDragStart = (
@@ -323,6 +312,8 @@ const CourseSchedule: React.FC = () => {
     e.dataTransfer.setDragImage(img, 0, 0);
   };
 
+  const [hasOverlapWarning, setHasOverlapWarning] = useState<boolean>(false);
+
   const handleDragOver = (
     e: React.DragEvent<HTMLDivElement>,
     day: string
@@ -340,12 +331,49 @@ const CourseSchedule: React.FC = () => {
       day,
       top: adjustedY,
     });
+
+    // Calculate potential new time positions
+    const newStartTime = getTimeFromPosition(adjustedY);
+
+    // Calculate duration of the block in half-hour increments
+    const originalStartPos = getPositionFromTime(draggedBlock.startTime);
+    const originalEndPos = getPositionFromTime(draggedBlock.endTime);
+    const durationInHalfHours = originalEndPos - originalStartPos;
+
+    // Calculate new end time
+    const newStartPos = getPositionFromTime(newStartTime);
+    const newEndPos = newStartPos + durationInHalfHours;
+
+    // Convert to hours and minutes
+    const endHours = Math.floor(newEndPos / 2) + 7;
+    const endMins = (newEndPos % 2) * 30;
+
+    let newEndTime = `${endHours.toString().padStart(2, "0")}:${endMins
+      .toString()
+      .padStart(2, "0")}`;
+
+    // Ensure block doesn't go beyond the schedule
+    if (endHours > 21 || (endHours === 21 && endMins > 0)) {
+      newEndTime = "21:00";
+    }
+
+    // Check for potential overlap and set warning state
+    // Only set the visual indicator but don't log errors during drag
+    const conflictBlocks = checkOverlap(
+      day,
+      newStartTime,
+      newEndTime,
+      draggedBlock.id
+    );
+    setHasOverlapWarning(conflictBlocks.length > 0);
   };
 
+  // Make sure to reset the warning state when drag ends
   const handleDragEnd = (): void => {
     setDraggedBlock(null);
     setDragInfo(null);
     setGhostPosition(null);
+    setHasOverlapWarning(false);
   };
 
   const handleDrop = (
@@ -384,20 +412,30 @@ const CourseSchedule: React.FC = () => {
       newEndTime = "21:00";
     }
 
-    // Check for overlap
-    if (hasOverlap(day, newStartTime, newEndTime, draggedBlock.id)) {
-      // Error messages are now handled by the hasOverlap function
+    // Check for overlap - only log errors at drop time
+    const conflictBlocks = checkOverlap(
+      day,
+      newStartTime,
+      newEndTime,
+      draggedBlock.id
+    );
+
+    if (conflictBlocks.length > 0) {
+      // Log errors only when user tries to drop with conflicts
+      const errorInfo = conflictBlocks
+        .map(
+          (block) =>
+            `Block #${block.id} <${block.courseCode}> (${
+              block.day
+            } ${formatTimeForDisplay(block.startTime)}-${formatTimeForDisplay(
+              block.endTime
+            )})`
+        )
+        .join(", ");
+
+      logError(`Overlap detected: Schedule block conflicts with ${errorInfo}`);
       return;
     }
-
-    // Log successful move
-    logError(
-      `Moved Block #${draggedBlock.id} <${
-        draggedBlock.courseCode
-      }> to ${day} ${formatTimeForDisplay(newStartTime)}-${formatTimeForDisplay(
-        newEndTime
-      )}`
-    );
 
     // Update the block
     setScheduleBlocks((prevBlocks) =>
@@ -413,24 +451,13 @@ const CourseSchedule: React.FC = () => {
     setGhostPosition(null);
   };
 
-  // Format timestamp for error logs
-  const formatTimestamp = (date: Date): string => {
-    return date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
-  };
-
   return (
-    <div className="w-full max-w-6xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Weekly Course Schedule</h1>
-
+    <div className="w-full max-w-full mx-auto p-4">
       {/* Terminal-style error log display */}
       {showTerminal && (
         <div className="mb-4 relative">
           <div className="bg-gray-900 text-gray-100 p-2 rounded-t flex justify-between items-center">
-            <span className="font-mono text-sm">Terminal Output</span>
+            <span className="font-mono text-sm">Terminal</span>
             <div className="flex space-x-2">
               <button
                 onClick={() => setErrorLogs([])}
@@ -455,9 +482,6 @@ const CourseSchedule: React.FC = () => {
                   key={log.id}
                   className="mb-1 border-b border-gray-700 pb-1"
                 >
-                  <span className="text-gray-500">
-                    [{formatTimestamp(log.timestamp)}]
-                  </span>{" "}
                   {log.message}
                 </div>
               ))
@@ -467,15 +491,17 @@ const CourseSchedule: React.FC = () => {
       )}
 
       <div className="overflow-x-auto">
-        <div className="grid grid-cols-7 bg-white border border-gray-200">
-          <div className="col-span-1 border-r border-b border-gray-200 p-2 bg-gray-50">
-            <div className="h-8"></div>
+        <div className="grid grid-cols-7 bg-[#E0EFFA] border border-primary">
+          <div className="col-span-1 border-r border-b border-primary p-2 bg-[#E0EFFA]">
+            <div className="h-8 text-center font-Manrope font-bold text-primary">
+              Time
+            </div>
           </div>
 
           {days.map((day) => (
             <div
               key={day}
-              className="col-span-1 border-r border-b border-gray-200 p-2 text-center bg-gray-50"
+              className="col-span-1 border-r border-b border-primary p-2 text-center bg-[#E0EFFA] text-primary font-Manrope font-bold flex justify-center"
               onDragOver={(e) => handleDragOver(e, day)}
               onDrop={(e) => handleDrop(e, day)}
             >
@@ -484,11 +510,11 @@ const CourseSchedule: React.FC = () => {
           ))}
 
           <div ref={gridRef} className="col-span-7 grid grid-cols-7">
-            <div className="col-span-1 border-r border-gray-200">
+            <div className="col-span-1 border-r border-primary">
               {hours.map((hour, index) => (
                 <div
                   key={index}
-                  className="h-8 border-b border-gray-200 text-sm text-right pr-2 text-gray-600"
+                  className="h-8 border-b border-transparent text-sm text-right pr-2 text-primary font-Manrope font-bold"
                 >
                   {hour.display}
                 </div>
@@ -498,7 +524,7 @@ const CourseSchedule: React.FC = () => {
             {days.map((day) => (
               <div
                 key={day}
-                className="col-span-1 border-r border-gray-200 relative"
+                className="col-span-1 border-r border-primary relative"
                 onDragOver={(e) => handleDragOver(e, day)}
                 onDrop={(e) => handleDrop(e, day)}
                 onDragEnd={handleDragEnd}
@@ -506,14 +532,14 @@ const CourseSchedule: React.FC = () => {
                 {hours.map((_, index) => (
                   <div
                     key={index}
-                    className="h-8 border-b border-gray-200"
+                    className="h-8 border-b border-primary"
                   ></div>
                 ))}
 
                 {/* Ghost block when dragging */}
                 {ghostPosition && ghostPosition.day === day && draggedBlock && (
                   <div
-                    className={`absolute ${draggedBlock.color} p-1 w-full border border-gray-400 rounded shadow-sm overflow-hidden opacity-50`}
+                    className={`absolute ${draggedBlock.color} p-1 w-full rounded shadow-sm overflow-hidden opacity-50`}
                     style={{
                       top: `${
                         Math.floor(ghostPosition.top / cellHeight) * cellHeight
@@ -526,6 +552,8 @@ const CourseSchedule: React.FC = () => {
                       right: "0px",
                       pointerEvents: "none",
                       borderStyle: "dashed",
+                      borderWidth: "2px",
+                      borderColor: hasOverlapWarning ? "red" : "gray-400",
                     }}
                   >
                     <div className="text-xs font-bold">
@@ -535,15 +563,13 @@ const CourseSchedule: React.FC = () => {
                     <div className="text-xs">{draggedBlock.labLec}</div>
                   </div>
                 )}
-
                 {scheduleBlocks
                   .filter((block) => block.day === day)
                   .map((block) => {
-                    // Calculate precise positioning based on time
-                    const startPosition = getPositionFromTime(block.startTime);
-                    const top = startPosition * cellHeight;
+                    // Get precise top position based on start time
+                    const top = getTopPosition(block.startTime);
 
-                    // Calculate height to exactly include the end time cell
+                    // Calculate correct height
                     const height = getBlockHeight(
                       block.startTime,
                       block.endTime

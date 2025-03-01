@@ -5,7 +5,7 @@ const Greeting = ({ userName }: { userName: String }) => {
     <div>
       <div>
         <div className="flex gap-7 items-center">
-          <h1 className="font-Helvetica-Neue-Heavy text-5xl">
+          <h1 className="font-Helvetica-Neue-Heavy text-5xl md:whitespace-nowrap">
             <div className="flex gap-3">
               <div className="text-primary">Hello, </div>{" "}
               <div className="text-secondary">{userName}</div>

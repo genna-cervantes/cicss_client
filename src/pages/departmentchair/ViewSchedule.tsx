@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import GeneratedScheduleCalendar from "./GeneratedScheduleCalendar";
+import { useNavigate } from "react-router-dom";
 
 const ViewSchedule = () => {
+  const navigate = useNavigate();
   //Section Info
   const sections = [
     { code: "3CSA", label: "Core Computer Science" },
@@ -134,9 +136,9 @@ const ViewSchedule = () => {
 
   return (
     <div className="w-full bg-transparent py-4 px-16 ">
-      <div className="flex items-center justify-between">
+      <div className="relative flex items-center justify-between">
         {/* Display Info Based on Current Filter */}
-        <div className="flex items-center gap-3">
+        <div className="relative flex items-center gap-3">
           <div className="font-CyGrotesk text-primary text-[40px]">
             {currentDisplayInfo.code}
           </div>
@@ -174,7 +176,7 @@ const ViewSchedule = () => {
         {/* Navigation Controls */}
         <div className="flex items-center space-x-6 font-Manrope font-bold">
           {/* Filter Tabs */}
-          <div className="flex items-center border rounded-lg overflow-hidden bg-primary px-3 py-2">
+          <div className="relative flex items-center border rounded-lg overflow-hidden bg-primary px-3 py-2">
             <button
               className={`px-3 py-1 text-sm rounded-md ${
                 currentFilter === "Section"
@@ -249,14 +251,17 @@ const ViewSchedule = () => {
       <div>
         <GeneratedScheduleCalendar />
       </div>
-      <div className="flex space-x-4 font-Manrope font-semibold justify-center mt-[500px]">
+      <div className="flex space-x-4 font-Manrope font-semibold justify-center ">
         <button className="bg-primary text-white w-[150px] py-1 rounded-md">
           Regenerate
         </button>
         <button className="bg-primary text-white w-[150px] py-1 rounded-md">
           Draft
         </button>
-        <button className="bg-[#FFBA21] text-[#444444] border border-[#444444] w-[150px] py-1 rounded-md">
+        <button
+          onClick={() => navigate("/departmentchair/schedule-publishing")}
+          className="bg-[#FFBA21] text-[#444444] border border-[#444444] w-[150px] py-1 rounded-md"
+        >
           Lock Schedule
         </button>
       </div>
