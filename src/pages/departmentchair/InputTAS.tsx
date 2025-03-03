@@ -375,11 +375,29 @@ const InputTAS: React.FC = () => {
         let field: any = upd.fields[j];
 
         if (field === 'restrictions'){
-          console.log(tas);
-          break loop0;
-        }
+          let restrictionsObj: any = {
+            M: [],
+            T: [],
+            W: [],
+            TH: [],
+            F: [],
+            S: []
+          }
 
-        resObj[field] = tas?.[field]
+          tas?.['restrictions'].forEach((res: any) => {
+            console.log(res)
+            res.startEndTimes.forEach((set: any) => {
+              restrictionsObj[res.day].push({
+                start: `${set.start.slice(0, 2)}${set.start.slice(3)}`,
+                end: `${set.end.slice(0, 2)}${set.end.slice(3)}`
+              })
+            })
+          });
+
+          resObj['restrictions'] = restrictionsObj;
+        }else{
+          resObj[field] = tas?.[field]
+        }
 
         const res = await fetch('http://localhost:8080/tasconstraints', {
           method: 'PUT',
