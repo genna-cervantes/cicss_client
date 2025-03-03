@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import Select, { MultiValue } from "react-select";
 import Navbar from "../../components/Navbar";
 
@@ -17,10 +17,11 @@ interface Request {
 }
 
 interface TasInfo {
+  tasId: string;
   name: string;
-  status: string;
-  specialties: string[];
-  requests: Request[];
+  units: number;
+  courses: string[];
+  restrictions: Request[];
 }
 
 interface Option {
@@ -28,14 +29,35 @@ interface Option {
   label: string;
 }
 
+const courseOptions: Option[] = [
+  { value: "coa", label: "Computer Organization and Architecture" },
+  { value: "stats", label: "Advanced Statistics and Probability" },
+  { value: "desalgo", label: "Design and Analysis of Algorithms" },
+  { value: "appdev1", label: "Applications Development 1" },
+  { value: "se1", label: "Software Engineering 1" },
+  { value: "se2", label: "Software Engineering 2" },
+  { value: "automata", label: "Theory of Automata" },
+  { value: "thesis1", label: "Thesis 1" },
+];
+
+const dayOptions: Option[] = [
+  { value: "monday", label: "Monday" },
+  { value: "tuesday", label: "Tuesday" },
+  { value: "wednesday", label: "Wednesday" },
+  { value: "thursday", label: "Thursday" },
+  { value: "friday", label: "Friday" },
+  { value: "saturday", label: "Saturday" },
+];
+
 const InputTAS: React.FC = () => {
   // Store an array of TAS
   const [tasList, setTasList] = useState<TasInfo[]>([
     {
+      tasId: "1",
       name: "",
-      status: "",
-      specialties: [],
-      requests: [{ day: "", startEndTimes: [{ start: "", end: "" }] }],
+      units: 0,
+      courses: [],
+      restrictions: [{ day: "", startEndTimes: [{ start: "", end: "" }] }],
     },
   ]);
 
@@ -52,20 +74,6 @@ const InputTAS: React.FC = () => {
     });
   };
 
-  // Handler for status change (react-select single)
-  const handleTASStatusChange = (
-    tasIndex: number,
-    selectedOption: Option | null
-  ) => {
-    setTasList((prev) => {
-      const updated = [...prev];
-      updated[tasIndex] = {
-        ...updated[tasIndex],
-        status: selectedOption ? selectedOption.value : "",
-      };
-      return updated;
-    });
-  };
 
   // Handler for specialties change (react-select multi)
   const handleTASSpecialtiesChange = (
@@ -76,13 +84,27 @@ const InputTAS: React.FC = () => {
       const updated = [...prev];
       updated[tasIndex] = {
         ...updated[tasIndex],
-        specialties: selectedOptions
+        courses: selectedOptions
           ? selectedOptions.map((option) => option.value)
           : [],
       };
       return updated;
     });
   };
+
+  const handleUnitsFieldChange = (
+    tasIndex: number,
+    unitsValue: number
+  ) => {
+    setTasList((prev) => {
+      const updated = [...prev];
+      updated[tasIndex] = {
+        ...updated[tasIndex],
+        units: unitsValue
+      };
+      return updated;
+    });
+  }
 
   // Handler for changing a request's day for a specific TAS and request index
   const handleTASRequestDayChange = (
@@ -92,12 +114,12 @@ const InputTAS: React.FC = () => {
   ) => {
     setTasList((prev) => {
       const updated = [...prev];
-      const updatedRequests = [...updated[tasIndex].requests];
+      const updatedRequests = [...updated[tasIndex].restrictions];
       updatedRequests[requestIndex] = {
         ...updatedRequests[requestIndex],
         day: selectedOption ? selectedOption.value : "",
       };
-      updated[tasIndex] = { ...updated[tasIndex], requests: updatedRequests };
+      updated[tasIndex] = { ...updated[tasIndex], restrictions: updatedRequests };
       return updated;
     });
   };
@@ -112,14 +134,14 @@ const InputTAS: React.FC = () => {
     const { name, value } = e.target;
     setTasList((prev) => {
       const updated = [...prev];
-      const updatedRequests = [...updated[tasIndex].requests];
+      const updatedRequests = [...updated[tasIndex].restrictions];
       const updatedTimes = [...updatedRequests[requestIndex].startEndTimes];
       updatedTimes[timeIndex] = { ...updatedTimes[timeIndex], [name]: value };
       updatedRequests[requestIndex] = {
         ...updatedRequests[requestIndex],
         startEndTimes: updatedTimes,
       };
-      updated[tasIndex] = { ...updated[tasIndex], requests: updatedRequests };
+      updated[tasIndex] = { ...updated[tasIndex], restrictions: updatedRequests };
       return updated;
     });
   };
@@ -131,8 +153,8 @@ const InputTAS: React.FC = () => {
       const updated = [...prev];
       updated[tasIndex] = {
         ...updated[tasIndex],
-        requests: [
-          ...updated[tasIndex].requests,
+        restrictions: [
+          ...updated[tasIndex].restrictions,
           { day: "", startEndTimes: [{ start: "", end: "" }] },
         ],
       };
@@ -146,7 +168,7 @@ const InputTAS: React.FC = () => {
       const updated = [...prev];
       updated[tasIndex] = {
         ...updated[tasIndex],
-        requests: updated[tasIndex].requests.filter(
+        restrictions: updated[tasIndex].restrictions.filter(
           (_, i) => i !== requestIndex
         ),
       };
@@ -158,7 +180,7 @@ const InputTAS: React.FC = () => {
   const handleTASAddTime = (tasIndex: number, requestIndex: number) => {
     setTasList((prev) => {
       const updated = [...prev];
-      const updatedRequests = [...updated[tasIndex].requests];
+      const updatedRequests = [...updated[tasIndex].restrictions];
       updatedRequests[requestIndex] = {
         ...updatedRequests[requestIndex],
         startEndTimes: [
@@ -166,7 +188,7 @@ const InputTAS: React.FC = () => {
           { start: "", end: "" },
         ],
       };
-      updated[tasIndex] = { ...updated[tasIndex], requests: updatedRequests };
+      updated[tasIndex] = { ...updated[tasIndex], restrictions: updatedRequests };
       return updated;
     });
   };
@@ -179,7 +201,7 @@ const InputTAS: React.FC = () => {
   ) => {
     setTasList((prev) => {
       const updated = [...prev];
-      const updatedRequests = [...updated[tasIndex].requests];
+      const updatedRequests = [...updated[tasIndex].restrictions];
       // Only delete if more than one time entry exists
       if (updatedRequests[requestIndex].startEndTimes.length > 1) {
         updatedRequests[requestIndex] = {
@@ -189,7 +211,7 @@ const InputTAS: React.FC = () => {
           ),
         };
       }
-      updated[tasIndex] = { ...updated[tasIndex], requests: updatedRequests };
+      updated[tasIndex] = { ...updated[tasIndex], restrictions: updatedRequests };
       return updated;
     });
   };
@@ -200,10 +222,11 @@ const InputTAS: React.FC = () => {
     setTasList((prev) => [
       ...prev,
       {
+        tasId: "1",
         name: "",
-        status: "",
-        specialties: [],
-        requests: [{ day: "", startEndTimes: [{ start: "", end: "" }] }],
+        units: 0,
+        courses: [],
+        restrictions: [{ day: "", startEndTimes: [{ start: "", end: "" }] }],
       },
     ]);
   };
@@ -219,9 +242,9 @@ const InputTAS: React.FC = () => {
     tasList.forEach((tas, tasIndex) => {
       console.log(`TAS ${tasIndex + 1}:`);
       console.log("   Name:", tas.name);
-      console.log("   Status:", tas.status);
-      console.log("   Specialties:", tas.specialties.join(", "));
-      tas.requests.forEach((req, reqIndex) => {
+      
+      console.log("   Specialties:", tas.courses.join(", "));
+      tas.restrictions.forEach((req, reqIndex) => {
         console.log(`   Request ${reqIndex + 1}:`);
         console.log("      Day:", req.day);
         req.startEndTimes.forEach((time, timeIndex) => {
@@ -234,32 +257,6 @@ const InputTAS: React.FC = () => {
       });
     });
   };
-
-  // Sample options for react-select
-  const profStatus: Option[] = [
-    { value: "part-time", label: "Part-Time" },
-    { value: "full-time", label: "Full-Time" },
-  ];
-
-  const courseOptions: Option[] = [
-    { value: "coa", label: "Computer Organization and Architecture" },
-    { value: "stats", label: "Advanced Statistics and Probability" },
-    { value: "desalgo", label: "Design and Analysis of Algorithms" },
-    { value: "appdev1", label: "Applications Development 1" },
-    { value: "se1", label: "Software Engineering 1" },
-    { value: "se2", label: "Software Engineering 2" },
-    { value: "automata", label: "Theory of Automata" },
-    { value: "thesis1", label: "Thesis 1" },
-  ];
-
-  const dayOptions: Option[] = [
-    { value: "monday", label: "Monday" },
-    { value: "tuesday", label: "Tuesday" },
-    { value: "wednesday", label: "Wednesday" },
-    { value: "thursday", label: "Thursday" },
-    { value: "friday", label: "Friday" },
-    { value: "saturday", label: "Saturday" },
-  ];
 
   const selectStyles = {
     control: (provided: any) => ({
@@ -286,6 +283,26 @@ const InputTAS: React.FC = () => {
     }),
   };
 
+  console.log('tas list', tasList)
+
+  // get tapos display
+  // dapat may sample sa taas
+
+  // ung save ung pag save sa database
+
+  // CONNECTIONS TO THE DATABASE
+  useEffect(() => {
+    const getTASConstraints = async () => {
+      console.log('getting tas constraints')
+      const res = await fetch('http://localhost:8080/tasconstraints/CS') // EDIT THIS TO BE DYNAMIC PERO CS MUNA FOR NOW
+      const data = await res.json();
+
+      console.log(data);
+    }
+
+    getTASConstraints();
+  }, [])
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="mx-auto py-10">
@@ -304,7 +321,7 @@ const InputTAS: React.FC = () => {
               <p>No.</p>
               <p>TAS Name</p>
             </div>
-            <p>Status</p>
+            <p>Units</p>
             <p>Specialties</p>
           </div>
           <p>Day and Time Restriction</p>
@@ -329,17 +346,13 @@ const InputTAS: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <Select
-                      options={profStatus}
-                      placeholder="Select"
-                      value={
-                        profStatus.find((opt) => opt.value === tas.status) ||
-                        null
-                      }
-                      onChange={(selectedOption) =>
-                        handleTASStatusChange(tasIndex, selectedOption)
-                      }
-                      styles={selectStyles}
+                    <input
+                      type="number"
+                      name="units"
+                      value={tas.units}
+                      onChange={(e) => handleUnitsFieldChange(tasIndex, parseInt(e.target.value))}
+                      placeholder="Units"
+                      className="h-[38px] border border-primary rounded-[5px] px-2 w-[100px]"
                     />
                   </div>
                   <div>
@@ -351,7 +364,7 @@ const InputTAS: React.FC = () => {
                       closeMenuOnSelect={false}
                       className="w-[200px]"
                       value={courseOptions.filter((opt) =>
-                        tas.specialties.includes(opt.value)
+                        tas.courses.includes(opt.value)
                       )}
                       onChange={(selectedOptions) =>
                         handleTASSpecialtiesChange(tasIndex, selectedOptions)
@@ -361,7 +374,7 @@ const InputTAS: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  {tas.requests.map((request, reqIndex) => (
+                  {tas.restrictions.map((request, reqIndex) => (
                     <div
                       key={reqIndex}
                       className="bg-[#BFDDF6] p-5 rounded-md mb-5"
@@ -458,7 +471,7 @@ const InputTAS: React.FC = () => {
                         >
                           Add Day
                         </button>
-                        {tas.requests.length > 1 && (
+                        {tas.restrictions.length > 1 && (
                           <button
                             type="button"
                             onClick={() =>

@@ -57,6 +57,8 @@ export const checkIfCICSTAS = async (email: string) => {
 export const checkIfCICSDepartmentChair = async (email: string) => {
     try{
 
+        return true;
+
         // POST /api/department-chair/email 
         // {email: email}
 
