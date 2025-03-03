@@ -5,6 +5,7 @@ import Navbar from "../../components/Navbar";
 import add_button from "../../assets/add_button.png";
 import trash_button from "../../assets/trash_button.png";
 import add_button_white from "../../assets/add_button_white.png";
+import { getCourseCodesFromInternalRepresentation } from "../../utils/utils";
 
 interface TimeEntry {
   start: string;
@@ -27,7 +28,7 @@ interface TasInfo {
 interface Option {
   value: string;
   label: string;
-  subjectCode?: string;
+  hasLab?: boolean;
 }
 
 // gawa ng function to get the courses from the internal representation - nasa utils
@@ -35,14 +36,14 @@ interface Option {
 // lipat sa utils ung pag convert from db rep to normal rep
 
 const courseOptions: Option[] = [
-  { value: "coa", label: "Computer Organization and Architecture", subjectCode: "CS2619"},
-  { value: "stats", label: "Advanced Statistics and Probability", subjectCode: "CS2617"},
-  { value: "desalgo", label: "Design and Analysis of Algorithms", subjectCode: "CS2615" },
-  { value: "appdev1", label: "Applications Development 1", subjectCode: "ICS2608" },
-  { value: "se1", label: "Software Engineering 1", subjectCode: "ICS26010" },
-  { value: "se2", label: "Software Engineering 2", subjectCode: "ICS26013" },
-  { value: "automata", label: "Theory of Automata", subjectCode: "CS2616" },
-  { value: "thesis1", label: "Thesis 1", subjectCode: "CS26112" },
+  { value: "CS2619", label: "Computer Organization and Architecture"},
+  { value: "CS2617", label: "Advanced Statistics and Probability"},
+  { value: "CS2615", label: "Design and Analysis of Algorithms"},
+  { value: "ICS2608", label: "Applications Development 1"},
+  { value: "ICS26010", label: "Software Engineering 1"},
+  { value: "ICS26013", label: "Software Engineering 2"},
+  { value: "CS2616", label: "Theory of Automata"},
+  { value: "CS26112", label: "Thesis 1"},
 ];
 
 const dayOptions: Option[] = [
@@ -55,6 +56,7 @@ const dayOptions: Option[] = [
 ];
 
 const InputTAS: React.FC = () => {
+
   // Store an array of TAS
   const [tasList, setTasList] = useState<TasInfo[]>([
     {
@@ -314,6 +316,11 @@ const InputTAS: React.FC = () => {
 
       for (let i = 0; i < data.length; i++) {
         let newTas = data[i];
+
+        // courses
+        newTas.courses = getCourseCodesFromInternalRepresentation(newTas.courses)
+
+        // restrictions
         let newTasRestrictions = newTas.restrictions;
         let newTasRestricionKeys: any = Object.keys(newTasRestrictions);
 
