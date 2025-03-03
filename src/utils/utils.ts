@@ -57,6 +57,8 @@ export const checkIfCICSTAS = async (email: string) => {
 export const checkIfCICSDepartmentChair = async (email: string) => {
     try{
 
+        return true;
+
         // POST /api/department-chair/email 
         // {email: email}
 
@@ -82,5 +84,12 @@ export const checkIfCICSDepartmentChair = async (email: string) => {
     }
 }
 
+export const getCourseCodesFromInternalRepresentation = (internalRep: String[]) => {
 
-  
+    // loop thru the string arr
+    // remove ung mga -LC -LB sa dulo tapos gawing set - para sa may mga lab
+    // remove ung mga W- sa unahan - para sa mga specialization - lagyan ng (Specialization)
+
+    // return the set
+
+}

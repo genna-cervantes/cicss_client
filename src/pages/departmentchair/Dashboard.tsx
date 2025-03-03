@@ -14,7 +14,7 @@ const Dashboard = () => {
   useEffect(() => {
     const checkScreenSize = () => {
       // Based on your screenshot, we need to detect when width is below a certain threshold
-      setIsMinimized(window.innerWidth < 1500);
+      setIsMinimized(window.innerWidth < 1000); // why check this manually ????
     };
 
     // Check on initial load
