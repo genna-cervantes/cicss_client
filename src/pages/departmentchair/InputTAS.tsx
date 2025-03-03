@@ -399,21 +399,22 @@ const InputTAS: React.FC = () => {
           resObj[field] = tas?.[field]
         }
 
-        const res = await fetch('http://localhost:8080/tasconstraints', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(resObj)
-        })
-        
-        if (res.ok){
-          console.log('yey ok')
-        }else{
-          console.log('nooo', res.body)
-        }
         
         // console.log(resObj)
+      }
+
+      const res = await fetch('http://localhost:8080/tasconstraints', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(resObj)
+      })
+      
+      if (res.ok){
+        console.log('yey ok') // PLS CHANGE THIS TO MESSAGE KAHIT SA BABA NUNG BUTTONS LNG
+      }else{
+        console.log('nooo', res.body)
       }
       
     }
