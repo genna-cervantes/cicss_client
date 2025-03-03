@@ -73,10 +73,15 @@ const InputTAS: React.FC = () => {
     { tasId: string; fields: string[] }[]
   >([]);
   const [insertedTAS, setInsertedTas] = useState<string[]>([]);
+  const [deletedTAS, setDeletedTAS] = useState<string[]>([]);
 
   useEffect(() => {
     console.log("updated tas ids: ", updatedTAS);
   }, [updatedTAS]);
+
+  useEffect(() => {
+    console.log("deleted tas ids: ", deletedTAS);
+  }, [deletedTAS]);
 
   // handler for text fields on the TAS level (name)
   const handleTASFieldChange = (
@@ -399,6 +404,7 @@ const InputTAS: React.FC = () => {
   // Handler to delete an entire TAS form - ADD SA DELETE TRACKER
   const handleDeleteTAS = (tasIndex: number) => {
     setTasList((prev) => prev.filter((_, i) => i !== tasIndex));
+    setDeletedTAS((prev) => [...prev, tasList[tasIndex].tasId])
   };
 
   // LOOP THRU HTE TRACKERS AND QUERY NECESSARY ENDPOINT
@@ -521,6 +527,24 @@ const InputTAS: React.FC = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(reqObj),
+      });
+
+      if (res.ok) {
+        console.log("yey ok"); // PLS CHANGE THIS TO MESSAGE KAHIT SA BABA NUNG BUTTONS LNG
+      } else {
+        const data = await res.json()
+        console.log("nooo", data);
+      }
+    }
+
+    console.log('DELETING')
+    for (let i = 0; i < deletedTAS.length; i++){
+      const res = await fetch("http://localhost:8080/tasconstraints", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({tasId: deletedTAS[i]}),
       });
 
       if (res.ok) {
