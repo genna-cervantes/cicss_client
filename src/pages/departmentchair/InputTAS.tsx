@@ -47,12 +47,12 @@ const courseOptions: Option[] = [
 ];
 
 const dayOptions: Option[] = [
-  { value: "monday", label: "Monday" },
-  { value: "tuesday", label: "Tuesday" },
-  { value: "wednesday", label: "Wednesday" },
-  { value: "thursday", label: "Thursday" },
-  { value: "friday", label: "Friday" },
-  { value: "saturday", label: "Saturday" },
+  { value: "M", label: "Monday" },
+  { value: "T", label: "Tuesday" },
+  { value: "W", label: "Wednesday" },
+  { value: "TH", label: "Thursday" },
+  { value: "F", label: "Friday" },
+  { value: "S", label: "Saturday" },
 ];
 
 const InputTAS: React.FC = () => {
@@ -337,8 +337,8 @@ const InputTAS: React.FC = () => {
               // loop dapat toh pero fuck
               startEndTimes: [
                 {
-                  start: specRestriction.start,
-                  end: specRestriction.end,
+                  start: `${specRestriction.start.slice(0, 2)}:${specRestriction.start.slice(2)}`,
+                  end: `${specRestriction.end.slice(0, 2)}:${specRestriction.end.slice(2)}`,
                 },
               ],
             });
