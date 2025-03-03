@@ -68,6 +68,13 @@ const InputTAS: React.FC = () => {
     },
   ]);
 
+  // store changed tas ids
+  const [updatedTAS, setUpdatedTAS] = useState<{tasId: string, fields: string[]}[]>([]);
+
+  useEffect(() => {
+    console.log('updated tas ids: ', updatedTAS)
+  }, [updatedTAS])
+
   // handler for text fields on the TAS level (name)
   const handleTASFieldChange = (
     tasIndex: number,
@@ -78,6 +85,15 @@ const InputTAS: React.FC = () => {
       const updated = [...prev];
       updated[tasIndex] = { ...updated[tasIndex], [name]: value };
       return updated;
+    });
+    setUpdatedTAS((prev) => {
+      return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
+        ? prev.map((item) =>
+            item.tasId === tasList[tasIndex].tasId
+              ? { ...item, fields: [...new Set([...item.fields, 'name'])] }
+              : item
+          )
+        : [...prev, { tasId: tasList[tasIndex].tasId, fields: ['name'] }];
     });
   };
 
@@ -96,6 +112,15 @@ const InputTAS: React.FC = () => {
       };
       return updated;
     });
+    setUpdatedTAS((prev) => {
+      return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
+        ? prev.map((item) =>
+            item.tasId === tasList[tasIndex].tasId
+              ? { ...item, fields: [...new Set([...item.fields, 'courses'])] }
+              : item
+          )
+        : [...prev, { tasId: tasList[tasIndex].tasId, fields: ['courses'] }];
+    });
   };
 
   const handleUnitsFieldChange = (tasIndex: number, unitsValue: number) => {
@@ -106,6 +131,15 @@ const InputTAS: React.FC = () => {
         units: unitsValue,
       };
       return updated;
+    });
+    setUpdatedTAS((prev) => {
+      return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
+        ? prev.map((item) =>
+            item.tasId === tasList[tasIndex].tasId
+              ? { ...item, fields: [...new Set([...item.fields, 'units'])] }
+              : item
+          )
+        : [...prev, { tasId: tasList[tasIndex].tasId, fields: ['units'] }];
     });
   };
 
@@ -128,6 +162,15 @@ const InputTAS: React.FC = () => {
       };
       return updated;
     });
+    setUpdatedTAS((prev) => {
+      return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
+        ? prev.map((item) =>
+            item.tasId === tasList[tasIndex].tasId
+              ? { ...item, fields: [...new Set([...item.fields, 'restrictions'])] }
+              : item
+          )
+        : [...prev, { tasId: tasList[tasIndex].tasId, fields: ['restrictions'] }];
+    });
   };
 
   // Handler for changing a time field (start or end) for a specific TAS, request, and time index
@@ -141,7 +184,8 @@ const InputTAS: React.FC = () => {
     setTasList((prev) => {
       const updated = [...prev];
       const updatedRequests = [...updated[tasIndex].restrictions];
-      const updatedTimes = [...updatedRequests[requestIndex].startEndTimes];
+      const updatedTimes = !updatedRequests[requestIndex].startEndTimes ? [] : [...updatedRequests[requestIndex].startEndTimes];
+
       updatedTimes[timeIndex] = { ...updatedTimes[timeIndex], [name]: value };
       updatedRequests[requestIndex] = {
         ...updatedRequests[requestIndex],
@@ -152,6 +196,15 @@ const InputTAS: React.FC = () => {
         restrictions: updatedRequests,
       };
       return updated;
+    });
+    setUpdatedTAS((prev) => {
+      return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
+        ? prev.map((item) =>
+            item.tasId === tasList[tasIndex].tasId
+              ? { ...item, fields: [...new Set([...item.fields, 'restrictions'])] }
+              : item
+          )
+        : [...prev, { tasId: tasList[tasIndex].tasId, fields: ['restrictions'] }];
     });
   };
 
@@ -169,6 +222,15 @@ const InputTAS: React.FC = () => {
       };
       return updated;
     });
+    setUpdatedTAS((prev) => {
+      return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
+        ? prev.map((item) =>
+            item.tasId === tasList[tasIndex].tasId
+              ? { ...item, fields: [...new Set([...item.fields, 'restrictions'])] }
+              : item
+          )
+        : [...prev, { tasId: tasList[tasIndex].tasId, fields: ['restrictions'] }];
+    });
   };
 
   // Handler to delete a day (request) from a specific TAS form
@@ -182,6 +244,15 @@ const InputTAS: React.FC = () => {
         ),
       };
       return updated;
+    });
+    setUpdatedTAS((prev) => {
+      return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
+        ? prev.map((item) =>
+            item.tasId === tasList[tasIndex].tasId
+              ? { ...item, fields: [...new Set([...item.fields, 'restrictions'])] }
+              : item
+          )
+        : [...prev, { tasId: tasList[tasIndex].tasId, fields: ['restrictions'] }];
     });
   };
 
@@ -202,6 +273,15 @@ const InputTAS: React.FC = () => {
         restrictions: updatedRequests,
       };
       return updated;
+    });
+    setUpdatedTAS((prev) => {
+      return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
+        ? prev.map((item) =>
+            item.tasId === tasList[tasIndex].tasId
+              ? { ...item, fields: [...new Set([...item.fields, 'restrictions'])] }
+              : item
+          )
+        : [...prev, { tasId: tasList[tasIndex].tasId, fields: ['restrictions'] }];
     });
   };
 
@@ -229,9 +309,18 @@ const InputTAS: React.FC = () => {
       };
       return updated;
     });
+    setUpdatedTAS((prev) => {
+      return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
+        ? prev.map((item) =>
+            item.tasId === tasList[tasIndex].tasId
+              ? { ...item, fields: [...new Set([...item.fields, 'restrictions'])] }
+              : item
+          )
+        : [...prev, { tasId: tasList[tasIndex].tasId, fields: ['restrictions'] }];
+    });
   };
 
-  // Handler to add a new TAS form
+  // Handler to add a new TAS form - ADD SA INSERT TRACKER
   const handleAddTAS = (e: FormEvent) => {
     e.preventDefault();
     setTasList((prev) => [
@@ -246,31 +335,72 @@ const InputTAS: React.FC = () => {
     ]);
   };
 
-  // Handler to delete an entire TAS form
+  // Handler to delete an entire TAS form - ADD SA DELETE TRACKER
   const handleDeleteTAS = (tasIndex: number) => {
     setTasList((prev) => prev.filter((_, i) => i !== tasIndex));
   };
 
-  const handleSave = (e: FormEvent) => {
+  // LOOP THRU HTE TRACKERS AND QUERY NECESSARY ENDPOINT  
+  const handleSave = async (e: FormEvent) => {
     e.preventDefault();
     // Log each TAS details
-    tasList.forEach((tas, tasIndex) => {
-      console.log(`TAS ${tasIndex + 1}:`);
-      console.log("   Name:", tas.name);
+    // tasList.forEach((tas, tasIndex) => {
+    //   console.log(`TAS ${tasIndex + 1}:`);
+    //   console.log("   Name:", tas.name);
 
-      console.log("   Specialties:", tas.courses.join(", "));
-      tas.restrictions.forEach((req, reqIndex) => {
-        console.log(`   Request ${reqIndex + 1}:`);
-        console.log("      Day:", req.day);
-        req.startEndTimes.forEach((time, timeIndex) => {
-          console.log(
-            `      Time ${timeIndex + 1} - Start: ${time.start}, End: ${
-              time.end
-            }`
-          );
-        });
-      });
-    });
+    //   console.log("   Specialties:", tas.courses.join(", "));
+    //   tas.restrictions.forEach((req, reqIndex) => {
+    //     console.log(`   Request ${reqIndex + 1}:`);
+    //     console.log("      Day:", req.day);
+    //     req.startEndTimes.forEach((time, timeIndex) => {
+    //       console.log(
+    //         `      Time ${timeIndex + 1} - Start: ${time.start}, End: ${
+    //           time.end
+    //         }`
+    //       );
+    //     });
+    //   });
+    // });
+
+    // UPDATES
+    // check if may nagbago b talaga
+    console.log('UPDATING')
+    loop0:
+    for (let i = 0; i < updatedTAS.length; i++){
+      let upd = updatedTAS[i]
+      let tas: any = tasList.find((item) => item.tasId === upd.tasId)
+      
+      let resObj: any = {tasId: tas?.tasId};
+      for (let j = 0; j < upd.fields.length; j++){
+        let field: any = upd.fields[j];
+
+        if (field === 'restrictions'){
+          console.log(tas);
+          break loop0;
+        }
+
+        resObj[field] = tas?.[field]
+
+        const res = await fetch('http://localhost:8080/tasconstraints', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(resObj)
+        })
+        
+        if (res.ok){
+          console.log('yey ok')
+        }else{
+          console.log('nooo', res.body)
+        }
+        
+        // console.log(resObj)
+      }
+      
+    }
+    
+    
   };
 
   const selectStyles = {
@@ -311,8 +441,6 @@ const InputTAS: React.FC = () => {
       console.log("getting tas constraints");
       const res = await fetch("http://localhost:8080/tasconstraints/CS"); // EDIT THIS TO BE DYNAMIC PERO CS MUNA FOR NOW
       const data = await res.json();
-
-      // const convertedTasList: TasInfo[] = [];
 
       for (let i = 0; i < data.length; i++) {
         let newTas = data[i];
@@ -463,7 +591,7 @@ const InputTAS: React.FC = () => {
                           </div>
 
                           <div className="flex flex-col">
-                            {request.startEndTimes.map((time, timeIndex) => (
+                            {request.startEndTimes?.length > 0 ? request.startEndTimes.map((time, timeIndex) => (
                               <div key={timeIndex} className="mb-3">
                                 <div className="flex items-center gap-3 justify-center">
                                   <label>Start</label>
@@ -522,7 +650,51 @@ const InputTAS: React.FC = () => {
                                   </button>
                                 </div>
                               </div>
-                            ))}
+                            )) : 
+                            <div className="mb-3">
+                                <div className="flex items-center gap-3 justify-center">
+                                  <label>Start</label>
+                                  <input
+                                    type="time"
+                                    name="start"
+                                    // value={''}
+                                    onChange={(e) =>
+                                      handleTASTimeChange(
+                                        tasIndex,
+                                        reqIndex,
+                                        0,
+                                        e
+                                      )
+                                    }
+                                    className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                                  />
+                                  <label>End</label>
+                                  <input
+                                    type="time"
+                                    name="end"
+                                    // value={time.end}
+                                    onChange={(e) =>
+                                      handleTASTimeChange(
+                                        tasIndex,
+                                        reqIndex,
+                                        0,
+                                        e
+                                      )
+                                    }
+                                    className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleTASAddTime(tasIndex, reqIndex)
+                                    }
+                                    className="w-7"
+                                  >
+                                    <img src={add_button} />
+                                  </button>
+                                </div>
+                              </div>
+                            }
                           </div>
                         </div>
                         <div className="flex justify-center gap-3 mt-5">
