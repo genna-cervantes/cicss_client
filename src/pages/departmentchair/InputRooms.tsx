@@ -17,13 +17,13 @@ interface Option {
 }
 
 const roomCodes: Option[] = [
-  { value: "RM1801", label: "RM1903" },
-  { value: "RM1805", label: "RM1903" },
-  { value: "RM1806", label: "RM1903" },
-  { value: "RM1807", label: "RM1903" },
-  { value: "RM1808", label: "RM1903" },
-  { value: "RM1901", label: "RM1903" },
-  { value: "RM1902", label: "RM1903" },
+  { value: "RM1801", label: "RM1801" },
+  { value: "RM1805", label: "RM1805" },
+  { value: "RM1806", label: "RM1806" },
+  { value: "RM1807", label: "RM1807" },
+  { value: "RM1808", label: "RM1808" },
+  { value: "RM1901", label: "RM1901" },
+  { value: "RM1902", label: "RM1902" },
   { value: "RM1903", label: "RM1903" },
   { value: "RM1904", label: "RM1904" },
   { value: "RM1905", label: "RM1905" },
@@ -49,12 +49,12 @@ const roomType: Option[] = [
 ];
 
 const InputRooms = () => {
-  //Dummy Options
 
   // Array of Rooms
   const [rooms, setRooms] = useState<RoomInfo[]>([
-    // { roomId: '', department: "", roomType: "" },
   ]);
+
+  const [updatedRooms, setUpdatedRooms] = useState<{roomId: string, fields: string[]}[]>([])
 
   // Update the roomCode for a specific form.
   const handleRoomCodeChange = (
@@ -65,9 +65,7 @@ const InputRooms = () => {
       const updated = [...prev];
       updated[index] = {
         ...updated[index],
-        roomId: selectedOption
-          ? selectedOption.value
-          : updated[index].roomId,
+        roomId: selectedOption ? selectedOption.value : updated[index].roomId,
       };
       return updated;
     });
@@ -86,6 +84,21 @@ const InputRooms = () => {
       };
       return updated;
     });
+    setUpdatedRooms((prev) => {
+      return prev.some((item) => item.roomId === rooms[index].roomId)
+        ? prev.map((item) =>
+            item.roomId === rooms[index].roomId
+              ? {
+                  ...item,
+                  fields: [...new Set([...item.fields, "department"])],
+                }
+              : item
+          )
+        : [
+            ...prev,
+            { roomId: rooms[index].roomId, fields: ["department"] },
+          ];
+    });
   };
 
   // Update the room type for a specific form.
@@ -101,15 +114,27 @@ const InputRooms = () => {
       };
       return updated;
     });
+    setUpdatedRooms((prev) => {
+      return prev.some((item) => item.roomId === rooms[index].roomId)
+        ? prev.map((item) =>
+            item.roomId === rooms[index].roomId
+              ? {
+                  ...item,
+                  fields: [...new Set([...item.fields, "roomType"])],
+                }
+              : item
+          )
+        : [
+            ...prev,
+            { roomId: rooms[index].roomId, fields: ["roomType"] },
+          ];
+    });
   };
 
   // Add a new form.
   const handleAddRoom = (e: FormEvent) => {
     e.preventDefault();
-    setRooms((prev) => [
-      ...prev,
-      { roomId: '', department: "", roomType: "" },
-    ]);
+    setRooms((prev) => [...prev, { roomId: "", department: "", roomType: "" }]);
   };
 
   // Delete a specific form.
@@ -118,32 +143,64 @@ const InputRooms = () => {
   };
 
   // Save handler for demonstration (logs the rooms array).
-  const handleSave = (e: FormEvent) => {
+  const handleSave = async (e: FormEvent) => {
     e.preventDefault();
-    rooms.forEach((room, index) => {
-      console.log(`Room ${index + 1}`);
-      console.log(` Code: ${room.roomId}`);
-      console.log(` Department: ${room.department}`);
-      console.log(` Type: ${room.roomType}`);
-    });
+    // rooms.forEach((room, index) => {
+    //   console.log(`Room ${index + 1}`);
+    //   console.log(` Code: ${room.roomId}`);
+    //   console.log(` Department: ${room.department}`);
+    //   console.log(` Type: ${room.roomType}`);
+    // });
+
+    for (let i = 0; i < updatedRooms.length; i++){
+      let updatedRoom: any = rooms.find((r) => r.roomId === updatedRooms[i].roomId);
+
+      if (!updatedRoom){
+        continue;
+      }
+
+      const reqObj: any = {
+        roomId: updatedRoom.roomId
+      }
+
+      for (let j = 0; j < updatedRooms[i].fields.length; j++){
+        let field = updatedRooms[i].fields[j];
+        reqObj[field] = updatedRoom[field];
+      }
+
+      const res = await fetch('http://localhost:8080/rooms', {
+        method: 'PUT',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(reqObj)
+      })
+      
+      if (res.ok){
+        console.log('yeey ok')
+      }else{
+        const data = await res.json();
+        console.log('error', data)
+      }
+    }
   };
 
   // CONNECTIONS TO DB
   useEffect(() => {
     const getRooms = async () => {
-      const res = await fetch('http://localhost:8080/rooms/CS') // MAKE DYNAMIC AH
+      const res = await fetch("http://localhost:8080/rooms/CS"); // MAKE DYNAMIC AH
       const data = await res.json();
 
-      if (res.ok){
-        setRooms(data)
-        console.log(data)
-      }else{
-        console.log('error', data)
+      if (res.ok) {
+        setRooms(data);
+        console.log(data);
+      } else {
+        console.log("error", data);
       }
-    }
+    };
 
     getRooms();
-  }, [])
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -168,74 +225,77 @@ const InputRooms = () => {
       </section>
 
       <form className="flex flex-col">
-        {rooms.map((room, index) => (
-          <div
-            key={index}
-            className="flex gap-5 mx-auto font-Manrope font-semibold mb-7"
-          >
-            <div className="flex bg-[rgba(241,250,255,0.5)] rounded-xl shadow-md gap-16 p-10 items-center">
-              <label className="block font-semibold mb-2">
-                Room {index + 1}
-              </label>
-              <Select
-                options={roomCodes}
-                className="w-44"
-                placeholder="Select"
-                styles={{
-                  control: (provided: any) => ({
-                    ...provided,
-                    border: "1px solid #02296D",
-                    borderRadius: "6px",
-                  }),
-                }}
-                value={
-                  roomCodes.find(
-                    (option) => option.value === room.roomId
-                  ) || null
-                }
-                onChange={(option) => handleRoomCodeChange(index, option)}
-              />
-              <Select
-                options={department}
-                className="w-44"
-                placeholder="Select"
-                styles={{
-                  control: (provided: any) => ({
-                    ...provided,
-                    border: "1px solid #02296D",
-                    borderRadius: "6px",
-                  }),
-                }}
-                value={
-                  department.find(
-                    (option) => option.value === room.department
-                  ) || null
-                }
-                onChange={(option) => handleDepartmentChange(index, option)}
-              />
-              <Select
-                options={roomType}
-                className="w-44"
-                placeholder="Select"
-                styles={{
-                  control: (provided: any) => ({
-                    ...provided,
-                    border: "1px solid #02296D",
-                    borderRadius: "6px",
-                  }),
-                }}
-                value={
-                  roomType.find((option) => option.value === room.roomType) ||
-                  null
-                }
-                onChange={(option) => handleRoomTypeChange(index, option)}
-              />
+        {rooms.map((room, index) => {
+          console.log(room.roomId);
+          return (
+            <div
+              key={index}
+              className="flex gap-5 mx-auto font-Manrope font-semibold mb-7"
+            >
+              <div className="flex bg-[rgba(241,250,255,0.5)] rounded-xl shadow-md gap-16 p-10 items-center">
+                <label className="block font-semibold mb-2">
+                  Room {index + 1}
+                </label>
+                <Select
+                  isDisabled={true}
+                  options={roomCodes}
+                  className="w-44"
+                  placeholder="Select"
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      border: "1px solid #02296D",
+                      borderRadius: "6px",
+                    }),
+                  }}
+                  value={
+                    roomCodes.find((option) => option.value === room.roomId) ||
+                    null
+                  }
+                  onChange={(option) => handleRoomCodeChange(index, option)}
+                />
+                <Select
+                  options={department}
+                  className="w-44"
+                  placeholder="Select"
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      border: "1px solid #02296D",
+                      borderRadius: "6px",
+                    }),
+                  }}
+                  value={
+                    department.find(
+                      (option) => option.value === room.department
+                    ) || null
+                  }
+                  onChange={(option) => handleDepartmentChange(index, option)}
+                />
+                <Select
+                  options={roomType}
+                  className="w-44"
+                  placeholder="Select"
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      border: "1px solid #02296D",
+                      borderRadius: "6px",
+                    }),
+                  }}
+                  value={
+                    roomType.find((option) => option.value === room.roomType) ||
+                    null
+                  }
+                  onChange={(option) => handleRoomTypeChange(index, option)}
+                />
+              </div>
+              <button type="button" onClick={() => handleDeleteRoom(index)}>
+                <img src={trash_button} alt="Delete" className="w-7" />
+              </button>
             </div>
-            <button type="button" onClick={() => handleDeleteRoom(index)}>
-              <img src={trash_button} alt="Delete" className="w-7" />
-            </button>
-          </div>
-        ))}
+          );
+        })}
 
         <div className="mx-auto flex gap-4">
           <div>
