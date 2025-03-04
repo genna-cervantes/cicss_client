@@ -1,6 +1,7 @@
 import React, { useState, FormEvent, useEffect } from "react";
 import Select from "react-select";
 import Navbar from "../../components/Navbar";
+import { v4 as uuidv4 } from "uuid";
 
 import add_button_white from "../../assets/add_button_white.png";
 import trash_button from "../../assets/trash_button.png";
@@ -49,18 +50,30 @@ const roomType: Option[] = [
 ];
 
 const InputRooms = () => {
-
   // Array of Rooms
-  const [rooms, setRooms] = useState<RoomInfo[]>([
-  ]);
+  const [rooms, setRooms] = useState<RoomInfo[]>([]);
 
-  const [updatedRooms, setUpdatedRooms] = useState<{roomId: string, fields: string[]}[]>([])
+  const [updatedRooms, setUpdatedRooms] = useState<
+    { roomId: string; fields: string[] }[]
+  >([]);
+  const [insertedRooms, setInsertedRooms] = useState<string[]>([]);
+
+  useEffect(() => {
+    console.log('updated', updatedRooms)
+  }, [updatedRooms])
+
+  useEffect(() => {
+    console.log('inserted', insertedRooms)
+  }, [insertedRooms])
 
   // Update the roomCode for a specific form.
   const handleRoomCodeChange = (
     index: number,
     selectedOption: Option | null
   ) => {
+    if (insertedRooms.find((r) => r === rooms[index].roomId)) {
+      setInsertedRooms((prev) => [...prev, selectedOption ? selectedOption.value : rooms[index].roomId])
+    }
     setRooms((prev) => {
       const updated = [...prev];
       updated[index] = {
@@ -84,21 +97,20 @@ const InputRooms = () => {
       };
       return updated;
     });
-    setUpdatedRooms((prev) => {
-      return prev.some((item) => item.roomId === rooms[index].roomId)
-        ? prev.map((item) =>
-            item.roomId === rooms[index].roomId
-              ? {
-                  ...item,
-                  fields: [...new Set([...item.fields, "department"])],
-                }
-              : item
-          )
-        : [
-            ...prev,
-            { roomId: rooms[index].roomId, fields: ["department"] },
-          ];
-    });
+    if (!insertedRooms.find((r) => r === rooms[index].roomId)) {
+      setUpdatedRooms((prev) => {
+        return prev.some((item) => item.roomId === rooms[index].roomId)
+          ? prev.map((item) =>
+              item.roomId === rooms[index].roomId
+                ? {
+                    ...item,
+                    fields: [...new Set([...item.fields, "department"])],
+                  }
+                : item
+            )
+          : [...prev, { roomId: rooms[index].roomId, fields: ["department"] }];
+      });
+    }
   };
 
   // Update the room type for a specific form.
@@ -114,27 +126,28 @@ const InputRooms = () => {
       };
       return updated;
     });
-    setUpdatedRooms((prev) => {
-      return prev.some((item) => item.roomId === rooms[index].roomId)
-        ? prev.map((item) =>
-            item.roomId === rooms[index].roomId
-              ? {
-                  ...item,
-                  fields: [...new Set([...item.fields, "roomType"])],
-                }
-              : item
-          )
-        : [
-            ...prev,
-            { roomId: rooms[index].roomId, fields: ["roomType"] },
-          ];
-    });
+    if (!insertedRooms.find((r) => r === rooms[index].roomId)) {
+      setUpdatedRooms((prev) => {
+        return prev.some((item) => item.roomId === rooms[index].roomId)
+          ? prev.map((item) =>
+              item.roomId === rooms[index].roomId
+                ? {
+                    ...item,
+                    fields: [...new Set([...item.fields, "roomType"])],
+                  }
+                : item
+            )
+          : [...prev, { roomId: rooms[index].roomId, fields: ["roomType"] }];
+      });
+    }
   };
 
   // Add a new form.
   const handleAddRoom = (e: FormEvent) => {
     e.preventDefault();
-    setRooms((prev) => [...prev, { roomId: "", department: "", roomType: "" }]);
+    let tempId = uuidv4();
+    setRooms((prev) => [...prev, { roomId: tempId, department: "", roomType: "" }]);
+    setInsertedRooms((prev) => [...prev, tempId]);
   };
 
   // Delete a specific form.
@@ -152,35 +165,79 @@ const InputRooms = () => {
     //   console.log(` Type: ${room.roomType}`);
     // });
 
-    for (let i = 0; i < updatedRooms.length; i++){
-      let updatedRoom: any = rooms.find((r) => r.roomId === updatedRooms[i].roomId);
+    // UPDATES
+    for (let i = 0; i < updatedRooms.length; i++) {
+      let updatedRoom: any = rooms.find(
+        (r) => r.roomId === updatedRooms[i].roomId
+      );
 
-      if (!updatedRoom){
+      if (!updatedRoom) {
         continue;
       }
 
       const reqObj: any = {
-        roomId: updatedRoom.roomId
-      }
+        roomId: updatedRoom.roomId,
+      };
 
-      for (let j = 0; j < updatedRooms[i].fields.length; j++){
+      for (let j = 0; j < updatedRooms[i].fields.length; j++) {
         let field = updatedRooms[i].fields[j];
         reqObj[field] = updatedRoom[field];
       }
 
-      const res = await fetch('http://localhost:8080/rooms', {
-        method: 'PUT',
+      const res = await fetch("http://localhost:8080/rooms", {
+        method: "PUT",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(reqObj)
-      })
-      
-      if (res.ok){
-        console.log('yeey ok')
-      }else{
+        body: JSON.stringify(reqObj),
+      });
+
+      if (res.ok) {
+        console.log("yeey ok");
+      } else {
         const data = await res.json();
-        console.log('error', data)
+        console.log("error", data);
+      }
+    }
+
+    // INSERTS
+    for (let i = 0; i < insertedRooms.length; i++) {
+      let insertedRoom = insertedRooms[i];
+
+      if (!insertedRoom.startsWith("RM")) {
+        continue;
+      }
+
+      if (rooms.filter((r) => r.roomId === insertedRoom).length > 1) {
+        continue;
+        // set error dito na bawal mag dupli ng room
+      }
+
+      let room = rooms.find((r) => r.roomId === insertedRoom);
+
+      if (!room) {
+        continue;
+      }
+
+      let reqObj = {
+        roomId: insertedRoom,
+        department: room.department,
+        roomType: room.roomType,
+      };
+
+      console.log(reqObj)
+
+      const res = await fetch("http://localhost:8080/rooms", {
+        method: "POST",
+        headers: { "Content-type": "application/json" },
+        body: JSON.stringify(reqObj),
+      });
+
+      if (res.ok) {
+        console.log("yeyy");
+      } else {
+        const data = await res.json();
+        console.log("error", data);
       }
     }
   };
@@ -226,7 +283,6 @@ const InputRooms = () => {
 
       <form className="flex flex-col">
         {rooms.map((room, index) => {
-          console.log(room.roomId);
           return (
             <div
               key={index}
@@ -237,7 +293,7 @@ const InputRooms = () => {
                   Room {index + 1}
                 </label>
                 <Select
-                  isDisabled={true}
+                  isDisabled={room.roomId.startsWith("RM")}
                   options={roomCodes}
                   className="w-44"
                   placeholder="Select"
