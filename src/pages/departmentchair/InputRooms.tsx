@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import Select from "react-select";
 import Navbar from "../../components/Navbar";
 
@@ -6,7 +6,7 @@ import add_button_white from "../../assets/add_button_white.png";
 import trash_button from "../../assets/trash_button.png";
 
 interface RoomInfo {
-  roomCode: number;
+  roomId: string;
   department: string;
   roomType: string;
 }
@@ -16,36 +16,44 @@ interface Option {
   label: string;
 }
 
+const roomCodes: Option[] = [
+  { value: "RM1801", label: "RM1903" },
+  { value: "RM1805", label: "RM1903" },
+  { value: "RM1806", label: "RM1903" },
+  { value: "RM1807", label: "RM1903" },
+  { value: "RM1808", label: "RM1903" },
+  { value: "RM1901", label: "RM1903" },
+  { value: "RM1902", label: "RM1903" },
+  { value: "RM1903", label: "RM1903" },
+  { value: "RM1904", label: "RM1904" },
+  { value: "RM1905", label: "RM1905" },
+  { value: "RM1906", label: "RM1906" },
+  { value: "RM1907", label: "RM1907" },
+  { value: "RM1908", label: "RM1908" },
+  { value: "RM1909", label: "RM1909" },
+  { value: "RM1910", label: "RM1910" },
+  { value: "RM1911", label: "RM1911" },
+  { value: "RM1912", label: "RM1912" },
+  { value: "RM1913", label: "RM1913" },
+];
+
+const department: Option[] = [
+  { value: "CS", label: "CS" },
+  { value: "IT", label: "IT" },
+  { value: "IS", label: "IS" },
+];
+
+const roomType: Option[] = [
+  { value: "lec", label: "Lec" },
+  { value: "lab", label: "Lab" },
+];
+
 const InputRooms = () => {
   //Dummy Options
-  const roomCodes: Option[] = [
-    { value: "1903", label: "1903" },
-    { value: "1904", label: "1904" },
-    { value: "1905", label: "1905" },
-    { value: "1906", label: "1906" },
-    { value: "1907", label: "1907" },
-    { value: "1908", label: "1908" },
-    { value: "1909", label: "1909" },
-    { value: "1910", label: "1910" },
-    { value: "1911", label: "1911" },
-    { value: "1912", label: "1912" },
-    { value: "1913", label: "1913" },
-  ];
-
-  const department: Option[] = [
-    { value: "cs", label: "CS" },
-    { value: "it", label: "IT" },
-    { value: "is", label: "IS" },
-  ];
-
-  const roomType: Option[] = [
-    { value: "lec", label: "Lec" },
-    { value: "lab", label: "Lab" },
-  ];
 
   // Array of Rooms
   const [rooms, setRooms] = useState<RoomInfo[]>([
-    { roomCode: 0, department: "", roomType: "" },
+    // { roomId: '', department: "", roomType: "" },
   ]);
 
   // Update the roomCode for a specific form.
@@ -57,9 +65,9 @@ const InputRooms = () => {
       const updated = [...prev];
       updated[index] = {
         ...updated[index],
-        roomCode: selectedOption
-          ? Number(selectedOption.value)
-          : updated[index].roomCode,
+        roomId: selectedOption
+          ? selectedOption.value
+          : updated[index].roomId,
       };
       return updated;
     });
@@ -100,7 +108,7 @@ const InputRooms = () => {
     e.preventDefault();
     setRooms((prev) => [
       ...prev,
-      { roomCode: 0, department: "", roomType: "" },
+      { roomId: '', department: "", roomType: "" },
     ]);
   };
 
@@ -114,11 +122,28 @@ const InputRooms = () => {
     e.preventDefault();
     rooms.forEach((room, index) => {
       console.log(`Room ${index + 1}`);
-      console.log(` Code: ${room.roomCode}`);
+      console.log(` Code: ${room.roomId}`);
       console.log(` Department: ${room.department}`);
       console.log(` Type: ${room.roomType}`);
     });
   };
+
+  // CONNECTIONS TO DB
+  useEffect(() => {
+    const getRooms = async () => {
+      const res = await fetch('http://localhost:8080/rooms/CS') // MAKE DYNAMIC AH
+      const data = await res.json();
+
+      if (res.ok){
+        setRooms(data)
+        console.log(data)
+      }else{
+        console.log('error', data)
+      }
+    }
+
+    getRooms();
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -165,7 +190,7 @@ const InputRooms = () => {
                 }}
                 value={
                   roomCodes.find(
-                    (option) => Number(option.value) === room.roomCode
+                    (option) => option.value === room.roomId
                   ) || null
                 }
                 onChange={(option) => handleRoomCodeChange(index, option)}
