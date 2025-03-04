@@ -57,6 +57,7 @@ const InputRooms = () => {
     { roomId: string; fields: string[] }[]
   >([]);
   const [insertedRooms, setInsertedRooms] = useState<string[]>([]);
+  const [deletedRooms, setDeletedRooms] = useState<string[]>([]);
 
   useEffect(() => {
     console.log('updated', updatedRooms)
@@ -153,6 +154,7 @@ const InputRooms = () => {
   // Delete a specific form.
   const handleDeleteRoom = (index: number) => {
     setRooms((prev) => prev.filter((_, i) => i !== index));
+    setDeletedRooms((prev) => [...prev, rooms[index].roomId])
   };
 
   // Save handler for demonstration (logs the rooms array).
@@ -225,8 +227,6 @@ const InputRooms = () => {
         roomType: room.roomType,
       };
 
-      console.log(reqObj)
-
       const res = await fetch("http://localhost:8080/rooms", {
         method: "POST",
         headers: { "Content-type": "application/json" },
@@ -240,6 +240,25 @@ const InputRooms = () => {
         console.log("error", data);
       }
     }
+
+    // DELETES
+    for (let i = 0; i < deletedRooms.length; i++){
+      const res = await fetch("http://localhost:8080/rooms", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({roomId: deletedRooms[i]}),
+      });
+
+      if (res.ok) {
+        console.log("yey ok"); // PLS CHANGE THIS TO MESSAGE KAHIT SA BABA NUNG BUTTONS LNG
+      } else {
+        const data = await res.json()
+        console.log("nooo", data);
+      }
+    }
+    
   };
 
   // CONNECTIONS TO DB
