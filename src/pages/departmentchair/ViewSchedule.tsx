@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
+import ScheduleView from "../../components/ScheduleView";
 
 const ViewSchedule = () => {
   const sections = [
@@ -148,6 +149,9 @@ const ViewSchedule = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div>
+        <ScheduleView />
       </div>
     </div>
   );

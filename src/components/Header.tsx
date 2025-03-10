@@ -4,10 +4,10 @@ import { NavLink } from "react-router-dom";
 
 const Header = () => {
   return (
-    <header>
+    <header className="pt-4">
       <div className="flex justify-between items-center py-3 px-16">
         <a href="/">
-          <img src={cicss_logo} alt="" className="w-32" />
+          <img src={cicss_logo} alt="" className="w-36" />
         </a>
         <nav>
           <ul className="flex gap-8 text-sm font-Akira-Expanded items-center">

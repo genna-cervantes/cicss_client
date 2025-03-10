@@ -651,7 +651,7 @@ const InputTAS: React.FC = () => {
           1st Semester A.Y 2025-2026
         </div>
       </section>
-      <section className="mx-28 my-11">
+      <section className="mx-28 mt-11 mb-4">
         <div className="flex font-Manrope font-extrabold gap-80">
           <div className="flex gap-24">
             <div className="flex gap-20">
