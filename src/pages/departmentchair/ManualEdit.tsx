@@ -6,20 +6,7 @@ import { NavLink } from "react-router-dom";
 import Select from "react-select";
 import "../../components/custom-calendar.css";
 import "../../components/custom-event.css";
-
-interface WeekDates {
-  [day: string]: string;
-}
-
-const weekDates: WeekDates = {
-  Monday: "2025-02-03",
-  Tuesday: "2025-02-04",
-  Wednesday: "2025-02-05",
-  Thursday: "2025-02-06",
-  Friday: "2025-02-07",
-  Saturday: "2025-02-08",
-  Sunday: "2025-02-09",
-};
+import { weekDates } from "../../utils/constants";
 
 const ManualEdit = () => {
   // Initial events definition

@@ -2,10 +2,22 @@ import { CalendarApp, createViewWeek } from '@schedule-x/calendar';
 import { createDragAndDropPlugin } from '@schedule-x/drag-and-drop';
 import { ScheduleXCalendar, useCalendarApp } from '@schedule-x/react';
 import React, { useState } from 'react'
+import { weekDates } from '../utils/constants';
 
 const ScheduleView = () => {
 
-    const [events, setEvents] = useState()
+    const [events, setEvents] = useState(
+        [{
+            id: 1,
+            title: "Machine Learning",
+            start: `${weekDates.Monday} 08:00`,
+            end: `${weekDates.Monday} 10:00`,
+            location: "Room 1903",
+            people: ["Jessie James Suarez"],
+          },]
+    )
+
+    // useeffect the /scheudle endpoint
 
     const calendar: CalendarApp = useCalendarApp({
         views: [createViewWeek()],
