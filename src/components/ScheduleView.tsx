@@ -49,7 +49,7 @@ const transformToScheduleEvents = (rawSchedule: any) => {
   return transformedEvents;
 };
 
-const ScheduleView = () => {
+const ScheduleView = ({filter = 'Section', value = '1CSA'}: {filter: string, value: string}) => {
   const [events, setEvents] = useState([
     {
       id: 1,
@@ -66,8 +66,7 @@ const ScheduleView = () => {
     useState<any>();
   const [error, setError] = useState("");
 
-  // useeffect the /scheudle endpoint
-
+  // default schedule to show
   useEffect(() => {
     const fetchSchedule = async () => {
       const res = await fetch("http://localhost:3000/schedule/class/CS/1/CSA"); // DEFAULT NA SIMULA
@@ -83,6 +82,7 @@ const ScheduleView = () => {
     fetchSchedule();
   }, []);
 
+  // rendering when schedule is fetched
   useEffect(() => {
     console.log("raw schedule events");
     console.log(scheduleEvents);
@@ -96,9 +96,33 @@ const ScheduleView = () => {
     }
   }, [scheduleEvents]);
 
+  // update schedule when go to next or previous
   useEffect(() => {
-    console.log(transformedScheduleEvents);
-  }, [transformedScheduleEvents]);
+
+    console.log('filter', filter)
+    console.log('value', value)
+
+      if (filter === 'Section'){
+        let year = value.slice(0, 1);
+        let section = value.slice(1);
+
+        console.log(year)
+        console.log(section)
+        
+        const fetchSchedule = async () => {
+            const res = await fetch(`http://localhost:3000/schedule/class/CS/${year}/${section}`); // DEFAULT NA CS MUNA
+            const data = await res.json();
+      
+            if (res.ok) {
+              setScheduleEvents(data);
+            } else {
+              setError("may error sa pag kuha ng sched");
+            }
+          };
+      
+          fetchSchedule();
+    }
+  }, [filter, value])
 
   let calendar: CalendarApp;
   if (transformedScheduleEvents){

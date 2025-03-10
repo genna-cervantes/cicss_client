@@ -2,21 +2,36 @@ import React, { useState } from "react";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import ScheduleView from "../../components/ScheduleView";
 
+const sections = [
+  { code: "1CSA", next: "1CSB"},
+  { code: "1CSB", next: "1CSC"},
+  { code: "1CSC", next: "1CSD"},
+  { code: "1CSD", next: "1CSD"},
+  { code: "1CSE", next: "1CSE"},
+  { code: "3CSA", label: "Core Computer Science", next: "3CSB" },
+  { code: "3CSB", label: "Game Development" },
+  { code: "3CSC", label: "Data Science" },
+  { code: "3CSD", label: "Data Science" },
+  { code: "3CSE", label: "Data Science" },
+  { code: "3CSF", label: "Data Science" },
+];
+
+const sectionDirectory: any = {
+  '1CSA': '1CSB',
+  '1CSB': '1CSC',
+  '1CSC': '1CSD',
+  '1CSD': '1CSE',
+  '1CSE': '2CSA',
+}
+
 const ViewSchedule = () => {
-  const sections = [
-    { code: "3CSA", label: "Core Computer Science" },
-    { code: "3CSB", label: "Game Development" },
-    { code: "3CSC", label: "Data Science" },
-    { code: "3CSD", label: "Data Science" },
-    { code: "3CSE", label: "Data Science" },
-    { code: "3CSF", label: "Data Science" },
-  ];
 
   // State to track the current section index
   const [currentIndex, setCurrentIndex] = useState(0);
-
   // State to track the current filter
   const [currentFilter, setCurrentFilter] = useState("Section");
+  
+  const [currentValue, setCurrentValue] = useState(currentFilter === "Section" ? '1CSA' : currentFilter === "TAS" ? 'TAS1' : currentFilter === "Room" ? 'RM1901' : '');
 
   // Navigate to the previous section
   const goToPrevious = () => {
@@ -26,14 +41,21 @@ const ViewSchedule = () => {
   };
 
   // Navigate to the next section
+  // const goToNext = () => {
+  //   setCurrentIndex((prevIndex) =>
+  //     prevIndex < sections.length - 1 ? prevIndex + 1 : 0
+  //   );
+  // };
+
   const goToNext = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex < sections.length - 1 ? prevIndex + 1 : 0
-    );
-  };
+    if (currentFilter === 'Section'){
+      setCurrentValue(sectionDirectory[currentValue])
+    }
+  }
+
 
   // Change the current filter
-  const changeFilter = (filter: React.SetStateAction<string>) => {
+  const changeFilter = (filter: string) => {
     setCurrentFilter(filter);
   };
 
@@ -56,7 +78,8 @@ const ViewSchedule = () => {
         {/* Section Code and Label */}
         <div className="flex items-center gap-3">
           <div className="font-CyGrotesk text-primary text-[40px]">
-            {currentSection.code}
+            {/* {currentSection.code} */}
+          {currentValue}
           </div>
           <div className="font-Helvetica-Neue-Heavy bg-custom_yellow px-3 py-1 rounded-3xl">
             {currentSection.label}
@@ -151,7 +174,7 @@ const ViewSchedule = () => {
         </div>
       </div>
       <div>
-        <ScheduleView />
+        <ScheduleView value={currentValue} filter={currentFilter} />
       </div>
     </div>
   );
