@@ -13,7 +13,7 @@ const Dashboard = () => {
   // Check screen width on mount and when window resizes
   useEffect(() => {
     const checkScreenSize = () => {
-      setIsMinimized(window.innerWidth < 500);
+      setIsMinimized(window.innerWidth < 1000);
     };
 
     // Check on initial load

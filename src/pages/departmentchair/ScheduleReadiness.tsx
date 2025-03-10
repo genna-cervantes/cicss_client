@@ -40,10 +40,10 @@ const ScheduleReadiness = () => {
         </div>
 
         <button
-          onClick={() => navigate("/departmentchair/schedule-readiness")}
+          onClick={() => navigate("/departmentchair/schedule-view")}
           className="py-1 px-1 w-36 font-semibold bg-[#0350D3] text-white rounded-sm"
         >
-          Ready
+          Continue
         </button>
       </section>
     </div>

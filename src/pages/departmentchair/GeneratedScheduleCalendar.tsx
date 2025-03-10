@@ -491,11 +491,12 @@ const CourseSchedule: React.FC = () => {
       )}
 
       <div className="overflow-x-auto">
-        <div className="grid grid-cols-7 bg-[#E0EFFA] border border-primary">
-          <div className="col-span-1 border-r border-b border-primary p-2 bg-[#E0EFFA]">
-            <div className="h-8 text-center font-Manrope font-bold text-primary">
-              Time
-            </div>
+        <div
+          className="grid border-2 border-primary"
+          style={{ gridTemplateColumns: "120px repeat(6, 1fr)" }}
+        >
+          <div className="col-span-1 border-r  border-primary p-2 bg-[#E0EFFA]">
+            <div className="h-8 text-center font-Manrope font-bold text-primary"></div>
           </div>
 
           {days.map((day) => (
@@ -509,14 +510,17 @@ const CourseSchedule: React.FC = () => {
             </div>
           ))}
 
-          <div ref={gridRef} className="col-span-7 grid grid-cols-7">
-            <div className="col-span-1 border-r border-primary">
+          <div
+            ref={gridRef}
+            className="col-span-7 grid"
+            style={{ gridTemplateColumns: "120px repeat(6, 1fr)" }}
+          >
+            <div className="col-span-1 border-r border-primary relative">
               {hours.map((hour, index) => (
-                <div
-                  key={index}
-                  className="h-8 border-b border-transparent text-sm text-right pr-2 text-primary font-Manrope font-bold"
-                >
-                  {hour.display}
+                <div key={index} className="h-8">
+                  <span className="absolute -translate-y-1/2 right-2 text-sm text-primary font-Manrope font-bold ">
+                    {hour.display}
+                  </span>
                 </div>
               ))}
             </div>
