@@ -1,7 +1,9 @@
-import React from "react";
+import React from 'react'
 
 const TASDashboard = () => {
-  return <div>TASDashboard</div>;
-};
+  return (
+    <div>TASDashboard</div>
+  )
+}
 
-export default TASDashboard;
+export default TASDashboard

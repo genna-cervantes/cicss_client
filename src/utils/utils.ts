@@ -18,68 +18,78 @@ export const fetchUserInfo = async (accessToken: string) => {
 };
 
 export const checkIfCICSStudent = (email: string) => {
-  try {
-    let prefix = email.split("@")[0];
-    let prefixSplit = prefix.split(".");
-    let college = prefixSplit[prefixSplit.length - 1];
+    try{
 
-    return college === "cics";
-  } catch (error) {
-    console.error("Error with checking email:", error);
-  }
-};
+        let prefix = email.split('@')[0];
+        let prefixSplit = prefix.split('.');
+        let college = prefixSplit[prefixSplit.length - 1];
+
+        return college === 'cics';
+
+    }catch (error){
+        console.error("Error with checking email:", error);
+    }
+}
 
 export const checkIfCICSTAS = async (email: string) => {
-  try {
-    // POST /api/tas/email
-    let rqBody = JSON.stringify({ email }); // {email: email}
+    try{
 
-    let response = await fetch(
-      "http://localhost:8080/departmentchair/authenticate",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: rqBody,
-      }
-    );
+        // POST /api/tas/email 
+        let rqBody = JSON.stringify({email})// {email: email}
 
-    let jsRes = await response.json();
+        let response = await fetch("http://localhost:8080/departmentchair/authenticate", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: rqBody
+        })
 
-    return jsRes.auth;
-  } catch (error) {
-    console.error("Error with checking email: ", error);
-  }
-};
+        let jsRes = await response.json();
+
+        return jsRes.auth;
+
+    }catch (error){
+        console.error("Error with checking email: ", error);
+    }
+}
 
 export const checkIfCICSDepartmentChair = async (email: string) => {
-  return true;
+    try{
 
-  try {
-    // POST /api/department-chair/email
-    // {email: email}
+        return true;
 
-    // return true if may return ung query false if wala
-    // SELECT id FROM department_chairs WHERE email = 'email'
+        // POST /api/department-chair/email 
+        // {email: email}
 
-    let rqBody = JSON.stringify({ email }); // {email: email}
+        // return true if may return ung query false if wala
+        // SELECT id FROM department_chairs WHERE email = 'email'
 
-    let response = await fetch(
-      "http://localhost:8080/departmentchair/authenticate",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: rqBody,
-      }
-    );
+        let rqBody = JSON.stringify({email})// {email: email}
 
-    let jsRes = await response.json();
+        let response = await fetch("http://localhost:8080/departmentchair/authenticate", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: rqBody
+        })
 
-    return jsRes.auth;
-  } catch (error) {
-    console.error("Error with checking email: ", error);
-  }
-};
+        let jsRes = await response.json();
+
+        return jsRes.auth;
+
+    }catch (error){
+        console.error("Error with checking email: ", error);
+    }
+}
+
+export const getCourseCodesFromInternalRepresentation = (internalRep: String[]) => {
+
+    // loop thru the string arr
+    // remove ung mga -LC -LB sa dulo tapos gawing set - para sa may mga lab
+    // remove ung mga W- sa unahan - para sa mga specialization - lagyan ng (Specialization)
+
+    // return the set
+
+}
