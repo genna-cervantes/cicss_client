@@ -16,12 +16,13 @@ const sections = [
   { code: "3CSF", label: "Data Science" },
 ];
 
+// dynamically toh gagawin based sa section count sa simula
 const sectionDirectory: any = {
-  '1CSA': '1CSB',
-  '1CSB': '1CSC',
-  '1CSC': '1CSD',
-  '1CSD': '1CSE',
-  '1CSE': '2CSA',
+  '1CSA': {next: '1CSB', prev: '4CSC'},
+  '1CSB': {next: '1CSC', prev: '1CSA'},
+  '1CSC': {next: '1CSD', prev: '1CSB'},
+  '1CSD': {next: '1CSE', prev: '1CSC'},
+  '1CSE': {next: '2CSA', prev: '1CSD'},
 }
 
 const ViewSchedule = () => {
@@ -35,9 +36,12 @@ const ViewSchedule = () => {
 
   // Navigate to the previous section
   const goToPrevious = () => {
-    setCurrentIndex((prevIndex) =>
-      prevIndex > 0 ? prevIndex - 1 : sections.length - 1
-    );
+    // setCurrentIndex((prevIndex) =>
+    //   prevIndex > 0 ? prevIndex - 1 : sections.length - 1
+    // );
+    if (currentFilter === 'Section'){
+      setCurrentValue(sectionDirectory[currentValue].prev)
+    }
   };
 
   // Navigate to the next section
@@ -49,7 +53,7 @@ const ViewSchedule = () => {
 
   const goToNext = () => {
     if (currentFilter === 'Section'){
-      setCurrentValue(sectionDirectory[currentValue])
+      setCurrentValue(sectionDirectory[currentValue].next)
     }
   }
 
