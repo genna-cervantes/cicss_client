@@ -38,6 +38,9 @@ const transformToScheduleEvents = (rawSchedule: any) => {
     for (let j = 0; j < daySched.length; j++) {
       let schedBlock = daySched[j];
 
+      console.log('schedBlock')
+      console.log(schedBlock)
+
       let transformedSchedBlock = {
         id: schedBlock.id,
         title: schedBlock.course.subjectCode,
@@ -45,7 +48,7 @@ const transformToScheduleEvents = (rawSchedule: any) => {
         end: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.end)}`,
         location: schedBlock.room.roomId,
         people: [schedBlock.tas.tas_name], // magkaiba pa ung convnetiona mp
-        description: JSON.stringify({type: schedBlock.course.type})
+        description: JSON.stringify({type: schedBlock.course.type, violations: schedBlock.violations ?? []})
       };
 
       transformedEvents.push(transformedSchedBlock);
