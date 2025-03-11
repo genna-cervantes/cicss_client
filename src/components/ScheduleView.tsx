@@ -8,6 +8,7 @@ import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
 import React, { useEffect, useState } from "react";
 import { weekDates } from "../utils/constants";
 import GenerateButton from "./GenerateButton";
+import timeGridEvent from "../pages/departmentchair/TimeGridEvent";
 
 const dayKeysToFull: any = {
   M: "Monday",
@@ -44,7 +45,7 @@ const transformToScheduleEvents = (rawSchedule: any) => {
         end: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.end)}`,
         location: schedBlock.room.roomId,
         people: [schedBlock.tas.tas_name], // magkaiba pa ung convnetiona mp
-        description: 'hello'
+        description: JSON.stringify({type: schedBlock.course.type})
       };
 
       transformedEvents.push(transformedSchedBlock);
@@ -160,7 +161,7 @@ const ScheduleView = ({
   return (
     <div>
       <div className="pointer-events-none">
-        <ScheduleXCalendar calendarApp={calendar} />
+        <ScheduleXCalendar calendarApp={calendar} customComponents={{timeGridEvent: timeGridEvent}}/>
       </div>
     </div>
   );
