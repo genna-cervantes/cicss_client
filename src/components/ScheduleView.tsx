@@ -1,4 +1,8 @@
-import { CalendarApp, createCalendar, createViewWeek } from "@schedule-x/calendar";
+import {
+  CalendarApp,
+  createCalendar,
+  createViewWeek,
+} from "@schedule-x/calendar";
 import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
 import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
 import React, { useEffect, useState } from "react";
@@ -40,6 +44,7 @@ const transformToScheduleEvents = (rawSchedule: any) => {
         end: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.end)}`,
         location: schedBlock.room.roomId,
         people: [schedBlock.tas.tas_name], // magkaiba pa ung convnetiona mp
+        description: 'hello'
       };
 
       transformedEvents.push(transformedSchedBlock);
@@ -49,7 +54,13 @@ const transformToScheduleEvents = (rawSchedule: any) => {
   return transformedEvents;
 };
 
-const ScheduleView = ({filter = 'Section', value = '1CSA'}: {filter: string, value: string}) => {
+const ScheduleView = ({
+  filter = "Section",
+  value = "1CSA",
+}: {
+  filter: string;
+  value: string;
+}) => {
   const [events, setEvents] = useState([
     {
       id: 1,
@@ -98,79 +109,59 @@ const ScheduleView = ({filter = 'Section', value = '1CSA'}: {filter: string, val
 
   // update schedule when go to next or previous
   useEffect(() => {
+    console.log("filter", filter);
+    console.log("value", value);
 
-    console.log('filter', filter)
-    console.log('value', value)
+    if (filter === "Section") {
+      let year = value.slice(0, 1);
+      let section = value.slice(1);
 
-      if (filter === 'Section'){
-        let year = value.slice(0, 1);
-        let section = value.slice(1);
+      console.log(year);
+      console.log(section);
 
-        console.log(year)
-        console.log(section)
-        
-        const fetchSchedule = async () => {
-            const res = await fetch(`http://localhost:3000/schedule/class/CS/${year}/${section}`); // DEFAULT NA CS MUNA
-            const data = await res.json();
-      
-            if (res.ok) {
-              setScheduleEvents(data);
-            } else {
-              setError("may error sa pag kuha ng sched");
-            }
-          };
-      
-          fetchSchedule();
+      const fetchSchedule = async () => {
+        const res = await fetch(
+          `http://localhost:3000/schedule/class/CS/${year}/${section}`
+        ); // DEFAULT NA CS MUNA
+        const data = await res.json();
+
+        if (res.ok) {
+          setScheduleEvents(data);
+        } else {
+          setError("may error sa pag kuha ng sched");
+        }
+      };
+
+      fetchSchedule();
     }
-  }, [filter, value])
+  }, [filter, value]);
 
   let calendar: CalendarApp;
-  if (transformedScheduleEvents){
-      calendar = createCalendar(
-        {
-          views: [createViewWeek()],
-          events: transformedScheduleEvents,
-          selectedDate: "2025-02-03",
-          dayBoundaries: {
-            start: "07:00",
-            end: "21:00",
-          },
-          weekOptions: { eventOverlap: false, nDays: 6 },
-          plugins: [createDragAndDropPlugin(30)],
-          callbacks: {
-            onEventUpdate(updatedEvent) {
-              console.log("onEventUpdate", updatedEvent);
-            },
-            onBeforeEventUpdate(oldEvent, newEvent, $app) {
-              // Helper: convert a "YYYY-MM-DD HH:mm" string to a Date.
-              // const parseDateTime = (dateTimeStr: string) =>
-              //   new Date(dateTimeStr.replace(" ", "T"));
-    
-              // const newStart = parseDateTime(newEvent.start);
-              // const newEnd = parseDateTime(newEvent.end);
-    
-              // // Instead of $app.config.events, access the events from the calendarEvents store.
-              // const events = $app.calendarEvents.list.value;
-    
-              console.log("old event", oldEvent);
-              console.log("new event", newEvent);
-              console.log("app", $app);
-    
-              return true;
-            },
-          },
+  if (transformedScheduleEvents) {
+    calendar = createCalendar(
+      {
+        views: [createViewWeek()],
+        events: transformedScheduleEvents,
+        selectedDate: "2025-02-03",
+        dayBoundaries: {
+          start: "07:00",
+          end: "21:00",
         },
-        // [eventsServicePlugin]
-      );
-  }else{
-    return <>waiting...</>
-  }
+        weekOptions: { eventOverlap: false, nDays: 6 },
+      }
+      // [eventsServicePlugin]
+    );
 
+    console.log(transformedScheduleEvents)
+  } else {
+    return <>waiting...</>;
+  }
 
   return (
     <div>
-      <ScheduleXCalendar calendarApp={calendar} />
-      <GenerateButton />
+      <div className="pointer-events-none">
+        <ScheduleXCalendar calendarApp={calendar} />
+      </div>
     </div>
   );
 };

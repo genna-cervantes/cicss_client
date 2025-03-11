@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import ScheduleView from "../../components/ScheduleView";
+import GenerateButton from "../../components/GenerateButton";
 
 const sections = [
   { code: "1CSA", next: "1CSB"},
@@ -180,6 +181,7 @@ const ViewSchedule = () => {
       <div>
         <ScheduleView value={currentValue} filter={currentFilter} />
       </div>
+      <GenerateButton />
     </div>
   );
 };
