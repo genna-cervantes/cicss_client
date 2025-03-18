@@ -41,10 +41,6 @@ const Home = () => {
         setRole("department-chair");
         localStorage.setItem("role", "department-chair");
         navigate("/departmentchair");
-<<<<<<< HEAD
-=======
-
->>>>>>> e74de6c10418f59821b402b953259056783155c3
         return;
       }
 
@@ -54,24 +50,13 @@ const Home = () => {
         setRole("tas");
         localStorage.setItem("role", "tas");
         navigate("/tas");
-<<<<<<< HEAD
-=======
-
->>>>>>> e74de6c10418f59821b402b953259056783155c3
-        return;
-      }
-
-      // if student
-      if (checkIfCICSStudent(userInfo.email)) {
-        // redirect to dept chair view
-        setRole("student");
-        localStorage.setItem("role", "student");
-        navigate("/student");
-<<<<<<< HEAD
-=======
-
->>>>>>> e74de6c10418f59821b402b953259056783155c3
-        return;
+        if (checkIfCICSStudent(userInfo.email)) {
+          // redirect to dept chair view
+          setRole("student");
+          localStorage.setItem("role", "student");
+          navigate("/student");
+          return;
+        }
       }
     },
   });
