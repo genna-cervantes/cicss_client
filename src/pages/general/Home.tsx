@@ -33,12 +33,15 @@ const Home = () => {
       let userInfo = await fetchUserInfo(tokenResponse.access_token);
 
       // if department chair
-      if (await checkIfCICSDepartmentChair(userInfo.email)) {
+      let isDepartmentChair = await checkIfCICSDepartmentChair(userInfo.email);
+      console.log(isDepartmentChair);
+      if (isDepartmentChair) {
         // redirect to dept chair view
         // write sa local storage
         setRole("department-chair");
         localStorage.setItem("role", "department-chair");
         navigate("/departmentchair");
+        return;
       }
 
       // if prof
@@ -47,6 +50,7 @@ const Home = () => {
         setRole("tas");
         localStorage.setItem("role", "tas");
         navigate("/tas");
+        return;
       }
 
       // if student
@@ -55,6 +59,7 @@ const Home = () => {
         setRole("student");
         localStorage.setItem("role", "student");
         navigate("/student");
+        return;
       }
     },
   });

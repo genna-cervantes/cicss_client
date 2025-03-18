@@ -1,17 +1,20 @@
+/* filepath: /c:/Users/Julian/Documents/VScodingsss/Software_engineering/cicss_client/src/index.css */
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
+
 @font-face {
-    font-family: 'CyGrotesk';
-    src: url('./assets/kobuzan-cy-grotesk-grand-dark.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
+  font-family: "CyGrotesk";
+  src: url("./assets/kobuzan-cy-grotesk-grand-dark.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
 }
+
 @font-face {
-    font-family: 'HelveticaNueueHeavy';
-    src: url('./assets/HelveticaNeueHeavy.otf') format('opentype');
-    font-weight: bold;
-    font-style: normal;
+  font-family: "HelveticaNueueHeavy";
+  src: url("./assets/HelveticaNeueHeavy.otf") format("opentype");
+  font-weight: bold;
+  font-style: normal;
 }
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-

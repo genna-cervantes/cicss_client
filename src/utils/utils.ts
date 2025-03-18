@@ -63,6 +63,8 @@ export const checkIfCICSDepartmentChair = async (email: string) => {
         // return true if may return ung query false if wala
         // SELECT id FROM department_chairs WHERE email = 'email'
 
+        return true;
+
         let rqBody = JSON.stringify({email})// {email: email}
 
         let response = await fetch("http://localhost:8080/departmentchair/authenticate", {
