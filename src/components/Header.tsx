@@ -1,8 +1,17 @@
 import cicss_logo from "../assets/cicss_logo.png";
 import logout_logo from "../assets/logout_logo.png";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const Header = () => {
+
+  const navigate = useNavigate()
+
+  const handleLogout = () => {
+    console.log('logout')
+    localStorage.removeItem('role')
+    navigate(0)
+  }
+
   return (
     <header className="pt-4">
       <div className="flex justify-between items-center py-3 px-16">
@@ -24,9 +33,9 @@ const Header = () => {
 
             <div className=" bg-primary rounded-md w-32">
               <div className="flex px-3 py-1 items-center justify-between">
-                <NavLink to="logout" className="text-white">
+                <button onClick={handleLogout} className="text-white">
                   Logout
-                </NavLink>
+                </button>
                 <img src={logout_logo} alt="" className="w-5 h-4" />
               </div>
             </div>
