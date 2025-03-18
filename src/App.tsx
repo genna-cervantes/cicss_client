@@ -3,19 +3,28 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  Navigate
+  Navigate,
 } from "react-router-dom";
+
 import Home from "./pages/general/Home";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import DCDashboard from "./pages/department_chair/DCDashboard";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import TASDashboard from "./pages/tas/TASDashboard";
-import DCAuth from "./pages/department_chair/DCAuth";
+import DCAuth from "./pages/departmentchair/DCAuth";
 import TASAuth from "./pages/tas/TASAuth";
 import StudentAuth from "./pages/student/StudentAuth";
+import Dashboard from "./pages/departmentchair/Dashboard";
+import InputCourseOfferings from "./pages/departmentchair/InputCourseOfferings";
+import InputGenEd from "./pages/departmentchair/InputGenEd";
+import InputRooms from "./pages/departmentchair/InputRooms";
+import InputSectionCounts from "./pages/departmentchair/InputSectionCounts";
+import InputTAS from "./pages/departmentchair/InputTAS";
+import InputYLD from "./pages/departmentchair/InputYLD";
+import InputYLT from "./pages/departmentchair/InputYLT";
+import ManualEdit from "./pages/departmentchair/ManualEdit";
+import ViewSchedule from "./pages/departmentchair/ViewSchedule";
 
 const App: React.FC = () => {
-
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
 
   return (
@@ -26,18 +35,35 @@ const App: React.FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Home />} />
 
-          <Route path='/departmentchair' element={<DCAuth />}>
-            <Route index element={<DCDashboard />}/>
+          <Route path="/departmentchair" element={<DCAuth />}>
+            <Route index element={<Dashboard />} />
 
             {/* add routes for dc here */}
-            <Route path="sectioncount" element={<div>hello</div>} />
+            <Route
+              path="input-section-counts"
+              element={<InputSectionCounts />}
+            />
+            <Route path="input-TAS" element={<InputTAS />} />
+            <Route path="input-rooms" element={<InputRooms />} />
+            <Route
+              path="input-course-offerings"
+              element={<InputCourseOfferings />}
+            />
+            <Route path="input-gened" element={<InputGenEd />} />
+            <Route path="input-yld" element={<InputYLD />} />
+            <Route path="input-ylt" element={<InputYLT />} />
+            <Route path="schedule-view" element={<ViewSchedule />} />
+            <Route path="manual-edit" element={<ManualEdit />} />
 
             {/* catch all */}
-            <Route path="*" element={<Navigate to="/departmentchair" replace />} />
+            <Route
+              path="*"
+              element={<Navigate to="/departmentchair" replace />}
+            />
           </Route>
 
-          <Route path='/tas' element={<TASAuth />}>
-            <Route index element={<TASDashboard />}/>
+          <Route path="/tas" element={<TASAuth />}>
+            <Route index element={<TASDashboard />} />
 
             {/* add routes for tas here */}
             <Route path="schedule" element={<div>tas schedule</div>} />
@@ -45,15 +71,14 @@ const App: React.FC = () => {
             <Route path="*" element={<Navigate to="/tas" replace />} />
           </Route>
 
-          <Route path='/student' element={<StudentAuth />}>
-            <Route index element={<StudentDashboard />}/>
+          <Route path="/student" element={<StudentAuth />}>
+            <Route index element={<StudentDashboard />} />
 
             {/* add routes for student here */}
             <Route path="schedule" element={<div>student schedule</div>} />
 
             <Route path="*" element={<Navigate to="/student" replace />} />
           </Route>
-
         </Routes>
       </Router>
     </GoogleOAuthProvider>

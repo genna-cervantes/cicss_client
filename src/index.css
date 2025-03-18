@@ -1,6 +1,19 @@
 /* filepath: /c:/Users/Julian/Documents/VScodingsss/Software_engineering/cicss_client/src/index.css */
 @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "Akira-Expanded";
+  src: url(/fonts/Akira-Expanded.woff) format(woff);
+}
+@font-face {
+  font-family: "Helvetica-Neue-Heavy";
+  src: url(/fonts/HelveticaNeueHeavy.woff) format(woff);
+}
+
 @font-face {
   font-family: "CyGrotesk";
   src: url("./assets/kobuzan-cy-grotesk-grand-dark.otf") format("opentype");
@@ -14,7 +27,3 @@
   font-weight: bold;
   font-style: normal;
 }
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;

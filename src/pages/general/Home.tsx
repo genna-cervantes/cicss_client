@@ -10,7 +10,7 @@ import { Navigate, redirect, useNavigate } from "react-router-dom";
 
 import USTLogo from "../../assets/ust_logo.png";
 import CICSLogo from "../../assets/cics_logo.png";
-import CICSSLogo from "../../assets/cicss_logo.png";
+import CICSSLogo from "../../assets/cicss_logo_login.png";
 import HomeBg from "../../assets/home_bg.png";
 import GoogleLogo from "../../assets/google_logo.png";
 import Footer from "../../components/Footer";
@@ -41,6 +41,10 @@ const Home = () => {
         setRole("department-chair");
         localStorage.setItem("role", "department-chair");
         navigate("/departmentchair");
+<<<<<<< HEAD
+=======
+
+>>>>>>> e74de6c10418f59821b402b953259056783155c3
         return;
       }
 
@@ -50,6 +54,10 @@ const Home = () => {
         setRole("tas");
         localStorage.setItem("role", "tas");
         navigate("/tas");
+<<<<<<< HEAD
+=======
+
+>>>>>>> e74de6c10418f59821b402b953259056783155c3
         return;
       }
 
@@ -59,6 +67,10 @@ const Home = () => {
         setRole("student");
         localStorage.setItem("role", "student");
         navigate("/student");
+<<<<<<< HEAD
+=======
+
+>>>>>>> e74de6c10418f59821b402b953259056783155c3
         return;
       }
     },

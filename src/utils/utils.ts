@@ -57,6 +57,8 @@ export const checkIfCICSTAS = async (email: string) => {
 export const checkIfCICSDepartmentChair = async (email: string) => {
     try{
 
+        return true;
+
         // POST /api/department-chair/email 
         // {email: email}
 
@@ -84,5 +86,20 @@ export const checkIfCICSDepartmentChair = async (email: string) => {
     }
 }
 
+export const getCourseCodesFromInternalRepresentation = (internalRep: String[]) => {
 
-  
+    // loop thru the string arr
+    // remove ung mga -LC -LB sa dulo tapos gawing set - para sa may mga lab
+    // remove ung mga W- sa unahan - para sa mga specialization - lagyan ng (Specialization) - dont kasi sa front end may difference din dapat
+
+    // return the set
+    let removedLCandLb = internalRep.map((r) => {
+        if (r.endsWith('-LC') || r.endsWith('-LB')){
+            return r.slice(0, r.length - 3)
+        }
+        return r;
+    })
+
+    return Array(...new Set(removedLCandLb))
+
+}
