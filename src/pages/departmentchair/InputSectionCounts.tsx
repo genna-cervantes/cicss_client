@@ -16,6 +16,15 @@ const InputSectionCounts: React.FC = () => {
     fourthSC: "",
   });
 
+  const [firstYearSections, setFirstYearSections] = useState<string[]>([]);
+  const [secondYearSections, setSecondYearSections] = useState<string[]>([]);
+  const [thirdYearSections, setThirdYearSections] = useState<
+    { section: string; specialization: string }[]
+  >([]);
+  const [fourthYearSections, setFourthYearSections] = useState<
+    { section: string; specialization: string }[]
+  >([]);
+
   const handleSectionCountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSectionCounts((prevCounts) => ({
@@ -53,15 +62,35 @@ const InputSectionCounts: React.FC = () => {
         <div className="bg-[rgba(241,250,255,0.5)] rounded-xl shadow-[0px_2px_8px_0px_rgba(30,30,30,0.25)]">
           <div className="p-6 flex gap-32">
             <div>
-              <input
-                type="number"
-                id="firstSC"
-                name="firstSC"
-                value={sectionCounts.firstSC}
-                onChange={handleSectionCountChange}
-                className="border border-primary rounded-md w-20 p-2"
-                placeholder="0"
-              />
+              <div className="flex flex-col">
+                <input
+                  type="number"
+                  id="firstSC"
+                  name="firstSC"
+                  value={sectionCounts.firstSC}
+                  onChange={handleSectionCountChange}
+                  className="border border-primary rounded-md w-20 p-2"
+                  placeholder="0"
+                />
+                {typeof sectionCounts.firstSC == "number" &&
+                  Array.from({ length: sectionCounts.firstSC }).map((_, i) => {
+                    return (
+                      <input
+                        key={i}
+                        type="text"
+                        className="border border-primary rounded-md w-24 p-2 my-2"
+                        value={firstYearSections[i]}
+                        onChange={(e) =>
+                          setFirstYearSections((prev) => {
+                            const newSections = [...prev];
+                            newSections[i] = e.target.value;
+                            return newSections;
+                          })
+                        }
+                      />
+                    );
+                  })}
+              </div>
             </div>
             <div>
               <input
@@ -73,6 +102,24 @@ const InputSectionCounts: React.FC = () => {
                 className="border border-primary rounded-md w-20 p-2"
                 placeholder="0"
               />
+              {typeof sectionCounts.secondSC == "number" &&
+                Array.from({ length: sectionCounts.secondSC }).map((_, i) => {
+                  return (
+                    <input
+                      key={i}
+                      type="text"
+                      className="border border-primary rounded-md w-24 p-2 my-2"
+                      value={secondYearSections[i]}
+                      onChange={(e) =>
+                        setSecondYearSections((prev) => {
+                          const newSections = [...prev];
+                          newSections[i] = e.target.value;
+                          return newSections;
+                        })
+                      }
+                    />
+                  );
+                })}
             </div>
             <div>
               <input
@@ -84,6 +131,50 @@ const InputSectionCounts: React.FC = () => {
                 className="border border-primary rounded-md w-20 p-2"
                 placeholder="0"
               />
+              <div className="flex flex-col">
+
+              {typeof sectionCounts.thirdSC == "number" &&
+                Array.from({ length: sectionCounts.thirdSC }).map((_, i) => {
+                  return (
+                    <span>
+                      <input
+                        key={i}
+                        type="text"
+                        className="border border-primary rounded-md w-24 p-2 my-2"
+                        value={thirdYearSections[i]?.section ?? ''}
+                        onChange={(e) =>
+                          setSecondYearSections((prev) => {
+                            const newSections = [...prev];
+                            newSections[i] = e.target.value;
+                            return newSections;
+                          })
+                        }
+                      />
+                      <select
+                        name="thirdYearSpecializations"
+                        id="thirdYearSpecializations"
+                        value={thirdYearSections[i]?.specialization ?? 'none'}
+                        onChange={(e) => {
+                          setThirdYearSections((prev) => {
+                            const newSections = [...prev];
+                            newSections[i].specialization = e.target.value;
+                            return newSections;
+                          });
+                        }}
+                      >
+                        <option value="none">None</option>
+                        <option value="data_science">Data Science</option>
+                        <option value="core_computer_science">
+                          Core Computer Science
+                        </option>
+                        <option value="game_development">
+                          Game Development
+                        </option>
+                      </select>
+                    </span>
+                  );
+                })}
+              </div>
             </div>
             <div>
               <input
@@ -95,6 +186,50 @@ const InputSectionCounts: React.FC = () => {
                 className="border border-primary rounded-md w-20 p-2"
                 placeholder="0"
               />
+              <div className="flex flex-col">
+
+              {typeof sectionCounts.fourthSC == "number" &&
+                Array.from({ length: sectionCounts.fourthSC }).map((_, i) => {
+                  return (
+                    <span>
+                      <input
+                        key={i}
+                        type="text"
+                        className="border border-primary rounded-md w-24 p-2 my-2"
+                        value={fourthYearSections[i]?.section ?? ''}
+                        onChange={(e) =>
+                          setFourthYearSections((prev) => {
+                            const newSections = [...prev];
+                            newSections[i].specialization = e.target.value;
+                            return newSections;
+                          })
+                        }
+                      />
+                      <select
+                        name="fourthYearSpecializations"
+                        id="fourthYearSpecializations"
+                        value={fourthYearSections[i]?.specialization ?? 'none'}
+                        onChange={(e) => {
+                          setFourthYearSections((prev) => {
+                            const newSections = [...prev];
+                            newSections[i].specialization = e.target.value;
+                            return newSections;
+                          });
+                        }}
+                      >
+                        <option value="none">None</option>
+                        <option value="data_science">Data Science</option>
+                        <option value="core_computer_science">
+                          Core Computer Science
+                        </option>
+                        <option value="game_development">
+                          Game Development
+                        </option>
+                      </select>
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
