@@ -16,8 +16,8 @@ const InputSectionCounts: React.FC = () => {
     fourthSC: "",
   });
 
-  const [firstYearSections, setFirstYearSections] = useState<string[]>([]);
-  const [secondYearSections, setSecondYearSections] = useState<string[]>([]);
+  const [firstYearSections, setFirstYearSections] = useState<{ section: string; specialization: 'none' }[]>([]);
+  const [secondYearSections, setSecondYearSections] = useState<{ section: string; specialization: 'none' }[]>([]);
   const [thirdYearSections, setThirdYearSections] = useState<
     { section: string; specialization: string }[]
   >([]);
@@ -33,10 +33,34 @@ const InputSectionCounts: React.FC = () => {
     }));
   };
 
-  const handleSave = (e: FormEvent<HTMLFormElement>) => {
+  const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // get the data here
     console.log("Submitted section counts:", sectionCounts);
+
+    let reqBody = {
+      department: 'CS',
+      semester: 2,
+      1: firstYearSections,
+      2: secondYearSections,
+      3: thirdYearSections,
+      4: fourthYearSections
+    }
+
+    const res = await fetch('http://localhost:8080/year_sections', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(reqBody)
+    })
+
+    if (res.ok){
+      console.log('yeeyyyy saved') // gawan ng message pls thanks
+    }else{
+      console.log('may error UGH')
+    }
+
   };
 
   return (
@@ -79,14 +103,13 @@ const InputSectionCounts: React.FC = () => {
                         key={i}
                         type="text"
                         className="border border-primary rounded-md w-24 p-2 my-2"
-                        value={firstYearSections[i]}
+                        value={firstYearSections[i]?.section ?? ''}
                         onChange={(e) =>
                           setFirstYearSections((prev) => {
                             const newSections = [...prev];
-                            newSections[i] = e.target.value;
+                            newSections[i] = {...newSections[i], section: e.target.value};
                             return newSections;
-                          })
-                        }
+                          })}
                       />
                     );
                   })}
@@ -102,6 +125,7 @@ const InputSectionCounts: React.FC = () => {
                 className="border border-primary rounded-md w-20 p-2"
                 placeholder="0"
               />
+              <div className="flex flex-col">
               {typeof sectionCounts.secondSC == "number" &&
                 Array.from({ length: sectionCounts.secondSC }).map((_, i) => {
                   return (
@@ -109,17 +133,18 @@ const InputSectionCounts: React.FC = () => {
                       key={i}
                       type="text"
                       className="border border-primary rounded-md w-24 p-2 my-2"
-                      value={secondYearSections[i]}
+                      value={secondYearSections[i]?.section ?? ''}
                       onChange={(e) =>
                         setSecondYearSections((prev) => {
                           const newSections = [...prev];
-                          newSections[i] = e.target.value;
+                          newSections[i] = {...newSections[i], section: e.target.value};
                           return newSections;
                         })
                       }
                     />
                   );
                 })}
+              </div>
             </div>
             <div>
               <input
@@ -143,9 +168,9 @@ const InputSectionCounts: React.FC = () => {
                         className="border border-primary rounded-md w-24 p-2 my-2"
                         value={thirdYearSections[i]?.section ?? ''}
                         onChange={(e) =>
-                          setSecondYearSections((prev) => {
+                          setThirdYearSections((prev) => {
                             const newSections = [...prev];
-                            newSections[i] = e.target.value;
+                            newSections[i] = {...newSections[i], section: e.target.value};
                             return newSections;
                           })
                         }
@@ -157,7 +182,7 @@ const InputSectionCounts: React.FC = () => {
                         onChange={(e) => {
                           setThirdYearSections((prev) => {
                             const newSections = [...prev];
-                            newSections[i].specialization = e.target.value;
+                            newSections[i] = {...newSections[i], specialization: e.target.value};
                             return newSections;
                           });
                         }}
@@ -200,7 +225,7 @@ const InputSectionCounts: React.FC = () => {
                         onChange={(e) =>
                           setFourthYearSections((prev) => {
                             const newSections = [...prev];
-                            newSections[i].specialization = e.target.value;
+                            newSections[i] = {...newSections[i], section: e.target.value};
                             return newSections;
                           })
                         }
@@ -212,7 +237,7 @@ const InputSectionCounts: React.FC = () => {
                         onChange={(e) => {
                           setFourthYearSections((prev) => {
                             const newSections = [...prev];
-                            newSections[i].specialization = e.target.value;
+                            newSections[i] = {...newSections[i], specialization: e.target.value};
                             return newSections;
                           });
                         }}
