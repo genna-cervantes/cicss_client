@@ -65,16 +65,6 @@ const ScheduleView = ({
   filter: string;
   value: string;
 }) => {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "Machine Learning",
-      start: `${weekDates.Monday} 08:00`,
-      end: `${weekDates.Monday} 12:00`,
-      location: "Room 1903",
-      people: ["Jessie James Suarez"],
-    },
-  ]);
 
   const [scheduleEvents, setScheduleEvents] = useState<any>();
   const [transformedScheduleEvents, setTransformedScheduleEvents] =

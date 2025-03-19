@@ -3,7 +3,7 @@ import { CalendarEvent } from "@schedule-x/calendar";
 type props = { calendarEvent: CalendarEvent };
 
 const timeGridEvent = ({ calendarEvent }: props) => {
-  console.log(calendarEvent);
+  // console.log(calendarEvent);
 
   let desc = JSON.parse(calendarEvent?.description ?? "");
 

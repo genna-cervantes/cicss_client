@@ -46,9 +46,9 @@ const InputSectionCounts: React.FC = () => {
       if (res.ok) {
         setSectionCounts({
           firstSC: data.firstYearSections.length,
-          secondSC: data.firstYearSections.length,
-          thirdSC: data.firstYearSections.length,
-          fourthSC: data.firstYearSections.length,
+          secondSC: data.secondYearSections.length,
+          thirdSC: data.thirdYearSections.length,
+          fourthSC: data.fourthYearSections.length,
         });
         setFirstYearSections(data.firstYearSections);
         setSecondYearSections(data.secondYearSections);
@@ -64,7 +64,7 @@ const InputSectionCounts: React.FC = () => {
 
   const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // get the data here
+    // inserts
     console.log("Submitted section counts:", sectionCounts);
 
     let reqBody = {
@@ -89,6 +89,8 @@ const InputSectionCounts: React.FC = () => {
     } else {
       console.log("may error UGH");
     }
+
+    // updates
   };
 
   return (
