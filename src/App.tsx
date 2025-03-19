@@ -23,6 +23,7 @@ import InputYLD from "./pages/departmentchair/InputYLD";
 import InputYLT from "./pages/departmentchair/InputYLT";
 import ManualEdit from "./pages/departmentchair/ManualEdit";
 import ViewSchedule from "./pages/departmentchair/ViewSchedule";
+import WaitingPage from "./pages/general/WaitingPage";
 
 const App: React.FC = () => {
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
@@ -54,6 +55,7 @@ const App: React.FC = () => {
             <Route path="input-ylt" element={<InputYLT />} />
             <Route path="schedule-view" element={<ViewSchedule />} />
             <Route path="manual-edit" element={<ManualEdit />} />
+            <Route path="waiting" element={<WaitingPage />} />
 
             {/* catch all */}
             <Route
@@ -79,6 +81,7 @@ const App: React.FC = () => {
 
             <Route path="*" element={<Navigate to="/student" replace />} />
           </Route>
+
         </Routes>
       </Router>
     </GoogleOAuthProvider>
