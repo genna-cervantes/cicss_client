@@ -76,6 +76,8 @@ const InputSectionCounts: React.FC = () => {
       4: fourthYearSections,
     };
 
+    console.log(reqBody)
+
     const res = await fetch("http://localhost:8080/year_sections", {
       method: "POST",
       headers: {
@@ -128,6 +130,7 @@ const InputSectionCounts: React.FC = () => {
                 />
                 {typeof sectionCounts.firstSC == "number" &&
                   Array.from({ length: sectionCounts.firstSC }).map((_, i) => {
+                    firstYearSections[i].specialization = 'none'
                     return (
                       <input
                         key={i}
@@ -138,7 +141,7 @@ const InputSectionCounts: React.FC = () => {
                           setFirstYearSections((prev) => {
                             const newSections = [...prev];
                             newSections[i] = {
-                              ...newSections[i],
+                              specialization: 'none',
                               section: e.target.value,
                             };
                             return newSections;
@@ -162,6 +165,7 @@ const InputSectionCounts: React.FC = () => {
               <div className="flex flex-col">
                 {typeof sectionCounts.secondSC == "number" &&
                   Array.from({ length: sectionCounts.secondSC }).map((_, i) => {
+                    secondYearSections[i].specialization = 'none'
                     return (
                       <input
                         key={i}
@@ -172,7 +176,7 @@ const InputSectionCounts: React.FC = () => {
                           setSecondYearSections((prev) => {
                             const newSections = [...prev];
                             newSections[i] = {
-                              ...newSections[i],
+                              specialization: 'none',
                               section: e.target.value,
                             };
                             return newSections;
@@ -229,11 +233,11 @@ const InputSectionCounts: React.FC = () => {
                           }}
                         >
                           <option value="none">None</option>
-                          <option value="data_science">Data Science</option>
-                          <option value="core_computer_science">
+                          <option value="Data Science">Data Science</option>
+                          <option value="Core CS">
                             Core Computer Science
                           </option>
-                          <option value="game_development">
+                          <option value="Game Development">
                             Game Development
                           </option>
                         </select>
@@ -290,11 +294,11 @@ const InputSectionCounts: React.FC = () => {
                           }}
                         >
                           <option value="none">None</option>
-                          <option value="data_science">Data Science</option>
-                          <option value="core_computer_science">
+                          <option value="Data Science">Data Science</option>
+                          <option value="Core CS">
                             Core Computer Science
                           </option>
-                          <option value="game_development">
+                          <option value="Game Development">
                             Game Development
                           </option>
                         </select>
