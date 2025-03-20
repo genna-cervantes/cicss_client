@@ -122,7 +122,7 @@ const WaitingPage = () => {
             console.log("wala error");
             console.log(data);
             if (data) {
-              navigate("/departmentchair/schedule-view");
+              navigate("/departmentchair/view-schedule");
             }
           } else {
             console.log("may error");

@@ -53,7 +53,7 @@ const App: React.FC = () => {
             <Route path="input-gened" element={<InputGenEd />} />
             <Route path="input-yld" element={<InputYLD />} />
             <Route path="input-ylt" element={<InputYLT />} />
-            <Route path="schedule-view" element={<ViewSchedule />} />
+            <Route path="view-schedule" element={<ViewSchedule />} />
             <Route path="manual-edit" element={<ManualEdit />} />
             <Route path="waiting" element={<WaitingPage />} />
 
