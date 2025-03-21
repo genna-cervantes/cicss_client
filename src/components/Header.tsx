@@ -1,4 +1,4 @@
-import cicss_logo from "../assets/cicss_logo.png";
+import cicss_logo_header from "../assets/cicss_logo_header.png";
 import logout_logo from "../assets/logout_logo.png";
 import { NavLink } from "react-router-dom";
 
@@ -7,7 +7,7 @@ const Header = () => {
     <header>
       <div className="flex justify-between items-center py-3 px-16">
         <a href="/">
-          <img src={cicss_logo} alt="" className="w-32" />
+          <img src={cicss_logo_header} alt="" className="w-32" />
         </a>
         <nav>
           <ul className="flex gap-8 text-sm font-Akira-Expanded items-center">

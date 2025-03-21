@@ -13,12 +13,8 @@ const Dashboard = () => {
   // Check screen width on mount and when window resizes
   useEffect(() => {
     const checkScreenSize = () => {
-<<<<<<< HEAD
-      setIsMinimized(window.innerWidth < 1000);
-=======
       // Based on your screenshot, we need to detect when width is below a certain threshold
       setIsMinimized(window.innerWidth < 1000); // why check this manually ????
->>>>>>> 162ba780ec3ad112eee81d68891c9feba6d0dc14
     };
 
     // Check on initial load
@@ -84,6 +80,7 @@ const Dashboard = () => {
                 Path="input-YLT"
               />
             </div>
+
             {/* Right column - generate button and charts */}
             <div className="w-full lg:w-[55%] space-y-5 md:mb-5">
               <NavLink to="schedule-view" className="block w-full">
