@@ -30,7 +30,16 @@ interface ErrorLog {
   timestamp: Date;
 }
 
-const CourseSchedule: React.FC = () => {
+// Add props interface with optional defaults
+interface CourseScheduleProps {
+  initialShowTerminal?: boolean;
+  initialDragEnabled?: boolean;
+}
+
+const CourseSchedule: React.FC<CourseScheduleProps> = ({
+  initialShowTerminal = false,
+  initialDragEnabled = true,
+}) => {
   const [scheduleBlocks, setScheduleBlocks] = useState<CourseBlock[]>([
     {
       id: 1,
@@ -161,7 +170,11 @@ const CourseSchedule: React.FC = () => {
     top: number;
   } | null>(null);
   const [errorLogs, setErrorLogs] = useState<ErrorLog[]>([]);
-  const [showTerminal, setShowTerminal] = useState<boolean>(false);
+
+  // Initialize states with props
+  const [showTerminal, setShowTerminal] =
+    useState<boolean>(initialShowTerminal);
+  const [dragEnabled, setDragEnabled] = useState<boolean>(initialDragEnabled);
 
   const days: string[] = ["MON", "TUE", "WED", "THURS", "FRI", "SAT"];
   const hours: TimeFormat[] = [];
@@ -296,6 +309,12 @@ const CourseSchedule: React.FC = () => {
     e: React.DragEvent<HTMLDivElement>,
     block: CourseBlock
   ): void => {
+    // Check if drag is enabled before proceeding
+    if (!dragEnabled) {
+      e.preventDefault();
+      return;
+    }
+
     if (!e.currentTarget) return;
 
     // Calculate the offset from the top of the block
@@ -318,6 +337,9 @@ const CourseSchedule: React.FC = () => {
     e: React.DragEvent<HTMLDivElement>,
     day: string
   ): void => {
+    // Only process if drag is enabled
+    if (!dragEnabled) return;
+
     e.preventDefault();
 
     if (!draggedBlock || !gridRef.current || !dragInfo) return;
@@ -370,6 +392,8 @@ const CourseSchedule: React.FC = () => {
 
   // Make sure to reset the warning state when drag ends
   const handleDragEnd = (): void => {
+    if (!dragEnabled) return;
+
     setDraggedBlock(null);
     setDragInfo(null);
     setGhostPosition(null);
@@ -380,6 +404,9 @@ const CourseSchedule: React.FC = () => {
     e: React.DragEvent<HTMLDivElement>,
     day: string
   ): void => {
+    // Only process if drag is enabled
+    if (!dragEnabled) return;
+
     e.preventDefault();
     if (!draggedBlock || !gridRef.current || !dragInfo) return;
 
@@ -503,8 +530,10 @@ const CourseSchedule: React.FC = () => {
             <div
               key={day}
               className="col-span-1 border-r border-b border-primary p-2 text-center bg-[#E0EFFA] text-primary font-Manrope font-bold flex justify-center"
-              onDragOver={(e) => handleDragOver(e, day)}
-              onDrop={(e) => handleDrop(e, day)}
+              onDragOver={
+                dragEnabled ? (e) => handleDragOver(e, day) : undefined
+              }
+              onDrop={dragEnabled ? (e) => handleDrop(e, day) : undefined}
             >
               {day}
             </div>
@@ -529,9 +558,11 @@ const CourseSchedule: React.FC = () => {
               <div
                 key={day}
                 className="col-span-1 border-r border-primary relative"
-                onDragOver={(e) => handleDragOver(e, day)}
-                onDrop={(e) => handleDrop(e, day)}
-                onDragEnd={handleDragEnd}
+                onDragOver={
+                  dragEnabled ? (e) => handleDragOver(e, day) : undefined
+                }
+                onDrop={dragEnabled ? (e) => handleDrop(e, day) : undefined}
+                onDragEnd={dragEnabled ? handleDragEnd : undefined}
               >
                 {hours.map((_, index) => (
                   <div
@@ -541,32 +572,36 @@ const CourseSchedule: React.FC = () => {
                 ))}
 
                 {/* Ghost block when dragging */}
-                {ghostPosition && ghostPosition.day === day && draggedBlock && (
-                  <div
-                    className={`absolute ${draggedBlock.color} p-1 w-full rounded shadow-sm overflow-hidden opacity-50`}
-                    style={{
-                      top: `${
-                        Math.floor(ghostPosition.top / cellHeight) * cellHeight
-                      }px`,
-                      height: `${getBlockHeight(
-                        draggedBlock.startTime,
-                        draggedBlock.endTime
-                      )}px`,
-                      left: "0px",
-                      right: "0px",
-                      pointerEvents: "none",
-                      borderStyle: "dashed",
-                      borderWidth: "2px",
-                      borderColor: hasOverlapWarning ? "red" : "gray-400",
-                    }}
-                  >
-                    <div className="text-xs font-bold">
-                      &lt;{draggedBlock.courseCode}&gt;
+                {dragEnabled &&
+                  ghostPosition &&
+                  ghostPosition.day === day &&
+                  draggedBlock && (
+                    <div
+                      className={`absolute ${draggedBlock.color} p-1 w-full rounded shadow-sm overflow-hidden opacity-50`}
+                      style={{
+                        top: `${
+                          Math.floor(ghostPosition.top / cellHeight) *
+                          cellHeight
+                        }px`,
+                        height: `${getBlockHeight(
+                          draggedBlock.startTime,
+                          draggedBlock.endTime
+                        )}px`,
+                        left: "0px",
+                        right: "0px",
+                        pointerEvents: "none",
+                        borderStyle: "dashed",
+                        borderWidth: "2px",
+                        borderColor: hasOverlapWarning ? "red" : "gray-400",
+                      }}
+                    >
+                      <div className="text-xs font-bold">
+                        &lt;{draggedBlock.courseCode}&gt;
+                      </div>
+                      <div className="text-xs">{draggedBlock.courseName}</div>
+                      <div className="text-xs">{draggedBlock.labLec}</div>
                     </div>
-                    <div className="text-xs">{draggedBlock.courseName}</div>
-                    <div className="text-xs">{draggedBlock.labLec}</div>
-                  </div>
-                )}
+                  )}
                 {scheduleBlocks
                   .filter((block) => block.day === day)
                   .map((block) => {
@@ -586,15 +621,19 @@ const CourseSchedule: React.FC = () => {
                           block.color
                         } p-1 w-full border border-gray-400 rounded shadow-sm overflow-hidden ${
                           draggedBlock?.id === block.id ? "opacity-50" : ""
-                        }`}
+                        } ${!dragEnabled ? "cursor-default" : "cursor-grab"}`}
                         style={{
                           top: `${top}px`,
                           height: `${height}px`,
                           left: "0px",
                           right: "0px",
                         }}
-                        draggable
-                        onDragStart={(e) => handleDragStart(e, block)}
+                        draggable={dragEnabled}
+                        onDragStart={
+                          dragEnabled
+                            ? (e) => handleDragStart(e, block)
+                            : undefined
+                        }
                       >
                         <div className="text-xs font-bold">
                           &lt;{block.courseCode}&gt;

@@ -21,10 +21,10 @@ import InputSectionCounts from "./pages/departmentchair/InputSectionCounts";
 import InputTAS from "./pages/departmentchair/InputTAS";
 import InputYLD from "./pages/departmentchair/InputYLD";
 import InputYLT from "./pages/departmentchair/InputYLT";
-import ManualEdit from "./pages/departmentchair/ManualEdit";
 import ViewSchedule from "./pages/departmentchair/ViewSchedule";
 import SchedulePublishing from "./pages/departmentchair/SchedulePublishing";
 import ScheduleReadiness from "./pages/departmentchair/ScheduleReadiness";
+import ManualEdit from "./pages/departmentchair/ManualEdit";
 
 const App: React.FC = () => {
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
@@ -60,6 +60,7 @@ const App: React.FC = () => {
               element={<SchedulePublishing />}
             />
             <Route path="schedule-readiness" element={<ScheduleReadiness />} />
+            <Route path="manual-edit" element={<ManualEdit />} />
 
             {/* catch all */}
             <Route

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
-import GeneratedScheduleCalendar from "./GeneratedScheduleCalendar";
 import { useNavigate } from "react-router-dom";
+import GeneratedScheduleCalendar from "./GeneratedScheduleCalendar";
 
 const ViewSchedule = () => {
   const navigate = useNavigate();
@@ -249,7 +249,10 @@ const ViewSchedule = () => {
         </div>
       </div>
       <div>
-        <GeneratedScheduleCalendar />
+        <GeneratedScheduleCalendar
+          initialDragEnabled={false}
+          initialShowTerminal={false}
+        />
       </div>
       <div className="flex space-x-4 font-Manrope font-semibold justify-center ">
         <button className="bg-primary text-white w-[150px] py-1 rounded-md">
