@@ -19,20 +19,21 @@ const sections = [
 ];
 
 const ViewSchedule = () => {
-  // State to track the current section index
-  const [currentIndex, setCurrentIndex] = useState(0);
-  // State to track the current filter
+  
   const [currentFilter, setCurrentFilter] = useState("Section");
+  const [filter, setFilter] = useState("Section")
 
   const [yearSections, setYearSections] = useState<{
     [key: string]: { next: string; prev: string; specialization: string };
   }>({});
 
-  const [currentValue, setCurrentValue] = useState(
+  const [profDetails, setProfDetails] = useState<{[key: string]: string}>({})
+
+  const [currentValue, setCurrentValue] = useState<{label: string, name?: string, specialization?: string}>(
     currentFilter === "Section"
       ? { label: "1CSA", specialization: "" }
       : currentFilter === "TAS"
-        ? { label: "TAS1" }
+        ? { label: "", name: "" }
         : currentFilter === "Room"
           ? { label: "RM1901" }
           : { label: "" }
@@ -52,27 +53,50 @@ const ViewSchedule = () => {
   };
 
   useEffect(() => {
-    setCurrentValue((prev) => ({
-      ...prev,
-      specialization:
-        yearSections[currentValue.label]?.specialization === "none"
-          ? ""
-          : yearSections[currentValue.label]?.specialization ?? "",
-    }));
+    if (currentFilter === 'Section'){
+      setCurrentValue((prev) => ({
+        ...prev,
+        specialization:
+          yearSections[currentValue.label]?.specialization === "none"
+            ? ""
+            : yearSections[currentValue.label]?.specialization ?? "",
+      }));
+    }
   }, [currentValue.label]);
-
-  // Change the current filter
-  const changeFilter = (filter: string) => {
-    setCurrentFilter(filter);
-  };
 
   // Get the current section data
   // const currentSection = sections[currentIndex];
 
-  interface SelectOption {
-    value: number;
-    label: string;
-  }
+  useEffect(() => {
+    if (filter === 'Professor'){
+      const fetchTASData = async () => {
+        const res = await fetch("http://localhost:8080/tasconstraints/details/CS");
+        const data = await res.json();
+
+        setProfDetails(data.reduce((acc: any, prof: any) => ({ ...acc, ...prof }), {}))
+
+        if (res.ok){
+          setCurrentValue({label: Object.keys(data[0])[0], name: data[0][Object.keys(data[0])[0]]})
+          setCurrentFilter(filter);
+        }
+      }
+  
+      fetchTASData();
+    }
+    if (filter === 'Section'){
+      
+      // setCurrentValue((prev) => ({
+      //   ...prev,
+      //   specialization:
+      //   yearSections[currentValue.label]?.specialization === "none"
+      //   ? ""
+      //   : yearSections[currentValue.label]?.specialization ?? "",
+      // }));
+      console.log(yearSections[Object.keys(yearSections)[0]])
+      setCurrentValue({label: Object.keys(yearSections)[0], specialization: yearSections[Object.keys(yearSections)[0]].specialization})
+      setCurrentFilter(filter);
+    }
+  }, [filter])
 
   // fetch values for the sections - nakabase don sa year sections
   useEffect(() => {
@@ -212,9 +236,9 @@ const ViewSchedule = () => {
       <div className="flex items-center justify-between">
         {/* Section Code and Label */}
         <div className="flex items-center gap-3">
-          <div className="font-CyGrotesk text-primary text-[40px]">
+          <div className="font-CyGrotesk text-primary text-[40px] truncate">
             {/* {currentSection.code} */}
-            {currentValue.label}
+            {currentFilter === 'Section' ? currentValue.label : currentValue.name}
           </div>
           <div className="font-Helvetica-Neue-Heavy bg-custom_yellow px-3 py-1 rounded-3xl">
             {currentValue?.specialization}
@@ -253,7 +277,7 @@ const ViewSchedule = () => {
                   ? "bg-white text-primary"
                   : "text-white"
               }`}
-              onClick={() => changeFilter("Section")}
+              onClick={() => setFilter("Section")}
             >
               By Section
             </button>
@@ -263,7 +287,7 @@ const ViewSchedule = () => {
                   ? "bg-white text-primary"
                   : "text-white"
               }`}
-              onClick={() => changeFilter("Professor")}
+              onClick={() => setFilter("Professor")}
             >
               By Professor
             </button>
@@ -273,7 +297,7 @@ const ViewSchedule = () => {
                   ? "bg-white text-primary"
                   : "text-white"
               }`}
-              onClick={() => changeFilter("Room")}
+              onClick={() => setFilter("Room")}
             >
               By Room
             </button>
@@ -281,7 +305,7 @@ const ViewSchedule = () => {
 
           {/* Dropdown Selector */}
           <div className="relative inline-block">
-            <select
+            {currentFilter === "Section" && <select
               className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
               value={currentValue.label}
               onChange={(e) =>
@@ -302,7 +326,31 @@ const ViewSchedule = () => {
                   </option>
                 );
               })}
-            </select>
+            </select>}
+
+            {currentFilter === "Professor" && <select
+              className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
+              value={currentValue.label}
+              onChange={(e: any) =>
+                setCurrentValue({
+                  label: e.target.value,
+                  specialization: "",
+                  name: profDetails[e.target.value]
+                })
+              }
+            >
+              <option value="" disabled>
+                Select a Section
+              </option>
+              {Object.keys(profDetails).map((tasId, index) => {
+                let tasName = profDetails[tasId]
+                return (
+                  <option key={index} value={tasId} className="py-2">
+                    {tasName}
+                  </option>
+                );
+              })}
+            </select>}
 
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
               <svg

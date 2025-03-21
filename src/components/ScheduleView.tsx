@@ -3,11 +3,9 @@ import {
   createCalendar,
   createViewWeek,
 } from "@schedule-x/calendar";
-import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
 import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
 import React, { useEffect, useState } from "react";
 import { weekDates } from "../utils/constants";
-import GenerateButton from "./GenerateButton";
 import timeGridEvent from "../pages/departmentchair/TimeGridEvent";
 
 const dayKeysToFull: any = {
@@ -27,11 +25,18 @@ const transformMilitaryTimeRawToTime = (rawMilitaryTime: string) => {
   return `${rawMilitaryTime.slice(0, 2)}:${rawMilitaryTime.slice(2)}`;
 };
 
-const transformToScheduleEvents = (rawSchedule: any) => {
+const transformToScheduleEvents = (rawSchedule: any, filter: string, value: string) => {
   let transformedEvents = [];
 
   const dayKeys = Object.keys(rawSchedule);
   for (let i = 0; i < dayKeys.length; i++) {
+
+    if (dayKeys[i] === 'violations' || dayKeys[i] === 'units'){
+      continue;
+    }
+
+    // call the generate function again - error 
+
     let daySched = rawSchedule[dayKeys[i]];
     let schoolDay = dayKeysToFull[dayKeys[i]];
 
@@ -40,14 +45,18 @@ const transformToScheduleEvents = (rawSchedule: any) => {
 
       console.log('schedBlock')
       console.log(schedBlock)
+      console.log(filter)
+      console.log(value)
+
+      // nag eerror pag walang schedule ung prof na un -- gawing empty
 
       let transformedSchedBlock = {
         id: schedBlock.id,
-        title: schedBlock.course.subjectCode,
+        title: filter === 'Professor' ? schedBlock.course : schedBlock.course.subjectCode,
         start: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.start)}`,
         end: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.end)}`,
-        location: schedBlock.room.roomId,
-        people: [schedBlock.tas.tas_name], // magkaiba pa ung convnetiona mp
+        location: filter !== 'Room' ? schedBlock.room.roomId : '',
+        people: [filter !== 'Professor' ? schedBlock.tas.tas_name : schedBlock.section], // magkaiba pa ung convnetiona mp
         description: JSON.stringify({type: schedBlock.course.type, violations: schedBlock.violations ?? []})
       };
 
@@ -73,6 +82,9 @@ const ScheduleView = ({
 
   // default schedule to show
   useEffect(() => {
+
+
+
     const fetchSchedule = async () => {
       const res = await fetch("http://localhost:3000/schedule/class/CS/1/CSA"); // DEFAULT NA SIMULA
       const data = await res.json();
@@ -84,7 +96,10 @@ const ScheduleView = ({
       }
     };
 
-    fetchSchedule();
+    if (filter === 'Section'){
+      fetchSchedule();
+    }
+
   }, []);
 
   // rendering when schedule is fetched
@@ -96,7 +111,8 @@ const ScheduleView = ({
     // console.log(transformToScheduleEvents(scheduleEvents))
 
     if (scheduleEvents) {
-      let transformedEvents = transformToScheduleEvents(scheduleEvents);
+
+      let transformedEvents = transformToScheduleEvents(scheduleEvents, filter, value);
       setTransformedScheduleEvents(transformedEvents);
     }
   }, [scheduleEvents]);
@@ -127,7 +143,28 @@ const ScheduleView = ({
       };
 
       fetchSchedule();
+    }else if (filter === "Professor"){
+      let tasId = value;
+
+      console.log('tas', tasId)
+      
+      const fetchSchedule = async () => {
+        const res = await fetch(`http://localhost:3000/schedule/tas/${tasId}`)
+        const data = await res.json()
+
+        console.log('data', data)
+        
+        if (res.ok) {
+          setScheduleEvents(data);
+        } else {
+          setError("may error sa pag kuha ng sched - tas");
+        }
+      }
+
+      fetchSchedule();
     }
+
+
   }, [filter, value]);
 
   let calendar: CalendarApp;

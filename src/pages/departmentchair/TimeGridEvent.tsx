@@ -23,7 +23,6 @@ const timeGridEvent = ({ calendarEvent }: props) => {
     >
       <div>
         <h1 className="font-bold text-xl">{calendarEvent.title}</h1>
-        <h2>Course Name</h2>
         <h2>{desc.type}</h2>
         <h2>{calendarEvent.location}</h2>
         <h2>
