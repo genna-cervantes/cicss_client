@@ -28,6 +28,8 @@ const transformMilitaryTimeRawToTime = (rawMilitaryTime: string) => {
 const transformToScheduleEvents = (rawSchedule: any, filter: string, value: string) => {
   let transformedEvents = [];
 
+  console.log(rawSchedule)
+
   const dayKeys = Object.keys(rawSchedule);
   for (let i = 0; i < dayKeys.length; i++) {
 
@@ -56,7 +58,7 @@ const transformToScheduleEvents = (rawSchedule: any, filter: string, value: stri
         start: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.start)}`,
         end: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.end)}`,
         location: filter !== 'Room' ? schedBlock.room.roomId : '',
-        people: [filter !== 'Professor' ? schedBlock.tas.tas_name : schedBlock.section], // magkaiba pa ung convnetiona mp
+        people: [filter !== 'Professor' ? schedBlock.tas.tas_name : `${schedBlock.year}${schedBlock.section}`], // magkaiba pa ung convnetiona mp
         description: JSON.stringify({type: schedBlock.course.type, violations: schedBlock.violations ?? []})
       };
 
@@ -82,15 +84,17 @@ const ScheduleView = ({
 
   // default schedule to show
   useEffect(() => {
-
-
-
     const fetchSchedule = async () => {
       const res = await fetch("http://localhost:3000/schedule/class/CS/1/CSA"); // DEFAULT NA SIMULA
       const data = await res.json();
+      let sched = data;
+
+      if (data?.error){
+        sched = {}
+      }
 
       if (res.ok) {
-        setScheduleEvents(data);
+        setScheduleEvents(sched);
       } else {
         setError("may error sa pag kuha ng sched");
       }
@@ -134,9 +138,14 @@ const ScheduleView = ({
           `http://localhost:3000/schedule/class/CS/${year}/${section}`
         ); // DEFAULT NA CS MUNA
         const data = await res.json();
+        let sched = data;
+
+        if (data?.error){
+          sched = {}
+        }
 
         if (res.ok) {
-          setScheduleEvents(data);
+          setScheduleEvents(sched);
         } else {
           setError("may error sa pag kuha ng sched");
         }
@@ -151,11 +160,16 @@ const ScheduleView = ({
       const fetchSchedule = async () => {
         const res = await fetch(`http://localhost:3000/schedule/tas/${tasId}`)
         const data = await res.json()
+        let sched = data;
+
+        if (data?.error){
+          sched = {}
+        }
 
         console.log('data', data)
         
         if (res.ok) {
-          setScheduleEvents(data);
+          setScheduleEvents(sched);
         } else {
           setError("may error sa pag kuha ng sched - tas");
         }

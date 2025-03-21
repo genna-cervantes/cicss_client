@@ -43,12 +43,26 @@ const ViewSchedule = () => {
   const goToPrevious = () => {
     if (currentFilter === "Section") {
       setCurrentValue({ label: yearSections[currentValue.label].prev });
+    }else if (currentFilter === "Professor"){
+      const keys = Object.keys(profDetails);
+      const index = keys.findIndex((tasId) => tasId === currentValue.label);
+
+      let prevIndex: number = index === 0 ? keys.length - 1 : index - 1;
+
+      setCurrentValue({ label: keys[prevIndex], name: profDetails[keys[prevIndex]] });
     }
   };
 
   const goToNext = () => {
     if (currentFilter === "Section") {
       setCurrentValue({ label: yearSections[currentValue.label].next });
+    }else if (currentFilter === "Professor"){
+      const keys = Object.keys(profDetails);
+      const index = keys.findIndex((tasId) => tasId === currentValue.label);
+
+      let nextIndex: number = index === keys.length ? 0 : index + 1;
+
+      setCurrentValue({ label: keys[nextIndex], name: profDetails[keys[nextIndex]] });
     }
   };
 
@@ -84,16 +98,7 @@ const ViewSchedule = () => {
       fetchTASData();
     }
     if (filter === 'Section'){
-      
-      // setCurrentValue((prev) => ({
-      //   ...prev,
-      //   specialization:
-      //   yearSections[currentValue.label]?.specialization === "none"
-      //   ? ""
-      //   : yearSections[currentValue.label]?.specialization ?? "",
-      // }));
-      console.log(yearSections[Object.keys(yearSections)[0]])
-      setCurrentValue({label: Object.keys(yearSections)[0], specialization: yearSections[Object.keys(yearSections)[0]].specialization})
+      setCurrentValue({label: Object.keys(yearSections)[0], specialization: yearSections[Object.keys(yearSections)[0]]?.specialization})
       setCurrentFilter(filter);
     }
   }, [filter])
@@ -229,7 +234,12 @@ const ViewSchedule = () => {
     };
 
     fetchYearSectionsData();
+    console.log(yearSections)
   }, []);
+  
+  useEffect(() => {
+    setCurrentValue({label: Object.keys(yearSections)[0], specialization: yearSections[Object.keys(yearSections)[0]]?.specialization === 'none' ? '' : yearSections[Object.keys(yearSections)[0]]?.specialization})
+  }, [yearSections])
 
   return (
     <div className="w-full bg-transparent py-4 px-16">
