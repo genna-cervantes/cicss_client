@@ -5,6 +5,8 @@ import GeneratedScheduleCalendar from "./GeneratedScheduleCalendar";
 
 const ManualEdit = () => {
   const navigate = useNavigate();
+  const [showDeployModal, setShowDeployModal] = useState(false);
+
   //Section Info
   const sections = [
     { code: "3CSA", label: "Core Computer Science" },
@@ -74,8 +76,6 @@ const ManualEdit = () => {
     }
   };
 
-  // Change the current filter
-
   // Determine what to display based on the current filter
   const getCurrentDisplayInfo = () => {
     if (currentFilter === "Section") {
@@ -128,8 +128,26 @@ const ManualEdit = () => {
     }
   };
 
+  // Handle deploy button click
+  const handleDeployClick = () => {
+    setShowDeployModal(true);
+  };
+
+  // Handle confirm deploy
+  const handleConfirmDeploy = () => {
+    // Close the modal
+    setShowDeployModal(false);
+    // Navigate to the next page
+    navigate("/departmentchair/dashboard");
+  };
+
   const currentDisplayInfo = getCurrentDisplayInfo();
   const dropdownOptions = getDropdownOptions();
+
+  const modalBackgroundStyle = {
+    background:
+      "linear-gradient(180deg, #F1FAFF 0%, #BFDDF6 50%, #9FCEF5 100%)",
+  };
 
   return (
     <div className="w-full bg-transparent py-4 px-16 ">
@@ -223,12 +241,44 @@ const ManualEdit = () => {
         </button>
 
         <button
-          onClick={() => navigate("/departmentchair/schedule-publishing")}
+          onClick={handleDeployClick}
           className="bg-[#FFBA21] text-[#444444] border border-[#444444] w-[150px] py-1 rounded-md"
         >
           Deploy
         </button>
       </div>
+
+      {/* Deploy Confirmation Modal */}
+      {showDeployModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            className="rounded-2xl p-8 max-w-md w-full shadow-xl"
+            style={modalBackgroundStyle}
+          >
+            <p className="text-primary mb-4 text-center font-Helvetica-Neue-Heavy italic">
+              The schedule you are about to deploy contains{" "}
+              <p className="text-red-800">constraint violations</p>
+            </p>
+            <h3 className="text-primary text-center font-Helvetica-Neue-Heavy text-2xl mb-6">
+              Are you sure you want to <br /> proceed with the deployment?
+            </h3>
+            <div className="flex justify-center space-x-4">
+              <button
+                className="px-5 py-1 border border-primary rounded-md font-Manrope font-semibold text-primary"
+                onClick={() => setShowDeployModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-primary text-white rounded-md font-Manrope font-semibold"
+                onClick={handleConfirmDeploy}
+              >
+                Proceed
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

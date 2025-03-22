@@ -25,7 +25,7 @@ import ViewSchedule from "./pages/departmentchair/ViewSchedule";
 import SchedulePublishing from "./pages/departmentchair/SchedulePublishing";
 import ScheduleReadiness from "./pages/departmentchair/ScheduleReadiness";
 import ManualEdit from "./pages/departmentchair/ManualEdit";
-
+import Ratings from "./pages/departmentchair/Ratings";
 const App: React.FC = () => {
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
 
@@ -61,6 +61,7 @@ const App: React.FC = () => {
             />
             <Route path="schedule-readiness" element={<ScheduleReadiness />} />
             <Route path="manual-edit" element={<ManualEdit />} />
+            <Route path="ratings" element={<Ratings />} />
 
             {/* catch all */}
             <Route

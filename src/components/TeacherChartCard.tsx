@@ -1,7 +1,9 @@
 import React from "react";
 import TeacherChart from "./TeacherChart";
+import { useNavigate } from "react-router-dom";
 
 const TeacherChartCard = () => {
+  const navigate = useNavigate();
   return (
     <div className="bg-custom_lightblue rounded-2xl shadow-xl font-Manrope py-9">
       <div className="flex flex-col items-center space-y-10">
@@ -18,7 +20,10 @@ const TeacherChartCard = () => {
           </div>
         </div>
 
-        <button className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary">
+        <button
+          onClick={() => navigate("/departmentchair/ratings")}
+          className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary"
+        >
           See More
         </button>
       </div>
