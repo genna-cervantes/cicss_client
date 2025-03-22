@@ -28,6 +28,7 @@ const ViewSchedule = () => {
   }>({});
 
   const [profDetails, setProfDetails] = useState<{[key: string]: string}>({})
+  const [roomDetails, setRoomDetails] = useState<{[key: string]: string}>({});
 
   const [currentValue, setCurrentValue] = useState<{label: string, name?: string, specialization?: string}>(
     currentFilter === "Section"
@@ -49,7 +50,14 @@ const ViewSchedule = () => {
 
       let prevIndex: number = index === 0 ? keys.length - 1 : index - 1;
 
-      setCurrentValue({ label: keys[prevIndex], name: profDetails[keys[prevIndex]] });
+      setCurrentValue({ label: keys[prevIndex], name: profDetails[keys[prevIndex]] });  
+    }else if (currentFilter === "Room"){
+      const keys = Object.keys(roomDetails);
+      const index = keys.findIndex((roomId) => roomId === currentValue.label);
+
+      let prevIndex: number = index === 0 ? keys.length - 1 : index - 1;
+
+      setCurrentValue({ label: keys[prevIndex], name: keys[prevIndex], specialization: roomDetails[keys[prevIndex]] });  
     }
   };
 
@@ -63,6 +71,13 @@ const ViewSchedule = () => {
       let nextIndex: number = index === keys.length ? 0 : index + 1;
 
       setCurrentValue({ label: keys[nextIndex], name: profDetails[keys[nextIndex]] });
+    }else if (currentFilter === "Room"){
+      const keys = Object.keys(roomDetails);
+      const index = keys.findIndex((roomId) => roomId === currentValue.label);
+
+      let nextIndex: number = index === keys.length ? 0 : index + 1;
+
+      setCurrentValue({ label: keys[nextIndex], name: keys[nextIndex], specialization: roomDetails[keys[nextIndex]] });
     }
   };
 
@@ -100,6 +115,28 @@ const ViewSchedule = () => {
     if (filter === 'Section'){
       setCurrentValue({label: Object.keys(yearSections)[0], specialization: yearSections[Object.keys(yearSections)[0]]?.specialization})
       setCurrentFilter(filter);
+    }
+    if (filter === 'Room'){
+      const fetchRoomData = async () => {
+        const res = await fetch("http://localhost:8080/rooms/CS");
+        const data = await res.json();
+        
+        let roomDetails = data.map((rm: any) => ({[rm.roomId]: rm.roomType}))
+        roomDetails = roomDetails.reduce((acc: any, room: any) => ({ ...acc, ...room }), {})
+        // console.log(roomDetails)
+        // console.log(roomDetails.reduce((acc: any, room: any) => ({ ...acc, ...room }), {}))
+        setRoomDetails(roomDetails)
+
+        console.log(Object.keys(roomDetails)[0])
+        console.log(roomDetails[Object.keys(roomDetails)[0]])
+
+        if (res.ok){
+          setCurrentValue({label: Object.keys(roomDetails)[0], name: Object.keys(roomDetails)[0], specialization: roomDetails[Object.keys(roomDetails)[0]]})
+          setCurrentFilter(filter);
+        }
+      }
+  
+      fetchRoomData();
     }
   }, [filter])
 
@@ -357,6 +394,30 @@ const ViewSchedule = () => {
                 return (
                   <option key={index} value={tasId} className="py-2">
                     {tasName}
+                  </option>
+                );
+              })}
+            </select>}
+
+            {currentFilter === "Room" && <select
+              className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
+              value={currentValue.label}
+              onChange={(e: any) =>
+                setCurrentValue({
+                  label: e.target.value,
+                  specialization: roomDetails[e.target.value],
+                  name: e.target.value
+                })
+              }
+            >
+              <option value="" disabled>
+                Select a Section
+              </option>
+              {Object.keys(roomDetails).map((roomId, index) => {
+                console.log(typeof roomId)
+                return (
+                  <option key={index} value={roomId} className="py-2">
+                    {roomId}
                   </option>
                 );
               })}

@@ -54,11 +54,11 @@ const transformToScheduleEvents = (rawSchedule: any, filter: string, value: stri
 
       let transformedSchedBlock = {
         id: schedBlock.id,
-        title: filter === 'Professor' ? schedBlock.course : schedBlock.course.subjectCode,
+        title: filter !== 'Section' ? schedBlock.course : schedBlock.course.subjectCode,
         start: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.start)}`,
         end: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.end)}`,
         location: filter !== 'Room' ? schedBlock.room.roomId : '',
-        people: [filter !== 'Professor' ? schedBlock.tas.tas_name : `${schedBlock.year}${schedBlock.section}`], // magkaiba pa ung convnetiona mp
+        people: [filter === 'Section' ? schedBlock.tas.tas_name : `${schedBlock.year}${schedBlock.section}`], // magkaiba pa ung convnetiona mp
         description: JSON.stringify({type: schedBlock.course.type, violations: schedBlock.violations ?? []})
       };
 
@@ -176,6 +176,30 @@ const ScheduleView = ({
       }
 
       fetchSchedule();
+    }else if (filter === "Room"){
+      let roomId = value;
+
+      console.log('room', roomId)
+      
+      const fetchSchedule = async () => {
+        const res = await fetch(`http://localhost:3000/schedule/room/${roomId}`)
+        const data = await res.json()
+        let sched = data;
+
+        if (data?.error){
+          sched = {}
+        }
+
+        console.log('data', data)
+        
+        if (res.ok) {
+          setScheduleEvents(sched);
+        } else {
+          setError("may error sa pag kuha ng sched - tas");
+        }
+      }
+
+      fetchSchedule();
     }
 
 
@@ -204,7 +228,8 @@ const ScheduleView = ({
 
   return (
     <div>
-      <div className="pointer-events-none">
+      {/* <div className="pointer-events-none"> */}
+      <div>
         <ScheduleXCalendar calendarApp={calendar} customComponents={{timeGridEvent: timeGridEvent}}/>
       </div>
     </div>
