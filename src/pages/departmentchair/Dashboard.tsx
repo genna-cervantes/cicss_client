@@ -25,12 +25,12 @@ const Dashboard = () => {
       </div>
 
       <main className="hidden lg:block max-w-full">
-        <section className="flex items-center justify-between py-7 px-6 lg:px-16 xl:px-24 2xl:px-32">
+        <section className="flex items-center justify-between py-7 px-2 lg:px-12 xl:px-16 2xl:px-24">
           <Greeting userName="Cherry Rose" />
           <Semester />
         </section>
 
-        <section className="px-6 lg:px-16 xl:px-24 2xl:px-32 grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-8">
+        <section className="px-2 lg:px-12 xl:px-16 2xl:px-24 grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-8">
           {/* Left*/}
           <div className="lg:col-span-5 flex flex-col gap-5 xl:gap-6">
             <DashboardButtons
