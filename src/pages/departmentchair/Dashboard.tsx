@@ -24,16 +24,15 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Desktop content - only displays on medium screens and larger */}
       <main className="hidden md:block max-w-full">
-        <section className="flex items-center justify-between py-7 px-6 lg:px-16">
+        <section className="flex items-center justify-between py-7 px-6 lg:px-16 xl:px-24 2xl:px-32">
           <Greeting userName="Cherry Rose" />
           <Semester />
         </section>
 
-        <section className="px-6 lg:px-16 grid grid-cols-1 lg:grid-cols-12 gap-5">
-          {/* Left column - buttons */}
-          <div className="lg:col-span-5 flex flex-col gap-5">
+        <section className="px-6 lg:px-16 xl:px-24 2xl:px-32 grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-8">
+          {/* Left*/}
+          <div className="lg:col-span-5 flex flex-col gap-5 xl:gap-6">
             <DashboardButtons
               Label="Section Counts"
               Path="input-section-counts"
@@ -58,15 +57,15 @@ const Dashboard = () => {
             />
           </div>
 
-          {/* Right column - generate button and charts */}
-          <div className="lg:col-span-7 flex flex-col gap-5">
+          {/* Right */}
+          <div className="lg:col-span-7 flex flex-col gap-5 xl:gap-8">
             <NavLink to="schedule-view" className="block w-full">
-              <div className="p-3 text-center bg-secondary rounded-md font-Manrope font-bold text-2xl md:text-3xl text-white shadow-md hover:bg-primary overflow-hidden">
+              <div className="p-2 lg:p-3 xl:p-4 text-center bg-secondary rounded-md font-Manrope font-bold text-2xl md:text-3xl xl:text-4xl text-white shadow-md hover:bg-primary overflow-hidden">
                 Generate Schedule
               </div>
             </NavLink>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 xl:gap-8">
               <div className="w-full">
                 <StudentChartCard />
               </div>

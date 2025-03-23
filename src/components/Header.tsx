@@ -1,8 +1,23 @@
 import cicss_logo_header from "../assets/cicss_logo_header.png";
 import logout_logo from "../assets/logout_logo.png";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
 
 const Header = () => {
+  const navigate = useNavigate();
+  const { setRole } = useAppContext();
+
+  const handleLogout = () => {
+    // Clear the role from context
+    setRole("");
+
+    // Remove role from localStorage
+    localStorage.removeItem("role");
+
+    // Redirect to login page
+    navigate("/");
+  };
+
   return (
     <header>
       <div className="flex justify-between items-center py-3 px-16">
@@ -22,13 +37,14 @@ const Header = () => {
               Dashboard
             </NavLink>
 
-            <div className=" bg-primary rounded-md w-32">
-              <div className="flex px-3 py-1 items-center justify-between">
-                <NavLink to="logout" className="text-white">
-                  Logout
-                </NavLink>
+            <div className="bg-primary rounded-md w-32">
+              <button
+                onClick={handleLogout}
+                className="flex w-full px-3 py-1 items-center justify-between"
+              >
+                <span className="text-white">Logout</span>
                 <img src={logout_logo} alt="" className="w-5 h-4" />
-              </div>
+              </button>
             </div>
           </ul>
         </nav>

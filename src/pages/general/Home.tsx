@@ -6,7 +6,7 @@ import {
   fetchUserInfo,
 } from "../../utils/utils";
 import { useAppContext } from "../../context/AppContext";
-import { Navigate, redirect, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import USTLogo from "../../assets/ust_logo.png";
 import CICSLogo from "../../assets/cics_logo.png";
@@ -34,32 +34,25 @@ const Home = () => {
 
       // if department chair
       if (await checkIfCICSDepartmentChair(userInfo.email)) {
-        // redirect to dept chair view
-        // write sa local storage
         setRole("department-chair");
         localStorage.setItem("role", "department-chair");
         navigate("/departmentchair");
-
         return;
       }
 
       // if prof
       if (await checkIfCICSTAS(userInfo.email)) {
-        // redirect to dept chair view
         setRole("tas");
         localStorage.setItem("role", "tas");
         navigate("/tas");
-
         return;
       }
 
       // if student
       if (checkIfCICSStudent(userInfo.email)) {
-        // redirect to dept chair view
         setRole("student");
         localStorage.setItem("role", "student");
         navigate("/student");
-
         return;
       }
     },
@@ -67,41 +60,65 @@ const Home = () => {
 
   return (
     <div
-      className="w-full bg-cover bg-repeat-y bg-center h-screen overflow-hidden"
+      className="w-full bg-cover bg-repeat-y bg-center flex flex-col min-h-screen overflow-x-hidden"
       style={{ backgroundImage: `url(${HomeBg})` }}
     >
-      <div className="flex px-36 py-28 justify-around items-start">
-        <div>
-          <div className="flex mb-10">
-            <img src={USTLogo} alt="UST Logo" className="w-auto h-10" />
-            <img src={CICSLogo} alt="UST CICS Logo" className="w-auto h-10" />
-          </div>
-          <h1 className="font-Helvetica-Neue-Heavy text-white text-3xl leading-none">
-            Welcome To
-          </h1>
-          <h1 className="font-CyGrotesk text-[100px] leading-none text-transparent bg-clip-text bg-gradient-text-yellow drop-shadow-lg">
-            CICSS
-          </h1>
-          <p className="font-Manrope text-white mb-10">
-            Sign in to the <br />
-            <span className="font-bold">
-              Centralized Integrated Class Scheduling System
-              <br />
-            </span>
-            and shape the future of academic scheduling today!
-          </p>
-          <button
-            onClick={() => login()}
-            className="flex bg-gradient-to-b from-[#02296D] to-[#0350D3] items-center justify-center rounded-[100px] pl-2 pr-4 py-2 gap-x-2"
-          >
-            <div>
-              <img src={GoogleLogo} alt="Google Logo" className="h-10 w-10" />
+      <div className="flex-1 flex items-center justify-center w-full">
+        <div className="container mx-auto px-4 md:px-8 lg:px-10 xl:px-14 2xl:px-16 py-8 md:py-12 lg:py-16 xl:py-20 max-w-screen-2xl">
+          <div className="flex flex-col lg:flex-row items-center justify-center lg:space-x-28 xl:space-x-36 2xl:space-x-48">
+            <div className="max-w-xl xl:max-w-2xl">
+              <div className="flex mb-6 md:mb-10">
+                <img
+                  src={USTLogo}
+                  alt="UST Logo"
+                  className="h-8 md:h-10 lg:h-12 w-auto"
+                />
+                <img
+                  src={CICSLogo}
+                  alt="UST CICS Logo"
+                  className="h-8 md:h-10 lg:h-12 w-auto"
+                />
+              </div>
+              <h1 className="font-Helvetica-Neue-Heavy text-white text-2xl md:text-3xl lg:text-4xl leading-none">
+                Welcome To
+              </h1>
+              <h1 className="font-CyGrotesk text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl leading-none text-transparent bg-clip-text bg-gradient-text-yellow drop-shadow-lg">
+                CICSS
+              </h1>
+              <p className="font-Manrope text-white text-sm md:text-base lg:text-lg mb-6 md:mb-10">
+                Sign in to the <br />
+                <span className="font-bold">
+                  Centralized Integrated Class Scheduling System
+                  <br />
+                </span>
+                and shape the future of academic scheduling today!
+              </p>
+              <div>
+                <button
+                  onClick={() => login()}
+                  className="flex bg-gradient-to-b from-[#02296D] to-[#0350D3] items-center justify-center rounded-full pl-2 pr-4 py-2 gap-x-2 hover:shadow-lg transition-shadow"
+                >
+                  <div>
+                    <img
+                      src={GoogleLogo}
+                      alt="Google Logo"
+                      className="h-8 w-8 md:h-10 md:w-10 lg:h-12 lg:w-12"
+                    />
+                  </div>
+                  <p className="text-white text-sm md:text-base lg:text-lg">
+                    Sign in with Google
+                  </p>
+                </button>
+              </div>
             </div>
-            <p className="text-white">Sign in with Google</p>
-          </button>
-        </div>
-        <div>
-          <img src={CICSSLogo} alt="CICSS Logo" className="w-auto h-[480px]" />
+            <div className="mt-8 lg:mt-0 flex justify-center">
+              <img
+                src={CICSSLogo}
+                alt="CICSS Logo"
+                className="w-auto h-64 md:h-80 lg:h-96 xl:h-112 2xl:h-128 max-w-full"
+              />
+            </div>
+          </div>
         </div>
       </div>
       <Footer />

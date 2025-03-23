@@ -1,31 +1,45 @@
-import React from "react";
 import { NavLink } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <div>
-      <div className="bottom-0 w-full flex flex-col md:flex-row justify-between items-center py-[18px] px-[20px] md:px-[100px] mt-4 text-primary font-Manrope">
+    <footer className="mt-auto w-full">
+      <div className="w-full flex flex-col md:flex-row justify-between items-center py-4 px-6 md:px-12 lg:px-24 text-primary font-Manrope">
         {/* Copyright Text */}
-        <div className="text-center md:text-left mb-[15px] md:mb-0">
+        <div className="text-center md:text-left mb-4 md:mb-0 text-sm md:text-base">
           © Copyright 2024. University of Santo Tomas. All Rights reserved.
         </div>
 
         {/* Navigation Links */}
-        <nav>
-          <ul className="flex flex-col md:flex-row justify-center md:justify-end gap-4 md:gap-10 font-bold text-sm md:text-base">
-            <NavLink to="#" className="hover:text-primary-dark">
-              Help
-            </NavLink>
-            <NavLink to="#" className="hover:text-primary-dark">
-              Terms and Conditions
-            </NavLink>
-            <NavLink to="#" className="hover:text-primary-dark">
-              Send Feedback
-            </NavLink>
+        <nav className="w-full md:w-auto">
+          <ul className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8 font-bold text-sm">
+            <li>
+              <NavLink
+                to="#"
+                className="hover:text-primary-dark transition-colors"
+              >
+                Help
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="#"
+                className="hover:text-primary-dark transition-colors"
+              >
+                Terms and Conditions
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="#"
+                className="hover:text-primary-dark transition-colors"
+              >
+                Send Feedback
+              </NavLink>
+            </li>
           </ul>
         </nav>
       </div>
-    </div>
+    </footer>
   );
 };
 
