@@ -11,7 +11,7 @@ const Dashboard = () => {
   return (
     <div className="w-full">
       {/* Mobile/Small screen warning - only shows on screens smaller than md breakpoint */}
-      <div className="md:hidden flex flex-col items-center justify-center h-screen">
+      <div className="lg:hidden flex flex-col items-center justify-center h-screen">
         <div className="text-center p-8 bg-white rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-blue-800 mb-4">
             Limited Access
@@ -24,7 +24,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <main className="hidden md:block max-w-full">
+      <main className="hidden lg:block max-w-full">
         <section className="flex items-center justify-between py-7 px-6 lg:px-16 xl:px-24 2xl:px-32">
           <Greeting userName="Cherry Rose" />
           <Semester />
