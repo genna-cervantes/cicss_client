@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const WaitingPage = () => {
+  const [runningGenerator, setRunningGenerator] = useState(false)
   const [error, setError] = useState<string>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -91,7 +92,7 @@ const WaitingPage = () => {
   }, [location.state]);
 
   useEffect(() => {
-    if (CSSections && ITSections && ISSections) {
+    if (CSSections && ITSections && ISSections && !runningGenerator) {
       const generateSchedule = async () => {
         try {
           // if (firstYearSections.length === 0 || secondYearSections.length === 0 || thirdYearSections.length === 0 || fourthYearSections.length === 0){
@@ -134,7 +135,10 @@ const WaitingPage = () => {
         }
       };
 
+      console.log('running generate sched')
+      setRunningGenerator(true);
       generateSchedule();
+
       console.log("done");
     }
 

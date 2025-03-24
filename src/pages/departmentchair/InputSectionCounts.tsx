@@ -130,7 +130,7 @@ const InputSectionCounts: React.FC = () => {
                 />
                 {typeof sectionCounts.firstSC == "number" &&
                   Array.from({ length: sectionCounts.firstSC }).map((_, i) => {
-                    firstYearSections[i].specialization = 'none'
+                    firstYearSections[i] = {...firstYearSections[i], specialization: 'none'}
                     return (
                       <input
                         key={i}
@@ -165,7 +165,7 @@ const InputSectionCounts: React.FC = () => {
               <div className="flex flex-col">
                 {typeof sectionCounts.secondSC == "number" &&
                   Array.from({ length: sectionCounts.secondSC }).map((_, i) => {
-                    secondYearSections[i].specialization = 'none'
+                    secondYearSections[i] = {...secondYearSections[i], specialization: 'none'}
                     return (
                       <input
                         key={i}

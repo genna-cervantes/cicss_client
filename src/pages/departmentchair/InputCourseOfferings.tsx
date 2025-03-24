@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
 import Select from "react-select";
 import Navbar from "../../components/Navbar";
 
@@ -18,24 +18,26 @@ type Option = {
   label: string;
 };
 
+// Dummy Options
+const courseType: Option[] = [
+  { value: "lec", label: "Lec" },
+  { value: "lab", label: "Lab" },
+];
+
+const yearLevel: Option[] = [
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+  { value: "3", label: "3" },
+  { value: "4", label: "4" },
+];
+
 const InputCourseOfferings = () => {
-  // Dummy Options
-  const courseType: Option[] = [
-    { value: "lec", label: "Lec" },
-    { value: "lab", label: "Lab" },
-  ];
-
-  const yearLevel: Option[] = [
-    { value: "1", label: "1" },
-    { value: "2", label: "2" },
-    { value: "3", label: "3" },
-    { value: "4", label: "4" },
-  ];
-
   // Array of Courses
   const [courses, setCourses] = useState<CourseInfo[]>([
     { title: "", code: "", unit: "", type: "", yearLevel: "" },
   ]);
+
+  const [firstYearCourses, setFirstYearCourses] = useState<CourseInfo[]>([])
 
   // Handles the Course Title Changes for each form
   const handleCourseTitleChange = (
@@ -130,6 +132,44 @@ const InputCourseOfferings = () => {
     });
   };
 
+  // fetch data
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      try{
+        const res = await fetch('http://localhost:8080/courseofferings/1/2/CS') // sem and department must be dynamic
+        const data = await res.json()
+  
+        if (res.ok){
+          console.log(data)
+
+          let transformedFirstYearCourses: CourseInfo[] = [];
+          transformedFirstYearCourses = data.map((course: any) => {
+            return {
+              title: course.courseName,
+              code: course.courseCode,
+              unit: course.totalUnits,
+              type: course.courseType,
+              yearLevel: 1
+            }
+          })
+
+          setFirstYearCourses(transformedFirstYearCourses)
+
+        }else{
+          console.log('may error ate ko')
+        }
+      }catch(err){
+        console.log('error', err)
+      }
+    }
+
+    fetchCourseData()
+  }, [])
+
+  useEffect(() => {
+    console.log(firstYearCourses)
+  }, [firstYearCourses])
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="mx-auto py-10">
@@ -151,7 +191,7 @@ const InputCourseOfferings = () => {
       </section>
 
       <form className="flex flex-col">
-        {courses.map((course, index) => (
+        {firstYearCourses.map((course, index) => (
           <section
             key={index}
             className="flex mx-auto gap-7 font-semibold mb-5"
@@ -211,7 +251,7 @@ const InputCourseOfferings = () => {
                 }}
                 value={
                   yearLevel.find(
-                    (option) => option.value === course.yearLevel
+                    (option) => option.value === course.yearLevel.toString()
                   ) || null
                 }
                 onChange={(option) =>
