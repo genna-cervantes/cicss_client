@@ -51,7 +51,7 @@ const InputCourseOfferings = () => {
     index: number,
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    setCourses((prev) => {
+    setFirstYearCourses((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], title: e.target.value };
       return updated;
@@ -74,7 +74,7 @@ const InputCourseOfferings = () => {
     index: number,
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    setCourses((prev) => {
+    setFirstYearCourses((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], code: e.target.value };
       return updated;
@@ -97,7 +97,7 @@ const InputCourseOfferings = () => {
     index: number,
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    setCourses((prev) => {
+    setFirstYearCourses((prev) => {
       const updated = [...prev];
       updated[index] = { ...updated[index], unit: e.target.value };
       return updated;
@@ -120,7 +120,7 @@ const InputCourseOfferings = () => {
     index: number,
     selectedOption: Option | null
   ) => {
-    setCourses((prev) => {
+    setFirstYearCourses((prev) => {
       const updated = [...prev];
       updated[index] = {
         ...updated[index],
@@ -148,7 +148,7 @@ const InputCourseOfferings = () => {
     index: number,
     selectedOption: Option | null
   ) => {
-    setCourses((prev) => {
+    setFirstYearCourses((prev) => {
       const updated = [...prev];
       updated[index] = {
         ...updated[index],
@@ -177,7 +177,7 @@ const InputCourseOfferings = () => {
     index: number,
     selectedOption: Option | null
   ) => {
-    setCourses((prev) => {
+    setFirstYearCourses((prev) => {
       const updated = [...prev];
       updated[index] = {
         ...updated[index],
@@ -239,7 +239,9 @@ const InputCourseOfferings = () => {
           `http://localhost:8080/courseofferings/${course.yearLevel}/2/CS`,
           {
             method: "POST",
-            headers: { "Content-type": "application/json" },
+            headers: { 
+              "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
+              "Content-type": "application/json" },
             body: JSON.stringify(reqObj),
           }
         );
@@ -251,15 +253,21 @@ const InputCourseOfferings = () => {
         }
       }
     };
-
     addCourseData();
+
+    // save updated courses
+
   };
 
   // fetch data
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
-        const res = await fetch("http://localhost:8080/courseofferings/1/2/CS"); // sem and department must be dynamic
+        const res = await fetch("http://localhost:8080/courseofferings/1/2/CS", {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
+          }
+        }); // sem and department must be dynamic
         const data = await res.json();
 
         if (res.ok) {
@@ -382,6 +390,7 @@ const InputCourseOfferings = () => {
                 className="w-[150px] rounded-[5px]"
               />
               <Select
+                isDisabled={true}
                 options={yearLevel}
                 placeholder="Select"
                 styles={{

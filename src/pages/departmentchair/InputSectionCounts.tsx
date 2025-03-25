@@ -40,7 +40,11 @@ const InputSectionCounts: React.FC = () => {
   // fetch data
   useEffect(() => {
     const fetchYearSectionsData = async () => {
-      const res = await fetch("http://localhost:8080/year_sections/CS");
+      const res = await fetch("http://localhost:8080/year_sections/CS", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`
+        }
+      });
       const data = await res.json();
 
       if (res.ok) {
@@ -81,6 +85,7 @@ const InputSectionCounts: React.FC = () => {
     const res = await fetch("http://localhost:8080/year_sections", {
       method: "POST",
       headers: {
+        "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
         "Content-type": "application/json",
       },
       body: JSON.stringify(reqBody),

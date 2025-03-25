@@ -32,35 +32,71 @@ const Home = () => {
     onSuccess: async (tokenResponse) => {
       let userInfo = await fetchUserInfo(tokenResponse.access_token);
 
-      // if department chair
-      let isDepartmentChair = await checkIfCICSDepartmentChair(userInfo.email);
-      console.log(isDepartmentChair);
-      if (isDepartmentChair) {
-        // redirect to dept chair view
-        // write sa local storage
-        setRole("department-chair");
-        localStorage.setItem("role", "department-chair");
-        navigate("/departmentchair");
-        return;
+      const res = await fetch("http://localhost:8080/auth/login", {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify({email: userInfo.email})
+      })
+
+      const data = await res.json();
+
+      if (res.ok){
+        let {token, role} = data;
+        setRole(role);
+        localStorage.setItem("role", role);
+        localStorage.setItem("token", token);
+
+        switch (role) {
+          case "Department Chair":
+            navigate("/departmentchair");
+            return;
+            break;
+          case "TAS":
+            navigate("/tas");
+            return;
+            break;
+          case "Student":
+            navigate("/student");
+            return;
+            break;
+          default:
+            navigate("/");
+        }
+      }else{
+        console.log('may error sisiy')
       }
 
-      // if prof
-      if (await checkIfCICSTAS(userInfo.email)) {
-        // redirect to dept chair view
-        setRole("tas");
-        localStorage.setItem("role", "tas");
-        navigate("/tas");
-        return;
-      }
+      // // if department chair
+      // let isDepartmentChair = await checkIfCICSDepartmentChair(userInfo.email);
+      // // console.log(isDepartmentChair);
+      // if (isDepartmentChair) {
+      //   // redirect to dept chair view
+      //   // write sa local storage
+      //   setRole("department-chair");
+      //   localStorage.setItem("role", "department-chair");
+      //   navigate("/departmentchair");
+      //   return;
+      // }
 
-      // if student
-      if (checkIfCICSStudent(userInfo.email)) {
-        // redirect to dept chair view
-        setRole("student");
-        localStorage.setItem("role", "student");
-        navigate("/student");
-        return;
-      }
+      // // if prof
+      // if (await checkIfCICSTAS(userInfo.email)) {
+      //   // redirect to dept chair view
+      //   setRole("tas");
+      //   localStorage.setItem("role", "tas");
+      //   navigate("/tas");
+      //   return;
+      // }
+
+      // // if student
+      // if (checkIfCICSStudent(userInfo.email)) {
+      //   // redirect to dept chair view
+      //   setRole("student");
+      //   localStorage.setItem("role", "student");
+      //   navigate("/student");
+      //   return;
+      // }
     },
   });
 

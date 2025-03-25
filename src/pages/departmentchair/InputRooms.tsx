@@ -189,6 +189,7 @@ const InputRooms = () => {
       const res = await fetch("http://localhost:8080/rooms", {
         method: "PUT",
         headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(reqObj),
@@ -229,7 +230,9 @@ const InputRooms = () => {
 
       const res = await fetch("http://localhost:8080/rooms", {
         method: "POST",
-        headers: { "Content-type": "application/json" },
+        headers: { 
+          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
+          "Content-type": "application/json" },
         body: JSON.stringify(reqObj),
       });
 
@@ -246,6 +249,7 @@ const InputRooms = () => {
       const res = await fetch("http://localhost:8080/rooms", {
         method: "DELETE",
         headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({roomId: deletedRooms[i]}),
@@ -264,7 +268,11 @@ const InputRooms = () => {
   // CONNECTIONS TO DB
   useEffect(() => {
     const getRooms = async () => {
-      const res = await fetch("http://localhost:8080/rooms/CS"); // MAKE DYNAMIC AH
+      const res = await fetch("http://localhost:8080/rooms/CS", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
+        }
+      }); // MAKE DYNAMIC AH
       const data = await res.json();
 
       if (res.ok) {

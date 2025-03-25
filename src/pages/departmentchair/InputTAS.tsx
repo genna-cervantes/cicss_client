@@ -471,6 +471,7 @@ const InputTAS: React.FC = () => {
       const res = await fetch("http://localhost:8080/tasconstraints", {
         method: "PUT",
         headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(reqObj),
@@ -524,6 +525,7 @@ const InputTAS: React.FC = () => {
       const res = await fetch("http://localhost:8080/tasconstraints", {
         method: "POST",
         headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(reqObj),
@@ -542,6 +544,7 @@ const InputTAS: React.FC = () => {
       const res = await fetch("http://localhost:8080/tasconstraints", {
         method: "DELETE",
         headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({tasId: deletedTAS[i]}),
@@ -592,7 +595,11 @@ const InputTAS: React.FC = () => {
   useEffect(() => {
     const getTASConstraints = async () => {
       console.log("getting tas constraints");
-      const res = await fetch("http://localhost:8080/tasconstraints/CS"); // EDIT THIS TO BE DYNAMIC PERO CS MUNA FOR NOW
+      const res = await fetch("http://localhost:8080/tasconstraints/CS", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`
+        }
+      }); // EDIT THIS TO BE DYNAMIC PERO CS MUNA FOR NOW
       const data = await res.json();
 
       for (let i = 0; i < data.length; i++) {
