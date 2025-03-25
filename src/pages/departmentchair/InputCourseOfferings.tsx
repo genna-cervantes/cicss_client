@@ -45,6 +45,11 @@ const InputCourseOfferings = () => {
 
   const [firstYearCourses, setFirstYearCourses] = useState<CourseInfo[]>([]);
   const [addedCourses, setAddedCourses] = useState<CourseInfo[]>([]);
+  const [deletedCourses, setDeletedCourses] = useState<{courseCode: String, yearLevel: number}[]>([]);
+
+  useEffect(() => {
+    console.log(deletedCourses)
+  }, [deletedCourses])
 
   // Handles the Course Title Changes for each form
   const handleCourseTitleChange = (
@@ -211,12 +216,17 @@ const InputCourseOfferings = () => {
   };
 
   // To Delete Course Form
-  const handleDeleteCourse = (index: number) => {
-    setCourses((prev) => prev.filter((_, i) => i !== index));
+  const handleDeleteCourse = (course: CourseInfo, yearLevel: number) => {
+    if (yearLevel === 1){
+      setFirstYearCourses((prev) => prev.filter((prevCourse) => prevCourse.code !== course.code));
+    }
+    setDeletedCourses((prev) => [...prev, {courseCode: course.code, yearLevel}])
+    console.log('deleted', course)
   };
 
   const handleDeleteAddedCourse = (index: number) => {
     setAddedCourses((prev) => prev.filter((_, i) => i !== index));
+    console.log('deleted', addedCourses[index])
   };
 
   // Save handler for demonstration: logs each course's details.
@@ -256,6 +266,31 @@ const InputCourseOfferings = () => {
     addCourseData();
 
     // save updated courses
+
+    // save deleted courses
+    const deleteCourseData = async () => {
+      for (let i = 0; i < deletedCourses.length; i++){
+        let reqObj = deletedCourses[i]
+
+        const res = await fetch(`http://localhost:8080/courseofferings/${deletedCourses[i].yearLevel}/2/CS`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
+            "Content-type": 'application/json'
+          },
+          body: JSON.stringify(reqObj)
+        })
+
+        if (res.ok){
+          console.log('yey delted')
+        }else{
+          console.log('may error sis')
+        }
+
+      }
+    }
+
+    deleteCourseData();
 
   };
 
@@ -411,8 +446,8 @@ const InputCourseOfferings = () => {
                 className="w-[150px] rounded-[5px]"
               />
             </div>
-            <button onClick={() => handleDeleteCourse(index)} className="w-7">
-              <img src={trash_button} alt="Remove" />
+            <button type="button" onClick={() => handleDeleteCourse(course, 1)} className="w-7">
+              <img src={trash_button} alt="Remove" />``
             </button>
           </section>
         ))}
@@ -505,6 +540,7 @@ const InputCourseOfferings = () => {
               />
             </div>
             <button
+              type="button"
               onClick={() => handleDeleteAddedCourse(index)}
               className="w-7"
             >
