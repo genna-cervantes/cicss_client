@@ -49,7 +49,9 @@ const InputCourseOfferings = () => {
   const [deletedCourses, setDeletedCourses] = useState<
     { courseCode: string; yearLevel: number }[]
   >([]);
-  const [updatedCourses, setUpdatedCourses] = useState<{[key: string]: any, yearLevel: number, courseCodeKey: string }[]>([]);
+  const [updatedCourses, setUpdatedCourses] = useState<
+    { [key: string]: any; yearLevel: number; courseCodeKey: string }[]
+  >([]);
 
   // IMPORTANT: use effect for check token if expired na
 
@@ -62,9 +64,9 @@ const InputCourseOfferings = () => {
     courseCode: string,
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    handleUpdateCourse('title', e.target.value as string, courseCode, 1)
+    handleUpdateCourse("title", e.target.value as string, courseCode, 1);
   };
-  
+
   const handleAddedCourseTitleChange = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
@@ -81,9 +83,14 @@ const InputCourseOfferings = () => {
     courseCode: string,
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    handleUpdateCourse('code', {previous: courseCode, new: e.target.value}, courseCode, 1)
+    handleUpdateCourse(
+      "code",
+      { previous: courseCode, new: e.target.value },
+      courseCode,
+      1
+    );
   };
-  
+
   const handleAddedCourseCodeChange = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
@@ -100,9 +107,9 @@ const InputCourseOfferings = () => {
     courseCode: string,
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    handleUpdateCourse('unit', e.target.value, courseCode, 1)
+    handleUpdateCourse("unit", e.target.value, courseCode, 1);
   };
-  
+
   const handleAddedCourseUnitChange = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
@@ -113,17 +120,17 @@ const InputCourseOfferings = () => {
       return updated;
     });
   };
-  
+
   // Handles the Course Type Changes for each form
   const handleCourseTypeChange = (
     courseCode: string,
     selectedOption: Option | null
   ) => {
-    if (selectedOption){
-      handleUpdateCourse('type', selectedOption.value, courseCode, 1)
+    if (selectedOption) {
+      handleUpdateCourse("type", selectedOption.value, courseCode, 1);
     }
   };
-  
+
   const handleAddedCourseTypeChange = (
     index: number,
     selectedOption: Option | null
@@ -137,13 +144,13 @@ const InputCourseOfferings = () => {
       return updated;
     });
   };
-  
+
   const handleCourseCategoryChange = (
     courseCode: string,
     selectedOption: Option | null
   ) => {
-    if (selectedOption){
-      handleUpdateCourse('category', selectedOption.value, courseCode, 1)
+    if (selectedOption) {
+      handleUpdateCourse("category", selectedOption.value, courseCode, 1);
     }
   };
 
@@ -227,7 +234,9 @@ const InputCourseOfferings = () => {
       setFirstYearCourses((prev) =>
         prev.map((course) =>
           course.code === courseCode
-            ? { ...course, [property]: newValue}
+            ? property !== 'code'
+              ? { ...course, [property]: newValue }
+              : { ...course, [property]: newValue.new }
             : course
         )
       );
@@ -239,9 +248,11 @@ const InputCourseOfferings = () => {
               ? { ...course, [property]: newValue }
               : course
           )
-        : [...prev, { yearLevel, courseCodeKey: courseCode, [property]: newValue }]
+        : [
+            ...prev,
+            { yearLevel, courseCodeKey: courseCode, [property]: newValue },
+          ]
     );
-    
   };
 
   // Save handler for demonstration: logs each course's details.
@@ -282,36 +293,48 @@ const InputCourseOfferings = () => {
     addCourseData();
 
     // save updated courses
-    const updateCoursesData = async () => { 
-      for (let i = 0; i < updatedCourses.length; i++){
-        
+    const updateCoursesData = async () => {
+      for (let i = 0; i < updatedCourses.length; i++) {
         let reqObj = {
           courseCodeKey: updatedCourses[i].courseCodeKey,
           ...(updatedCourses[i]?.title && { name: updatedCourses[i].title }),
-          ...(updatedCourses[i]?.courseCode && { courseCode: updatedCourses[i].courseCode }),
-          ...(updatedCourses[i]?.unit && { totalUnits: updatedCourses[i].unit }),
-          ...(updatedCourses[i]?.type && { courseType: updatedCourses[i].type }),
-          ...(updatedCourses[i]?.category && { courseCategory: updatedCourses[i].category })
+          ...(updatedCourses[i]?.code && {
+            courseCode: updatedCourses[i].code,
+          }),
+          ...(updatedCourses[i]?.unit && {
+            totalUnits: updatedCourses[i].unit,
+          }),
+          ...(updatedCourses[i]?.type && {
+            courseType: updatedCourses[i].type,
+          }),
+          ...(updatedCourses[i]?.category && {
+            courseCategory: updatedCourses[i].category,
+          }),
         };
 
-        const res = await fetch(`http://localhost:8080/courseofferings/${updatedCourses[i].yearLevel}/2/CS`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem("token") ?? ''}`,
-            'Content-type': 'application/json'
-          },
-          body: JSON.stringify(reqObj)
-        })
+        console.log(reqObj)
+        console.log(updatedCourses[i])
 
-        if (res.ok){
-          console.log('yey updated')
-        }else{
-          console.log('noo may error')
+        const res = await fetch(
+          `http://localhost:8080/courseofferings/${updatedCourses[i].yearLevel}/2/CS`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+              "Content-type": "application/json",
+            },
+            body: JSON.stringify(reqObj),
+          }
+        );
+
+        if (res.ok) {
+          console.log("yey updated");
+        } else {
+          console.log("noo may error");
         }
-      
       }
-    }
-    updateCoursesData()
+    };
+    updateCoursesData();
 
     // save deleted courses
     const deleteCourseData = async () => {
@@ -402,106 +425,110 @@ const InputCourseOfferings = () => {
       </section>
 
       <form className="flex flex-col">
-        {firstYearCourses.map((course, index) => (
-          <section
-            key={index}
-            className="flex mx-auto gap-7 font-semibold mb-5"
-          >
-            <div className="flex items-center gap-10 bg-[rgba(241,250,255,0.5)] p-6 shadow-md rounded-xl font-Manrope text-sm">
-              {/* <label>Course {index + 1}</label> */}
-              <input
-                type="text"
-                className="border border-primary h-[39px] w-[300px] rounded-md pl-2"
-                value={course.title}
-                onChange={(e) => handleCourseTitleChange(course.code, e)}
-                placeholder="Enter"
-              />
-
-              <input
-                type="text"
-                className="border border-primary h-[39px] w-[150px] rounded-md pl-2"
-                value={course.code}
-                onChange={(e) => handleCourseCodeChange(course.code, e)}
-                placeholder="Enter"
-              />
-              <input
-                type="number"
-                className="border border-primary h-[39px] w-[150px] rounded-md p-3"
-                value={course.unit}
-                onChange={(e) => handleCourseUnitChange(course.code, e)}
-                placeholder="Enter"
-              />
-              <Select
-                options={courseType}
-                placeholder="Select"
-                styles={{
-                  control: (provided: any) => ({
-                    ...provided,
-                    border: "1px solid #02296D",
-                    borderRadius: "6px",
-                  }),
-                }}
-                value={
-                  courseType.find((option) => option.value === course.type) ||
-                  null
-                }
-                onChange={(option) =>
-                  handleCourseTypeChange(course.code, option as Option)
-                }
-                className="w-[150px] rounded-[5px]"
-              />
-              <Select
-                options={courseCategory}
-                placeholder="Select"
-                styles={{
-                  control: (provided: any) => ({
-                    ...provided,
-                    border: "1px solid #02296D",
-                    borderRadius: "6px",
-                  }),
-                }}
-                value={
-                  courseCategory.find(
-                    (option) => option.value === course.category
-                  ) || null
-                }
-                onChange={(option) =>
-                  handleCourseCategoryChange(course.code, option as Option)
-                }
-                className="w-[150px] rounded-[5px]"
-              />
-              <Select
-                isDisabled={true}
-                options={yearLevel}
-                placeholder="Select"
-                styles={{
-                  control: (provided: any) => ({
-                    ...provided,
-                    border: "1px solid #02296D",
-                    borderRadius: "6px",
-                  }),
-                }}
-                value={
-                  yearLevel.find(
-                    (option) => option.value === course.yearLevel.toString()
-                  ) || null
-                }
-                onChange={(option) =>
-                  handleCourseYearLevelChange(index, option as Option)
-                }
-                className="w-[150px] rounded-[5px]"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={() => handleDeleteCourse(course, 1)}
-              className="w-7"
+        {firstYearCourses.map((course, index) => {
+          console.log(course);
+          return (
+            <section
+              key={index}
+              className="flex mx-auto gap-7 font-semibold mb-5"
             >
-              <img src={trash_button} alt="Remove" />
-              ``
-            </button>
-          </section>
-        ))}
+              <div className="flex items-center gap-10 bg-[rgba(241,250,255,0.5)] p-6 shadow-md rounded-xl font-Manrope text-sm">
+                {/* <label>Course {index + 1}</label> */}
+                <input
+                  type="text"
+                  className="border border-primary h-[39px] w-[300px] rounded-md pl-2"
+                  value={course.title}
+                  onChange={(e) => handleCourseTitleChange(course.code, e)}
+                  placeholder="Enter"
+                />
+
+                <input
+                  type="text"
+                  className="border border-primary h-[39px] w-[150px] rounded-md pl-2"
+                  value={course.code}
+                  onChange={(e) => handleCourseCodeChange(course.code, e)}
+                  placeholder="Enter"
+                />
+                <input
+                  type="number"
+                  className="border border-primary h-[39px] w-[150px] rounded-md p-3"
+                  value={course.unit}
+                  onChange={(e) => handleCourseUnitChange(course.code, e)}
+                  placeholder="Enter"
+                />
+                <Select
+                  options={courseType}
+                  placeholder="Select"
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      border: "1px solid #02296D",
+                      borderRadius: "6px",
+                    }),
+                  }}
+                  value={
+                    courseType.find((option) => option.value === course.type) ||
+                    null
+                  }
+                  onChange={(option) =>
+                    handleCourseTypeChange(course.code, option as Option)
+                  }
+                  className="w-[150px] rounded-[5px]"
+                />
+                <Select
+                  options={courseCategory}
+                  placeholder="Select"
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      border: "1px solid #02296D",
+                      borderRadius: "6px",
+                    }),
+                  }}
+                  value={
+                    courseCategory.find(
+                      (option) => option.value === course.category
+                    ) || null
+                  }
+                  onChange={(option) =>
+                    handleCourseCategoryChange(course.code, option as Option)
+                  }
+                  className="w-[150px] rounded-[5px]"
+                />
+                <Select
+                  isDisabled={true}
+                  options={yearLevel}
+                  placeholder="Select"
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      border: "1px solid #02296D",
+                      borderRadius: "6px",
+                    }),
+                  }}
+                  value={
+                    yearLevel.find(
+                      (option) => option.value === course.yearLevel.toString()
+                    ) || null
+                  }
+                  onChange={(option) =>
+                    handleCourseYearLevelChange(index, option as Option)
+                  }
+                  className="w-[150px] rounded-[5px]"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => handleDeleteCourse(course, 1)}
+                className="w-7"
+              >
+                <img src={trash_button} alt="Remove" />
+                ``
+              </button>
+            </section>
+          );
+        })}
+
         {addedCourses.map((course, index) => (
           <section
             key={index}
