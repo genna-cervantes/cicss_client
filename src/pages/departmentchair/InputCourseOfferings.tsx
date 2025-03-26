@@ -44,25 +44,27 @@ const InputCourseOfferings = () => {
   ]);
 
   const [firstYearCourses, setFirstYearCourses] = useState<CourseInfo[]>([]);
+
   const [addedCourses, setAddedCourses] = useState<CourseInfo[]>([]);
-  const [deletedCourses, setDeletedCourses] = useState<{courseCode: String, yearLevel: number}[]>([]);
+  const [deletedCourses, setDeletedCourses] = useState<
+    { courseCode: string; yearLevel: number }[]
+  >([]);
+  const [updatedCourses, setUpdatedCourses] = useState<{[key: string]: any, yearLevel: number, courseCodeKey: string }[]>([]);
+
+  // IMPORTANT: use effect for check token if expired na
 
   useEffect(() => {
-    console.log(deletedCourses)
-  }, [deletedCourses])
+    console.log(updatedCourses);
+  }, [updatedCourses]);
 
   // Handles the Course Title Changes for each form
   const handleCourseTitleChange = (
-    index: number,
+    courseCode: string,
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    setFirstYearCourses((prev) => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], title: e.target.value };
-      return updated;
-    });
+    handleUpdateCourse('title', e.target.value as string, courseCode, 1)
   };
-
+  
   const handleAddedCourseTitleChange = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
@@ -76,16 +78,12 @@ const InputCourseOfferings = () => {
 
   // Handles the Course Code Changes for each form
   const handleCourseCodeChange = (
-    index: number,
+    courseCode: string,
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    setFirstYearCourses((prev) => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], code: e.target.value };
-      return updated;
-    });
+    handleUpdateCourse('code', {previous: courseCode, new: e.target.value}, courseCode, 1)
   };
-
+  
   const handleAddedCourseCodeChange = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
@@ -99,16 +97,12 @@ const InputCourseOfferings = () => {
 
   // Handles the Course Unit Changes for each form
   const handleCourseUnitChange = (
-    index: number,
+    courseCode: string,
     e: ChangeEvent<HTMLInputElement>
   ) => {
-    setFirstYearCourses((prev) => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], unit: e.target.value };
-      return updated;
-    });
+    handleUpdateCourse('unit', e.target.value, courseCode, 1)
   };
-
+  
   const handleAddedCourseUnitChange = (
     index: number,
     e: ChangeEvent<HTMLInputElement>
@@ -119,22 +113,17 @@ const InputCourseOfferings = () => {
       return updated;
     });
   };
-
+  
   // Handles the Course Type Changes for each form
   const handleCourseTypeChange = (
-    index: number,
+    courseCode: string,
     selectedOption: Option | null
   ) => {
-    setFirstYearCourses((prev) => {
-      const updated = [...prev];
-      updated[index] = {
-        ...updated[index],
-        type: selectedOption ? selectedOption.value : "",
-      };
-      return updated;
-    });
+    if (selectedOption){
+      handleUpdateCourse('type', selectedOption.value, courseCode, 1)
+    }
   };
-
+  
   const handleAddedCourseTypeChange = (
     index: number,
     selectedOption: Option | null
@@ -148,19 +137,14 @@ const InputCourseOfferings = () => {
       return updated;
     });
   };
-
+  
   const handleCourseCategoryChange = (
-    index: number,
+    courseCode: string,
     selectedOption: Option | null
   ) => {
-    setFirstYearCourses((prev) => {
-      const updated = [...prev];
-      updated[index] = {
-        ...updated[index],
-        category: selectedOption ? selectedOption.value : "",
-      };
-      return updated;
-    });
+    if (selectedOption){
+      handleUpdateCourse('category', selectedOption.value, courseCode, 1)
+    }
   };
 
   const handleAddedCourseCategoryChange = (
@@ -217,16 +201,47 @@ const InputCourseOfferings = () => {
 
   // To Delete Course Form
   const handleDeleteCourse = (course: CourseInfo, yearLevel: number) => {
-    if (yearLevel === 1){
-      setFirstYearCourses((prev) => prev.filter((prevCourse) => prevCourse.code !== course.code));
+    if (yearLevel === 1) {
+      setFirstYearCourses((prev) =>
+        prev.filter((prevCourse) => prevCourse.code !== course.code)
+      );
     }
-    setDeletedCourses((prev) => [...prev, {courseCode: course.code, yearLevel}])
-    console.log('deleted', course)
+    setDeletedCourses((prev) => [
+      ...prev,
+      { courseCode: course.code, yearLevel },
+    ]);
+    console.log("deleted", course);
   };
 
   const handleDeleteAddedCourse = (index: number) => {
     setAddedCourses((prev) => prev.filter((_, i) => i !== index));
-    console.log('deleted', addedCourses[index])
+  };
+
+  const handleUpdateCourse = (
+    property: string,
+    newValue: any,
+    courseCode: string,
+    yearLevel: number
+  ) => {
+    if (yearLevel === 1) {
+      setFirstYearCourses((prev) =>
+        prev.map((course) =>
+          course.code === courseCode
+            ? { ...course, [property]: newValue}
+            : course
+        )
+      );
+    }
+    setUpdatedCourses((prev) =>
+      prev.some((course) => course.courseCodeKey === courseCode)
+        ? prev.map((course) =>
+            course.courseCodeKey === courseCode
+              ? { ...course, [property]: newValue }
+              : course
+          )
+        : [...prev, { yearLevel, courseCodeKey: courseCode, [property]: newValue }]
+    );
+    
   };
 
   // Save handler for demonstration: logs each course's details.
@@ -249,9 +264,10 @@ const InputCourseOfferings = () => {
           `http://localhost:8080/courseofferings/${course.yearLevel}/2/CS`,
           {
             method: "POST",
-            headers: { 
-              "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
-              "Content-type": "application/json" },
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+              "Content-type": "application/json",
+            },
             body: JSON.stringify(reqObj),
           }
         );
@@ -266,43 +282,76 @@ const InputCourseOfferings = () => {
     addCourseData();
 
     // save updated courses
+    const updateCoursesData = async () => { 
+      for (let i = 0; i < updatedCourses.length; i++){
+        
+        let reqObj = {
+          courseCodeKey: updatedCourses[i].courseCodeKey,
+          ...(updatedCourses[i]?.title && { name: updatedCourses[i].title }),
+          ...(updatedCourses[i]?.courseCode && { courseCode: updatedCourses[i].courseCode }),
+          ...(updatedCourses[i]?.unit && { totalUnits: updatedCourses[i].unit }),
+          ...(updatedCourses[i]?.type && { courseType: updatedCourses[i].type }),
+          ...(updatedCourses[i]?.category && { courseCategory: updatedCourses[i].category })
+        };
 
-    // save deleted courses
-    const deleteCourseData = async () => {
-      for (let i = 0; i < deletedCourses.length; i++){
-        let reqObj = deletedCourses[i]
-
-        const res = await fetch(`http://localhost:8080/courseofferings/${deletedCourses[i].yearLevel}/2/CS`, {
-          method: "DELETE",
+        const res = await fetch(`http://localhost:8080/courseofferings/${updatedCourses[i].yearLevel}/2/CS`, {
+          method: 'PUT',
           headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
-            "Content-type": 'application/json'
+            'Authorization': `Bearer ${localStorage.getItem("token") ?? ''}`,
+            'Content-type': 'application/json'
           },
           body: JSON.stringify(reqObj)
         })
 
         if (res.ok){
-          console.log('yey delted')
+          console.log('yey updated')
         }else{
-          console.log('may error sis')
+          console.log('noo may error')
         }
-
+      
       }
     }
+    updateCoursesData()
 
+    // save deleted courses
+    const deleteCourseData = async () => {
+      for (let i = 0; i < deletedCourses.length; i++) {
+        let reqObj = deletedCourses[i];
+
+        const res = await fetch(
+          `http://localhost:8080/courseofferings/${deletedCourses[i].yearLevel}/2/CS`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+              "Content-type": "application/json",
+            },
+            body: JSON.stringify(reqObj),
+          }
+        );
+
+        if (res.ok) {
+          console.log("yey delted");
+        } else {
+          console.log("may error sis");
+        }
+      }
+    };
     deleteCourseData();
-
   };
 
   // fetch data
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
-        const res = await fetch("http://localhost:8080/courseofferings/1/2/CS", {
-          headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
+        const res = await fetch(
+          "http://localhost:8080/courseofferings/1/2/CS",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            },
           }
-        }); // sem and department must be dynamic
+        ); // sem and department must be dynamic
         const data = await res.json();
 
         if (res.ok) {
@@ -331,10 +380,6 @@ const InputCourseOfferings = () => {
 
     fetchCourseData();
   }, []);
-
-  useEffect(() => {
-    console.log(firstYearCourses);
-  }, [firstYearCourses]);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -368,7 +413,7 @@ const InputCourseOfferings = () => {
                 type="text"
                 className="border border-primary h-[39px] w-[300px] rounded-md pl-2"
                 value={course.title}
-                onChange={(e) => handleCourseTitleChange(index, e)}
+                onChange={(e) => handleCourseTitleChange(course.code, e)}
                 placeholder="Enter"
               />
 
@@ -376,14 +421,14 @@ const InputCourseOfferings = () => {
                 type="text"
                 className="border border-primary h-[39px] w-[150px] rounded-md pl-2"
                 value={course.code}
-                onChange={(e) => handleCourseCodeChange(index, e)}
+                onChange={(e) => handleCourseCodeChange(course.code, e)}
                 placeholder="Enter"
               />
               <input
                 type="number"
                 className="border border-primary h-[39px] w-[150px] rounded-md p-3"
                 value={course.unit}
-                onChange={(e) => handleCourseUnitChange(index, e)}
+                onChange={(e) => handleCourseUnitChange(course.code, e)}
                 placeholder="Enter"
               />
               <Select
@@ -401,7 +446,7 @@ const InputCourseOfferings = () => {
                   null
                 }
                 onChange={(option) =>
-                  handleCourseTypeChange(index, option as Option)
+                  handleCourseTypeChange(course.code, option as Option)
                 }
                 className="w-[150px] rounded-[5px]"
               />
@@ -416,11 +461,12 @@ const InputCourseOfferings = () => {
                   }),
                 }}
                 value={
-                  courseCategory.find((option) => option.value === course.category) ||
-                  null
+                  courseCategory.find(
+                    (option) => option.value === course.category
+                  ) || null
                 }
                 onChange={(option) =>
-                  handleCourseCategoryChange(index, option as Option)
+                  handleCourseCategoryChange(course.code, option as Option)
                 }
                 className="w-[150px] rounded-[5px]"
               />
@@ -446,8 +492,13 @@ const InputCourseOfferings = () => {
                 className="w-[150px] rounded-[5px]"
               />
             </div>
-            <button type="button" onClick={() => handleDeleteCourse(course, 1)} className="w-7">
-              <img src={trash_button} alt="Remove" />``
+            <button
+              type="button"
+              onClick={() => handleDeleteCourse(course, 1)}
+              className="w-7"
+            >
+              <img src={trash_button} alt="Remove" />
+              ``
             </button>
           </section>
         ))}
@@ -510,8 +561,9 @@ const InputCourseOfferings = () => {
                   }),
                 }}
                 value={
-                  courseCategory.find((option) => option.value === course.category) ||
-                  null
+                  courseCategory.find(
+                    (option) => option.value === course.category
+                  ) || null
                 }
                 onChange={(option) =>
                   handleAddedCourseCategoryChange(index, option as Option)
