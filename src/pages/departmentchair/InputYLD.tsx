@@ -156,12 +156,14 @@ const InputYLD: React.FC = () => {
       <div className="mx-auto py-10">
         <Navbar />
       </div>
-      <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center">
-        <div className="text-primary text-[35px]">
-          Year Level - Day Constraints
-        </div>
-        <div className="bg-custom_yellow p-2 rounded-md">
-          1st Semester A.Y 2025-2026
+      <section className="flex items-center justify-center">
+        <div className="px-16 flex gap-10 items-center font-Helvetica-Neue-Heavy">
+          <div className="text-primary text-[35px] mb-2">
+            Year Level - Day Constraints
+          </div>
+          <div className="bg-custom_yellow p-2 rounded-md">
+            1st Semester A.Y 2025-2026
+          </div>
         </div>
       </section>
       <div className="flex text-center font-Manrope font-extrabold ml-[660px] mt-11 mb-7">

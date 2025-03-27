@@ -121,117 +121,136 @@ const InputRooms = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col overflow-hidden">
-      <div className="mx-auto py-10">
-        <Navbar />
+    <div>
+      <div className="lg:hidden flex flex-col items-center justify-center h-screen overflow-hidden m-10">
+        <div className="text-center p-8 bg-white rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-blue-800 mb-4">
+            Limited Access
+          </h2>
+          <p className="text-gray-600 mb-6">
+            This page is optimized for laptop or desktop use. Please open it
+            <br />
+            on a larger screen for the best experience.
+          </p>
+        </div>
       </div>
-      <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center">
-        <div className="text-primary text-[35px]">Rooms Constraints</div>
-        <div className="bg-custom_yellow p-2 rounded-md">
-          1st Semester A.Y 2025-2026
-        </div>
-      </section>
-      <section className="flex font-Manrope font-extrabold my-11 ml-[360px] gap-36">
-        <div className="flex gap-28">
-          <p>No.</p>
-          <p>Room Code</p>
-        </div>
-        <div className="flex gap-44">
-          <p>Department</p>
-          <p>Type</p>
-        </div>
-      </section>
 
-      <form className="flex flex-col">
-        {rooms.map((room, index) => (
-          <div
-            key={index}
-            className="flex gap-5 mx-auto font-Manrope font-semibold mb-7"
-          >
-            <div className="flex bg-[rgba(241,250,255,0.5)] rounded-xl shadow-md gap-16 p-10 items-center">
-              <label className="block font-semibold mb-2">
-                Room {index + 1}
-              </label>
-              <Select
-                options={roomCodes}
-                className="w-44"
-                placeholder="Select"
-                styles={{
-                  control: (provided: any) => ({
-                    ...provided,
-                    border: "1px solid #02296D",
-                    borderRadius: "6px",
-                  }),
-                }}
-                value={
-                  roomCodes.find(
-                    (option) => Number(option.value) === room.roomCode
-                  ) || null
-                }
-                onChange={(option) => handleRoomCodeChange(index, option)}
-              />
-              <Select
-                options={department}
-                className="w-44"
-                placeholder="Select"
-                styles={{
-                  control: (provided: any) => ({
-                    ...provided,
-                    border: "1px solid #02296D",
-                    borderRadius: "6px",
-                  }),
-                }}
-                value={
-                  department.find(
-                    (option) => option.value === room.department
-                  ) || null
-                }
-                onChange={(option) => handleDepartmentChange(index, option)}
-              />
-              <Select
-                options={roomType}
-                className="w-44"
-                placeholder="Select"
-                styles={{
-                  control: (provided: any) => ({
-                    ...provided,
-                    border: "1px solid #02296D",
-                    borderRadius: "6px",
-                  }),
-                }}
-                value={
-                  roomType.find((option) => option.value === room.roomType) ||
-                  null
-                }
-                onChange={(option) => handleRoomTypeChange(index, option)}
-              />
+      <div className="hidden lg:flex flex-col min-h-screen overflow-hidden">
+        <div className="mx-auto py-10">
+          <Navbar />
+        </div>
+        <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center justify-center">
+          <div className="text-primary text-[35px]">Rooms Constraints</div>
+          <div className="bg-custom_yellow p-2 rounded-md">
+            1st Semester A.Y 2025-2026
+          </div>
+        </section>
+
+        <form className="flex flex-col">
+          {rooms.map((room, index) => (
+            <div
+              key={index}
+              className="flex gap-5 mx-auto font-Manrope font-semibold mt-8"
+            >
+              <div className="flex flex-col bg-[rgba(241,250,255,0.5)] rounded-xl shadow-md gap-5 p-6">
+                <section className="flex font-Manrope text-primary font-extrabold gap-32">
+                  <div className="flex gap-24 ml-2">
+                    <p>No.</p>
+                    <p>Room Code</p>
+                  </div>
+                  <div className="flex gap-36">
+                    <p>Department</p>
+                    <p>Type</p>
+                  </div>
+                </section>
+
+                <div className="flex gap-10 items-center">
+                  <label className="block font-semibold">
+                    Room {index + 1}
+                  </label>
+                  <Select
+                    options={roomCodes}
+                    className="w-44"
+                    placeholder="Select"
+                    styles={{
+                      control: (provided: any) => ({
+                        ...provided,
+                        border: "1px solid #02296D",
+                        borderRadius: "6px",
+                      }),
+                    }}
+                    value={
+                      roomCodes.find(
+                        (option) => Number(option.value) === room.roomCode
+                      ) || null
+                    }
+                    onChange={(option) => handleRoomCodeChange(index, option)}
+                  />
+                  <Select
+                    options={department}
+                    className="w-44"
+                    placeholder="Select"
+                    styles={{
+                      control: (provided: any) => ({
+                        ...provided,
+                        border: "1px solid #02296D",
+                        borderRadius: "6px",
+                      }),
+                    }}
+                    value={
+                      department.find(
+                        (option) => option.value === room.department
+                      ) || null
+                    }
+                    onChange={(option) => handleDepartmentChange(index, option)}
+                  />
+                  <Select
+                    options={roomType}
+                    className="w-44"
+                    placeholder="Select"
+                    styles={{
+                      control: (provided: any) => ({
+                        ...provided,
+                        border: "1px solid #02296D",
+                        borderRadius: "6px",
+                      }),
+                    }}
+                    value={
+                      roomType.find(
+                        (option) => option.value === room.roomType
+                      ) || null
+                    }
+                    onChange={(option) => handleRoomTypeChange(index, option)}
+                  />
+                </div>
+              </div>
+              <button type="button" onClick={() => handleDeleteRoom(index)}>
+                <img src={trash_button} alt="Delete" className="w-7" />
+              </button>
             </div>
-            <button type="button" onClick={() => handleDeleteRoom(index)}>
-              <img src={trash_button} alt="Delete" className="w-7" />
-            </button>
-          </div>
-        ))}
+          ))}
 
-        <div className="mx-auto flex gap-4">
-          <div>
-            <button
-              onClick={handleSave}
-              className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white"
-            >
-              Save
-            </button>
+          <div className="mx-auto flex gap-4">
+            <div>
+              <button
+                onClick={handleSave}
+                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white"
+              >
+                Save
+              </button>
+            </div>
+            <div>
+              <button
+                onClick={handleAddRoom}
+                className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm"
+              >
+                Add
+                <img src={add_button_white} className="w-4" alt="Add" />
+              </button>
+            </div>
           </div>
-          <div>
-            <button
-              onClick={handleAddRoom}
-              className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm"
-            >
-              Add
-              <img src={add_button_white} className="w-4" alt="Add" />
-            </button>
-          </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

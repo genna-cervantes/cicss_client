@@ -272,7 +272,7 @@ const Ratings = () => {
 
                 {/* Left-lower */}
                 <div className="font-Helvetica-Neue-Heavy">
-                  <StarRating rating={3.5} totalRatings={142} size="small" />
+                  <StarRating rating={0.7} totalRatings={142} size="small" />
                 </div>
               </div>
 

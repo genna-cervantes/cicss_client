@@ -10,7 +10,7 @@ import { NavLink } from "react-router-dom";
 const Dashboard = () => {
   return (
     <div className="w-full">
-      {/* Mobile/Small screen warning - only shows on screens smaller than md breakpoint */}
+      {/* Mobile/Small screen warning - only shows on screens smaller than lg breakpoint */}
       <div className="lg:hidden flex flex-col items-center justify-center h-screen">
         <div className="text-center p-8 bg-white rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-blue-800 mb-4">
@@ -24,7 +24,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <main className="hidden lg:block max-w-full">
+      <main className="hidden lg:block justify-between max-w-full">
         <section className="flex items-center justify-between py-7 px-2 lg:px-12 xl:px-16 2xl:px-24">
           <Greeting userName="Cherry Rose" />
           <Semester />

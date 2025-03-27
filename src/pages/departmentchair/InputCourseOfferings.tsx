@@ -135,90 +135,92 @@ const InputCourseOfferings = () => {
       <div className="mx-auto py-10">
         <Navbar />
       </div>
-      <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center">
+      <section className="flex justify-center items-center gap-11 font-Helvetica-Neue-Heavy">
         <div className="text-primary text-[35px]">Course Offerings</div>
         <div className="bg-custom_yellow p-2 rounded-md">
           1st Semester A.Y 2025-2026
         </div>
-      </section>
-      <section className="flex font-Manrope font-extrabold ml-36 my-11">
-        <p>No.</p>
-        <p className="ml-44">Course Title</p>
-        <p className="ml-[187px]">Course Code</p>
-        <p className="ml-32">Unit</p>
-        <p className="ml-[136px]">Lab/Lec</p>
-        <p className="ml-28">Year Level</p>
       </section>
 
       <form className="flex flex-col">
         {courses.map((course, index) => (
           <section
             key={index}
-            className="flex mx-auto gap-7 font-semibold mb-5"
+            className="flex mx-auto gap-7 font-semibold mt-10"
           >
-            <div className="flex items-center gap-10 bg-[rgba(241,250,255,0.5)] p-6 shadow-md rounded-xl font-Manrope text-sm">
-              <label>Course {index + 1}</label>
-              <input
-                type="text"
-                className="border border-primary h-[39px] w-[350px] rounded-md pl-2"
-                value={course.title}
-                onChange={(e) => handleCourseTitleChange(index, e)}
-                placeholder="Enter"
-              />
+            <div className="flex flex-col bg-[rgba(241,250,255,0.5)] shadow-md rounded-xl font-Manrope  p-7 gap-5">
+              <section className="flex font-extrabold text-primary text-md">
+                <p className="ml-3">No.</p>
+                <p className="ml-28 mr-3">Course Title</p>
+                <p className="ml-28 mr-2">Course Code</p>
+                <p className="ml-24 mr-3">Unit</p>
+                <p className="ml-28">Lab/Lec</p>
+                <p className="ml-24">Year Level</p>
+              </section>
+              <div className="flex items-center justify-center space-x-5 text-sm">
+                <label>Course {index + 1}</label>
+                <input
+                  type="text"
+                  className="border border-primary h-[39px] w-[250px] rounded-md pl-2"
+                  value={course.title}
+                  onChange={(e) => handleCourseTitleChange(index, e)}
+                  placeholder="Enter"
+                />
 
-              <input
-                type="text"
-                className="border border-primary h-[39px] w-[150px] rounded-md pl-2"
-                value={course.code}
-                onChange={(e) => handleCourseCodeChange(index, e)}
-                placeholder="Enter"
-              />
-              <input
-                type="number"
-                className="border border-primary h-[39px] w-[150px] rounded-md p-3"
-                value={course.unit}
-                onChange={(e) => handleCourseUnitChange(index, e)}
-                placeholder="Enter"
-              />
-              <Select
-                options={courseType}
-                placeholder="Select"
-                styles={{
-                  control: (provided: any) => ({
-                    ...provided,
-                    border: "1px solid #02296D",
-                    borderRadius: "6px",
-                  }),
-                }}
-                value={
-                  courseType.find((option) => option.value === course.type) ||
-                  null
-                }
-                onChange={(option) =>
-                  handleCourseTypeChange(index, option as Option)
-                }
-                className="w-[150px] rounded-[5px]"
-              />
-              <Select
-                options={yearLevel}
-                placeholder="Select"
-                styles={{
-                  control: (provided: any) => ({
-                    ...provided,
-                    border: "1px solid #02296D",
-                    borderRadius: "6px",
-                  }),
-                }}
-                value={
-                  yearLevel.find(
-                    (option) => option.value === course.yearLevel
-                  ) || null
-                }
-                onChange={(option) =>
-                  handleCourseYearLevelChange(index, option as Option)
-                }
-                className="w-[150px] rounded-[5px]"
-              />
+                <input
+                  type="text"
+                  className="border border-primary h-[39px] w-[150px] rounded-md pl-2"
+                  value={course.code}
+                  onChange={(e) => handleCourseCodeChange(index, e)}
+                  placeholder="Enter"
+                />
+                <input
+                  type="number"
+                  className="border border-primary h-[39px] w-[150px] rounded-md p-3"
+                  value={course.unit}
+                  onChange={(e) => handleCourseUnitChange(index, e)}
+                  placeholder="Enter"
+                />
+                <Select
+                  options={courseType}
+                  placeholder="Select"
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      border: "1px solid #02296D",
+                      borderRadius: "6px",
+                    }),
+                  }}
+                  value={
+                    courseType.find((option) => option.value === course.type) ||
+                    null
+                  }
+                  onChange={(option) =>
+                    handleCourseTypeChange(index, option as Option)
+                  }
+                  className="w-[150px] rounded-[5px]"
+                />
+                <Select
+                  options={yearLevel}
+                  placeholder="Select"
+                  styles={{
+                    control: (provided: any) => ({
+                      ...provided,
+                      border: "1px solid #02296D",
+                      borderRadius: "6px",
+                    }),
+                  }}
+                  value={
+                    yearLevel.find(
+                      (option) => option.value === course.yearLevel
+                    ) || null
+                  }
+                  onChange={(option) =>
+                    handleCourseYearLevelChange(index, option as Option)
+                  }
+                  className="w-[150px] rounded-[5px]"
+                />
+              </div>
             </div>
             <button onClick={() => handleDeleteCourse(index)} className="w-7">
               <img src={trash_button} alt="Remove" />

@@ -271,181 +271,186 @@ const InputGenEd = () => {
       <div className="mx-auto py-10">
         <Navbar />
       </div>
-      <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center">
-        <div className="text-primary text-[35px]">Gen Ed Constraints</div>
-        <div className="bg-custom_yellow p-2 rounded-md">
-          1st Semester A.Y 2025-2026
+      <section className="flex items-center justify-center">
+        <div className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center">
+          <div className="text-primary text-[35px]">Gen Ed Constraints</div>
+          <div className="bg-custom_yellow p-2 rounded-md">
+            1st Semester A.Y 2025-2026
+          </div>
         </div>
-      </section>
-      <section className="flex font-Manrope mx-11 my-11 font-extrabold">
-        <p className="ml-[160px]">No.</p>
-        <p className="ml-[90px]">Course Title</p>
-        <p className="ml-[80px]">Course Code</p>
-        <p className="ml-[300px]">Time Restriction</p>
       </section>
 
       <div className="flex mx-auto gap-5 font-Manrope font-semibold">
         <form onSubmit={handleSave}>
           {genEdList.map((genEdCourse, genEdIndex) => (
-            <div key={genEdIndex} className="mb-7 flex gap-3">
-              <div className="flex gap-5 bg-[#F1FAFF] px-5 pt-5 rounded-xl shadow-sm">
-                <div className="flex gap-3">
-                  <div className="flex justify-center gap-3">
-                    <label className="mr-2">Course {genEdIndex + 1} </label>
+            <div key={genEdIndex} className="flex gap-3">
+              <div className="flex flex-col bg-[#F1FAFF] px-5 pt-5 rounded-xl shadow-sm gap-3 mt-5">
+                <section className="flex font-extrabold text-primary">
+                  <p className="ml-5 mr-3">No.</p>
+                  <p className="ml-20">Course Title</p>
+                  <p className="ml-28 mr-10">Course Code</p>
+                  <p className="ml-80">Time Restriction</p>
+                </section>
+                <div className="flex gap-5">
+                  <div className="flex gap-3">
+                    <div className="flex justify-center gap-3">
+                      <div className="flex">
+                        <label className="mr-2">Course {genEdIndex + 1} </label>
+                        <Select
+                          options={courseOptions}
+                          placeholder="Select"
+                          value={
+                            courseOptions.find(
+                              (opt) => opt.value === genEdCourse.courseTitle
+                            ) || null
+                          }
+                          onChange={(selectedOption) =>
+                            handleCourseTitleChange(genEdIndex, selectedOption)
+                          }
+                          styles={customStyles}
+                        />
+                      </div>
+                    </div>
                     <div>
-                      <Select
-                        options={courseOptions}
-                        placeholder="Select"
-                        value={
-                          courseOptions.find(
-                            (opt) => opt.value === genEdCourse.courseTitle
-                          ) || null
-                        }
-                        onChange={(selectedOption) =>
-                          handleCourseTitleChange(genEdIndex, selectedOption)
-                        }
-                        styles={customStyles}
+                      <input
+                        type="text"
+                        name="courseCode"
+                        value={genEdCourse.courseCode}
+                        onChange={(e) => handleCourseCodeChange(genEdIndex, e)}
+                        placeholder="Enter"
+                        className="h-[38px] border border-primary rounded-[5px] px-2 w-[200px]"
                       />
                     </div>
                   </div>
+
                   <div>
-                    <input
-                      type="text"
-                      name="courseCode"
-                      value={genEdCourse.courseCode}
-                      onChange={(e) => handleCourseCodeChange(genEdIndex, e)}
-                      placeholder="Enter"
-                      className="h-[38px] border border-primary rounded-[5px] px-2 w-[200px]"
-                    />
-                  </div>
-                </div>
+                    {genEdCourse.courseRestriction.map(
+                      (restriction, restrictionIndex) => (
+                        <div
+                          key={restrictionIndex}
+                          className="bg-[#BFDDF6] p-5 rounded-md mb-5"
+                        >
+                          <div className="flex gap-3 justify-center">
+                            <div className="flex gap-3 items-center mb-3">
+                              <label>Day</label>
+                              <Select
+                                options={dayOptions}
+                                placeholder="Select"
+                                value={
+                                  dayOptions.find(
+                                    (opt) => opt.value === restriction.day
+                                  ) || null
+                                }
+                                onChange={(selectedOption) =>
+                                  handleGenEdDayRestrictionChange(
+                                    genEdIndex,
+                                    restrictionIndex,
+                                    selectedOption
+                                  )
+                                }
+                                styles={customStyles}
+                              />
+                            </div>
 
-                <div>
-                  {genEdCourse.courseRestriction.map(
-                    (restriction, restrictionIndex) => (
-                      <div
-                        key={restrictionIndex}
-                        className="bg-[#BFDDF6] p-5 rounded-md mb-5"
-                      >
-                        <div className="flex gap-3 justify-center">
-                          <div className="flex gap-3 items-center mb-3">
-                            <label>Day</label>
-                            <Select
-                              options={dayOptions}
-                              placeholder="Select"
-                              value={
-                                dayOptions.find(
-                                  (opt) => opt.value === restriction.day
-                                ) || null
-                              }
-                              onChange={(selectedOption) =>
-                                handleGenEdDayRestrictionChange(
-                                  genEdIndex,
-                                  restrictionIndex,
-                                  selectedOption
-                                )
-                              }
-                              styles={customStyles}
-                            />
-                          </div>
+                            <div className="flex flex-col">
+                              {restriction.startEndTimes.map(
+                                (time, timeIndex) => (
+                                  <div key={timeIndex} className="mb-3">
+                                    <div className="flex items-center gap-3 justify-center">
+                                      <label>Start</label>
+                                      <input
+                                        type="time"
+                                        name="start"
+                                        value={time.start}
+                                        onChange={(e) =>
+                                          handleGenEdTimeRestrictionChange(
+                                            genEdIndex,
+                                            restrictionIndex,
+                                            timeIndex,
+                                            e
+                                          )
+                                        }
+                                        className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                                      />
+                                      <label>End</label>
+                                      <input
+                                        type="time"
+                                        name="end"
+                                        value={time.end}
+                                        onChange={(e) =>
+                                          handleGenEdTimeRestrictionChange(
+                                            genEdIndex,
+                                            restrictionIndex,
+                                            timeIndex,
+                                            e
+                                          )
+                                        }
+                                        className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                                      />
+                                      {restriction.startEndTimes.length > 1 && (
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            handleDeleteTimeRestriction(
+                                              genEdIndex,
+                                              restrictionIndex,
+                                              timeIndex
+                                            )
+                                          }
+                                        >
+                                          <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                                        </button>
+                                      )}
 
-                          <div className="flex flex-col">
-                            {restriction.startEndTimes.map(
-                              (time, timeIndex) => (
-                                <div key={timeIndex} className="mb-3">
-                                  <div className="flex items-center gap-3 justify-center">
-                                    <label>Start</label>
-                                    <input
-                                      type="time"
-                                      name="start"
-                                      value={time.start}
-                                      onChange={(e) =>
-                                        handleGenEdTimeRestrictionChange(
-                                          genEdIndex,
-                                          restrictionIndex,
-                                          timeIndex,
-                                          e
-                                        )
-                                      }
-                                      className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                                    />
-                                    <label>End</label>
-                                    <input
-                                      type="time"
-                                      name="end"
-                                      value={time.end}
-                                      onChange={(e) =>
-                                        handleGenEdTimeRestrictionChange(
-                                          genEdIndex,
-                                          restrictionIndex,
-                                          timeIndex,
-                                          e
-                                        )
-                                      }
-                                      className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                                    />
-                                    {restriction.startEndTimes.length > 1 && (
                                       <button
                                         type="button"
                                         onClick={() =>
-                                          handleDeleteTimeRestriction(
+                                          handleAddTimeRestriction(
                                             genEdIndex,
-                                            restrictionIndex,
-                                            timeIndex
+                                            restrictionIndex
                                           )
                                         }
+                                        className="w-7"
                                       >
-                                        <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                                        <img src={add_button} />
                                       </button>
-                                    )}
-
-                                    <button
-                                      type="button"
-                                      onClick={() =>
-                                        handleAddTimeRestriction(
-                                          genEdIndex,
-                                          restrictionIndex
-                                        )
-                                      }
-                                      className="w-7"
-                                    >
-                                      <img src={add_button} />
-                                    </button>
+                                    </div>
                                   </div>
-                                </div>
-                              )
+                                )
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex justify-center gap-3 mt-5">
+                            <button
+                              onClick={(e) =>
+                                handleAddDayRestriction(genEdIndex, e)
+                              }
+                              className="bg-primary text-white py-1 px-4 text-xs rounded-md"
+                            >
+                              Add Day
+                            </button>
+                            {genEdCourse.courseRestriction.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleDeleteDayRestriction(
+                                    genEdIndex,
+                                    restrictionIndex
+                                  )
+                                }
+                                className="border border-primary text-primary py-1 px-4 text-xs rounded-md"
+                              >
+                                Delete
+                              </button>
                             )}
                           </div>
                         </div>
-                        <div className="flex justify-center gap-3 mt-5">
-                          <button
-                            onClick={(e) =>
-                              handleAddDayRestriction(genEdIndex, e)
-                            }
-                            className="bg-primary text-white py-1 px-4 text-xs rounded-md"
-                          >
-                            Add Day
-                          </button>
-                          {genEdCourse.courseRestriction.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleDeleteDayRestriction(
-                                  genEdIndex,
-                                  restrictionIndex
-                                )
-                              }
-                              className="border border-primary text-primary py-1 px-4 text-xs rounded-md"
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  )}
+                      )
+                    )}
+                  </div>
                 </div>
               </div>
+
               <button onClick={() => handleDeleteGenEdCourse(genEdIndex)}>
                 <img src={trash_button} alt="Delete" className="w-9" />
               </button>
