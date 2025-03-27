@@ -6,7 +6,7 @@ import add_button from "../../assets/add_button.png";
 import trash_button from "../../assets/trash_button.png";
 import add_button_white from "../../assets/add_button_white.png";
 import { getCourseCodesFromInternalRepresentation } from "../../utils/utils";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 interface TimeEntry {
   start: string;
@@ -404,7 +404,7 @@ const InputTAS: React.FC = () => {
   // Handler to delete an entire TAS form - ADD SA DELETE TRACKER
   const handleDeleteTAS = (tasIndex: number) => {
     setTasList((prev) => prev.filter((_, i) => i !== tasIndex));
-    setDeletedTAS((prev) => [...prev, tasList[tasIndex].tasId])
+    setDeletedTAS((prev) => [...prev, tasList[tasIndex].tasId]);
   };
 
   // LOOP THRU HTE TRACKERS AND QUERY NECESSARY ENDPOINT
@@ -471,7 +471,7 @@ const InputTAS: React.FC = () => {
       const res = await fetch("http://localhost:8080/tasconstraints", {
         method: "PUT",
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(reqObj),
@@ -488,8 +488,10 @@ const InputTAS: React.FC = () => {
     console.log("INSERTING");
     for (let i = 0; i < insertedTAS.length; i++) {
       let tempId = insertedTAS[i];
-      let tas: TasInfo|undefined = tasList.find((item) => item.tasId === tempId);
-      if (!tas){
+      let tas: TasInfo | undefined = tasList.find(
+        (item) => item.tasId === tempId
+      );
+      if (!tas) {
         continue;
       }
       const { tasId, ...rest } = tas;
@@ -504,7 +506,7 @@ const InputTAS: React.FC = () => {
       };
 
       tas?.["restrictions"].forEach((res: any) => {
-        if (res.day === ''){
+        if (res.day === "") {
           return;
         }
         res.startEndTimes.forEach((set: any) => {
@@ -514,7 +516,7 @@ const InputTAS: React.FC = () => {
           });
         });
       });
-    
+
       const reqObj = {
         ...rest,
         restrictions: restrictionsObj,
@@ -525,7 +527,7 @@ const InputTAS: React.FC = () => {
       const res = await fetch("http://localhost:8080/tasconstraints", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(reqObj),
@@ -534,26 +536,26 @@ const InputTAS: React.FC = () => {
       if (res.ok) {
         console.log("yey ok"); // PLS CHANGE THIS TO MESSAGE KAHIT SA BABA NUNG BUTTONS LNG
       } else {
-        const data = await res.json()
+        const data = await res.json();
         console.log("nooo", data);
       }
     }
 
-    console.log('DELETING')
-    for (let i = 0; i < deletedTAS.length; i++){
+    console.log("DELETING");
+    for (let i = 0; i < deletedTAS.length; i++) {
       const res = await fetch("http://localhost:8080/tasconstraints", {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({tasId: deletedTAS[i]}),
+        body: JSON.stringify({ tasId: deletedTAS[i] }),
       });
 
       if (res.ok) {
         console.log("yey ok"); // PLS CHANGE THIS TO MESSAGE KAHIT SA BABA NUNG BUTTONS LNG
       } else {
-        const data = await res.json()
+        const data = await res.json();
         console.log("nooo", data);
       }
     }
@@ -597,8 +599,8 @@ const InputTAS: React.FC = () => {
       console.log("getting tas constraints");
       const res = await fetch("http://localhost:8080/tasconstraints/CS", {
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+        },
       }); // EDIT THIS TO BE DYNAMIC PERO CS MUNA FOR NOW
       const data = await res.json();
 
@@ -676,10 +678,9 @@ const InputTAS: React.FC = () => {
         <form onSubmit={handleSave}>
           {tasList.map((tas, tasIndex) => (
             <div key={tasIndex} className="mb-7 flex gap-3">
-              <div className="flex gap-5 bg-[#F1FAFF] px-5 pt-5 rounded-xl shadow-sm">
+              <div className="flex gap-5 bg-[#F1FAFF] px-5 py-5 rounded-xl shadow-sm w-full">
                 <div className="flex gap-3">
                   <div>
-                    <label className="mr-2">TAS {tasIndex + 1} </label>
                     <input
                       type="text"
                       name="name"
@@ -723,8 +724,8 @@ const InputTAS: React.FC = () => {
                     />
                   </div>
                 </div>
-                <div>
-                  {tas.restrictions.length > 0 ? (
+                <div className="w-full">
+                  {tas.restrictions.length > 0 &&
                     tas.restrictions.map((request, reqIndex) => (
                       <div
                         key={reqIndex}
@@ -862,12 +863,6 @@ const InputTAS: React.FC = () => {
                           </div>
                         </div>
                         <div className="flex justify-center gap-3 mt-5">
-                          <button
-                            onClick={(e) => handleTASAddDay(tasIndex, e)}
-                            className="bg-primary text-white py-1 px-4 text-xs rounded-md"
-                          >
-                            Add Day
-                          </button>
                           {tas.restrictions.length > 1 && (
                             <button
                               type="button"
@@ -881,69 +876,16 @@ const InputTAS: React.FC = () => {
                           )}
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className="bg-[#BFDDF6] p-5 rounded-md mb-5">
-                      <div className="flex gap-3 justify-center">
-                        <div className="flex gap-3 items-center mb-3">
-                          <label>Day</label>
-                          <Select
-                            options={dayOptions}
-                            placeholder="Select"
-                            value={null}
-                            onChange={(selectedOption) =>
-                              handleTASRequestDayChange(
-                                tasIndex,
-                                0, // First restriction
-                                selectedOption
-                              )
-                            }
-                            styles={selectStyles}
-                          />
-                        </div>
+                    ))}
+                  {tas.restrictions.length < 6 && (
+                    <div className="w-full flex justify-center pb-4 items-center">
+                    <button
+                      onClick={(e) => handleTASAddDay(tasIndex, e)}
+                      className="bg-primary text-white py-1 px-4 text-xs rounded-md"
+                    >
+                      Add Day
+                    </button>
 
-                        <div className="flex flex-col">
-                          <div className="mb-3">
-                            <div className="flex items-center gap-3 justify-center">
-                              <label>Start</label>
-                              <input
-                                type="time"
-                                name="start"
-                                value=""
-                                onChange={(e) =>
-                                  handleTASTimeChange(tasIndex, 0, 0, e)
-                                }
-                                className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                              />
-                              <label>End</label>
-                              <input
-                                type="time"
-                                name="end"
-                                value=""
-                                onChange={(e) =>
-                                  handleTASTimeChange(tasIndex, 0, 0, e)
-                                }
-                                className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleTASAddTime(tasIndex, 0)}
-                                className="w-7"
-                              >
-                                <img src={add_button} />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex justify-center gap-3 mt-5">
-                        <button
-                          onClick={(e) => handleTASAddDay(tasIndex, e)}
-                          className="bg-primary text-white py-1 px-4 text-xs rounded-md"
-                        >
-                          Add Day
-                        </button>
-                      </div>
                     </div>
                   )}
                 </div>
