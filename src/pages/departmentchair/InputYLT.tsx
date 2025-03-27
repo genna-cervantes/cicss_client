@@ -174,7 +174,7 @@ const InputYLT = () => {
                     ) => {
                       // console.log("year data", yearData);
                       return (
-                        <div className="w-full"> 
+                        <div className="w-full">
                           <div className="w-full">
                             <div className="flex gap-3 items-center font-Manrope font-semibold text-sm">
                               <Select
@@ -199,7 +199,7 @@ const InputYLT = () => {
                                         <input
                                           id={`${year}-start`}
                                           type="time"
-                                          // value={yearData.startTime} // Use yearData instead of yearLevels[year]
+                                          value={time.startTime} // Use yearData instead of yearLevels[year]
                                           onChange={(e) =>
                                             handleTimeChange(
                                               year,
@@ -216,7 +216,7 @@ const InputYLT = () => {
                                         <input
                                           id={`${year}-end`}
                                           type="time"
-                                          // value={yearData.endTime} // Use yearData instead of yearLevels[year]
+                                          value={time.endTime} // Use yearData instead of yearLevels[year]
                                           onChange={(e) =>
                                             handleTimeChange(
                                               year,
@@ -227,6 +227,15 @@ const InputYLT = () => {
                                           className="h-[38px] w-[130px] border border-primary rounded-[5px] py-1 px-2"
                                           required
                                         />
+                                        <button
+                                          type="button"
+                                          // onClick={() =>
+                                          //   handleAddTimeRestriction(genEdIndex, restrictionIndex)
+                                          // }
+                                          className="w-7"
+                                        >
+                                          <img src={add_button} />
+                                        </button>
                                       </>
                                     );
                                   })
@@ -237,7 +246,7 @@ const InputYLT = () => {
                                     // }
                                     className="bg-primary text-white py-1 px-4 text-xs rounded-md"
                                   >
-                                    Add Day
+                                    Add Time
                                   </button>
                                 )}
                               </div>
