@@ -94,14 +94,14 @@ const InputGenEd = () => {
 
   const [updatedGenedConstraints, setUpdatedGenedConstraints] = useState<
     {
-      courseCode: "";
-      courseRestriction: [{ day: ""; startEndTimes: [{ start: ""; end: "" }] }];
+      courseCode: string;
+      courseRestriction: Restriction[];
     }[]
   >([]);
 
   //Handler for changing a restriction's day for a specific GenEd Course
   const handleGenEdDayRestrictionChange = useCallback(
-    (courseCode: string, selectedOption: Option | null) => {
+    (courseCode: string, selectedOption: Option | null, restricitonIndex: number) => {
       if (selectedOption == null) {
         return;
       }
@@ -116,13 +116,7 @@ const InputGenEd = () => {
         if (index === -1) return prev; // No change if course not found
 
         const course = prev[index];
-        let resIndex = course.courseRestriction.findIndex(
-          (res) => res.day === selectedOption.value
-        );
-
-        if (resIndex === -1) {
-          resIndex = course.courseRestriction.length - 1;
-        }
+        let resIndex = restricitonIndex;
 
         console.log('res index', resIndex)
 
@@ -139,19 +133,23 @@ const InputGenEd = () => {
           courseRestriction: updatedRestrictions,
         };
 
+        handleUpdate({genedConstraint: updatedCourse})
+
         // Return new list with updated course
         const newGenedConstraints = [...prev];
         newGenedConstraints[index] = updatedCourse;
 
         return newGenedConstraints;
       });
+
     },
     []
   );
 
   useEffect(() => {
-    console.log(genEdList)
-  }, [genEdList])
+    console.log('updated gened constraints')
+    console.log(updatedGenedConstraints)
+  }, [updatedGenedConstraints])
 
   // Handler for changing a time field (start or end) for a specific GenEd Course
   const handleGenEdTimeRestrictionChange = useCallback(
@@ -199,7 +197,7 @@ const InputGenEd = () => {
           courseRestriction: updatedRestrictions,
         };
 
-        console.log('updated course', updatedCourse)
+        handleUpdate({genedConstraint: updatedCourse})
 
         // Return new list with updated course
         const newGenedConstraints = [...prev];
@@ -228,6 +226,8 @@ const InputGenEd = () => {
           ],
         };
 
+        handleUpdate({genedConstraint: updatedGened})
+
         let updatedGenedConstraints = [...prev];
         updatedGenedConstraints[index] = updatedGened;
 
@@ -248,6 +248,9 @@ const InputGenEd = () => {
             (_, i) => i !== restrictionIndex
           ),
         };
+
+        handleUpdate({genedConstraint: updated[genEdIndex]})
+
         return updated;
       });
     },
@@ -271,6 +274,9 @@ const InputGenEd = () => {
           ...updated[genEdIndex],
           courseRestriction: updatedRequests,
         };
+
+        handleUpdate({genedConstraint: updated[genEdIndex]})
+
         return updated;
       });
     },
@@ -296,21 +302,71 @@ const InputGenEd = () => {
           ...updated[genEdIndex],
           courseRestriction: updatedRequests,
         };
+
+        handleUpdate({genedConstraint: updated[genEdIndex]})
+
         return updated;
       });
     },
     []
   );
 
-  // Handler to delete an entire form
-  const handleDeleteGenEdCourse = (genEdIndex: number) => {
-    setGenEdList((prev) => prev.filter((_, i) => i !== genEdIndex));
-  };
+  const handleUpdate = ({genedConstraint}: {genedConstraint: GenEdInfo}) => {
+    setUpdatedGenedConstraints((prev) => {
+      let newGened = [...prev]
+      let index = prev.findIndex((gen) => gen.courseCode === genedConstraint.courseCode)
+      if (index === -1){
+        newGened.push({courseCode: genedConstraint.courseCode, courseRestriction: genedConstraint.courseRestriction})
+      }else{
+      newGened[index] = {courseCode: genedConstraint.courseCode, courseRestriction: genedConstraint.courseRestriction}
+      }
+      return newGened;
+    })
+  }
 
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
 
     // handle update
+    const updateGenedConstraintData = async () => {
+      for (let i = 0; i < updatedGenedConstraints.length; i++){
+        let genedcon = updatedGenedConstraints[i]
+
+        let transformedRestrictions: any = {
+          M: [],
+          T: [],
+          W: [],
+          TH: [],
+          F: [],
+          S: []
+        };
+        genedcon.courseRestriction.forEach((res) => {
+          let transformedStartEndTimes = res.startEndTimes.map((set) => {
+            return {
+              start: `${set.start.slice(0,2)}${set.start.slice(3)}`,
+              end: `${set.end.slice(0,2)}${set.end.slice(3)}`
+            }
+          })
+          transformedRestrictions[res.day] = transformedStartEndTimes
+        })
+
+        const res = await fetch(`http://localhost:8080/genedconstraint/${genedcon.courseCode}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem("token") ?? ''}`,
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify(transformedRestrictions)
+        })
+
+        if (res.ok){
+          console.log('yey updated')
+        }else{
+          console.log('may error sis')
+        }
+      }
+    }
+    updateGenedConstraintData()
   };
 
   // fetch data
@@ -489,9 +545,6 @@ const InputGenEd = () => {
                     )}
                   </div>
                 </div>
-                <button onClick={() => handleDeleteGenEdCourse(genEdIndex)}>
-                  <img src={trash_button} alt="Delete" className="w-9" />
-                </button>
               </div>
             );
           })}
@@ -526,10 +579,7 @@ const DayRestriction = React.memo(
     restriction: Restriction;
     genEdIndex: number;
     restrictionIndex: number;
-    handleGenEdDayRestrictionChange: (
-      courseCode: string,
-      selectedOption: Option | null
-    ) => void;
+    handleGenEdDayRestrictionChange: (courseCode: string, selectedOption: Option | null, restricitonIndex: number) => void
     handleGenEdTimeRestrictionChange: (
       genEdIndex: number,
       restrictionIndex: number,
@@ -559,7 +609,7 @@ const DayRestriction = React.memo(
 
     const onChangeHandler = useCallback(
       (selectedOption: any) =>
-        handleGenEdDayRestrictionChange(genEdCourse.courseCode, selectedOption),
+        handleGenEdDayRestrictionChange(genEdCourse.courseCode, selectedOption, restrictionIndex),
       [genEdCourse.courseCode, handleGenEdDayRestrictionChange]
     );
 
@@ -698,7 +748,7 @@ const DayRestriction = React.memo(
         <div className="flex justify-center gap-3 mt-5">
           <button
             type="button"
-            onClick={() => handleDeleteDayRestriction(genEdIndex, 0)}
+            onClick={() => handleDeleteDayRestriction(genEdIndex, restrictionIndex)}
             className="border border-primary text-primary py-1 px-4 text-xs rounded-md"
           >
             Delete
