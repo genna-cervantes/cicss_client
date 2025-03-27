@@ -115,39 +115,23 @@ const InputGenEd = () => {
         );
         if (index === -1) return prev; // No change if course not found
 
-        console.log("index", index);
-
         const course = prev[index];
-
-        console.log("course", course);
-
-        const resIndex = course.courseRestriction.findIndex(
+        let resIndex = course.courseRestriction.findIndex(
           (res) => res.day === selectedOption.value
         );
 
-        console.log("res index", resIndex);
+        if (resIndex === -1) {
+          resIndex = course.courseRestriction.length - 1;
+        }
+
+        console.log('res index', resIndex)
 
         let updatedRestrictions;
 
-        if (resIndex !== -1) {
-          // Update existing restriction
-          updatedRestrictions = course.courseRestriction.map((res, i) =>
-            i === resIndex ? { ...res, day: selectedOption.value } : res
-          );
-        } else {
-          // Add new restriction
-          updatedRestrictions = [
-            ...(course.courseRestriction[0].day !== ""
-              ? course.courseRestriction
-              : []),
-            {
-              day: selectedOption.value,
-              startEndTimes: [{ start: "", end: "" }],
-            },
-          ];
-        }
-
-        console.log("updated res", updatedRestrictions);
+        // Update existing restriction
+        updatedRestrictions = course.courseRestriction.map((res, i) =>
+          i === resIndex ? { ...res, day: selectedOption.value } : res
+        );
 
         // Update course with new restrictions
         const updatedCourse = {
@@ -155,19 +139,19 @@ const InputGenEd = () => {
           courseRestriction: updatedRestrictions,
         };
 
-        console.log("updated course", updatedCourse);
-
         // Return new list with updated course
         const newGenedConstraints = [...prev];
         newGenedConstraints[index] = updatedCourse;
-
-        console.log(newGenedConstraints);
 
         return newGenedConstraints;
       });
     },
     []
   );
+
+  useEffect(() => {
+    console.log(genEdList)
+  }, [genEdList])
 
   // Handler for changing a time field (start or end) for a specific GenEd Course
   const handleGenEdTimeRestrictionChange = useCallback(
@@ -178,23 +162,52 @@ const InputGenEd = () => {
       e: ChangeEvent<HTMLInputElement>
     ) => {
       const { name, value } = e.target;
+
+      console.log(value);
       setGenEdList((prev) => {
-        const updated = [...prev];
-        const updatedRequests = [...updated[genEdIndex].courseRestriction];
-        const updatedTimes = [
-          ...updatedRequests[restrictionIndex].startEndTimes,
-        ];
-        updatedTimes[timeIndex] = { ...updatedTimes[timeIndex], [name]: value };
-        updatedRequests[restrictionIndex] = {
-          ...updatedRequests[restrictionIndex],
-          startEndTimes: updatedTimes,
+        const index = genEdIndex;
+        if (index === -1) return prev; // No change if course not found
+
+        const course = prev[index];
+        const resIndex = restrictionIndex;
+
+        let updatedRestrictions;
+
+        // Update existing restriction
+        updatedRestrictions = course.courseRestriction.map((res, i) => {
+          if (i === resIndex) {
+            let updatedStartEndTimes = res.startEndTimes.map((set, si) => {
+              if (si === timeIndex) {
+                return {
+                  ...set,
+                  [name]: value,
+                };
+              } else {
+                return set;
+              }
+            });
+
+            return { ...res, startEndTimes: updatedStartEndTimes };
+          } else {
+            return { ...res };
+          }
+        });
+
+        // Update course with new restrictions
+        const updatedCourse = {
+          ...course,
+          courseRestriction: updatedRestrictions,
         };
-        updated[genEdIndex] = {
-          ...updated[genEdIndex],
-          courseRestriction: updatedRequests,
-        };
-        return updated;
+
+        console.log('updated course', updatedCourse)
+
+        // Return new list with updated course
+        const newGenedConstraints = [...prev];
+        newGenedConstraints[genEdIndex] = updatedCourse;
+
+        return newGenedConstraints;
       });
+
     },
     []
   );
@@ -324,9 +337,22 @@ const InputGenEd = () => {
             genedConstraintRestrictionKeys
               .map((genedkey: string) => {
                 if (genedConstraint.restrictions[genedkey].length > 0) {
+                  let transformedStartEndTimes = genedConstraint.restrictions[
+                    genedkey
+                  ].map((time: any) => {
+                    let start = time?.start
+                      ? `${time.start.slice(0, 2)}:${time.start.slice(2)}`
+                      : "";
+                    let end = time?.end
+                      ? `${time.end.slice(0, 2)}:${time.end.slice(2)}`
+                      : "";
+
+                    return { start, end };
+                  });
+
                   return {
                     day: genedkey,
-                    startEndTimes: genedConstraint.restrictions[genedkey],
+                    startEndTimes: transformedStartEndTimes, // genedConstraint.restrictions[genedkey],
                   };
                 }
                 return undefined; // Explicitly return undefined
@@ -559,12 +585,6 @@ const DayRestriction = React.memo(
           <div className="flex flex-col">
             {restriction.startEndTimes.length > 0 ? (
               restriction.startEndTimes.map((time, timeIndex) => {
-                let start = time?.start
-                  ? `${time.start.slice(0, 2)}:${time.start.slice(2)}`
-                  : "";
-                let end = time?.end
-                  ? `${time.end.slice(0, 2)}:${time.end.slice(2)}`
-                  : "";
                 return (
                   <div key={timeIndex} className="mb-3">
                     <div className="flex items-center gap-3 justify-center">
@@ -572,7 +592,7 @@ const DayRestriction = React.memo(
                       <input
                         type="time"
                         name="start"
-                        value={start}
+                        value={time.start}
                         onChange={(e) =>
                           handleGenEdTimeRestrictionChange(
                             genEdIndex,
@@ -587,7 +607,7 @@ const DayRestriction = React.memo(
                       <input
                         type="time"
                         name="end"
-                        value={end}
+                        value={time.end}
                         onChange={(e) =>
                           handleGenEdTimeRestrictionChange(
                             genEdIndex,
@@ -644,13 +664,15 @@ const DayRestriction = React.memo(
                     <input
                       type="time"
                       name="end"
-                      value={genEdCourse?.courseRestriction[0]?.startEndTimes[0]?.end || ""}
+                      value={
+                        genEdCourse?.courseRestriction[0]?.startEndTimes[0]
+                          ?.end || ""
+                      }
                       onChange={(e) =>
                         handleGenEdTimeRestrictionChange(genEdIndex, 0, 0, e)
                       }
                       className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
                     />
-
                     <button
                       type="button"
                       onClick={() =>
