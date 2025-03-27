@@ -1,4 +1,11 @@
-import React, { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import React, {
+  useState,
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 import Select from "react-select";
 import Navbar from "../../components/Navbar";
 
@@ -47,10 +54,22 @@ const dayOptions: Option[] = [
   { value: "S", label: "Saturday" },
 ];
 
-const getDayOptions = (currentDayRestrictions: Restriction[]) => {
-  return dayOptions.filter((opt) => !currentDayRestrictions.some((res) => res.day === opt.value));
-}
+const getDayOptions = (
+  currentRestriction: string,
+  currentDayRestrictions: Restriction[]
+) => {
+  const availableDays = dayOptions.filter(
+    (opt) => !currentDayRestrictions.some((res) => res.day === opt.value)
+  );
 
+  const currentDayOption = dayOptions.find(
+    (opt) => opt.value === currentRestriction
+  );
+
+  return currentDayOption
+    ? [...availableDays, currentDayOption]
+    : availableDays;
+};
 
 const customStyles = {
   control: (provided: any) => ({
@@ -81,161 +100,194 @@ const InputGenEd = () => {
   >([]);
 
   //Handler for changing a restriction's day for a specific GenEd Course
-  const handleGenEdDayRestrictionChange = (
-    courseCode: String,
-    selectedOption: Option | null
-  ) => {
-    if (selectedOption == null) {
-      return;
-    }
-    setGenEdList((prev) => {
-      const index = prev.findIndex(
-        (course) => course.courseCode === courseCode
-      );
-      if (index === -1) return prev; // No change if course not found
+  const handleGenEdDayRestrictionChange = useCallback(
+    (courseCode: string, selectedOption: Option | null) => {
+      if (selectedOption == null) {
+        return;
+      }
 
-      let resIndex = prev[index].courseRestriction.findIndex(
-        (res) => res.day == selectedOption.value
-      );
-      let updatedRes = {
-        ...prev[index].courseRestriction[resIndex],
-        day: selectedOption.value,
-      };
+      console.log("getting called");
+      console.log(selectedOption);
 
-      const updatedCourse = {
-        ...prev[index],
-        courseRestrictions: [prev[index].courseRestriction, updatedRes],
-      };
+      setGenEdList((prev) => {
+        const index = prev.findIndex(
+          (course) => course.courseCode === courseCode
+        );
+        if (index === -1) return prev; // No change if course not found
 
-      const newGenedConstraints = [...prev];
-      newGenedConstraints[index] = updatedCourse;
-      return newGenedConstraints;
-    });
+        console.log("index", index);
 
-    // setUpdatedGenedConstraints((prev) => ())
-  };
+        const course = prev[index];
+
+        console.log("course", course);
+
+        const resIndex = course.courseRestriction.findIndex(
+          (res) => res.day === selectedOption.value
+        );
+
+        console.log("res index", resIndex);
+
+        let updatedRestrictions;
+
+        if (resIndex !== -1) {
+          // Update existing restriction
+          updatedRestrictions = course.courseRestriction.map((res, i) =>
+            i === resIndex ? { ...res, day: selectedOption.value } : res
+          );
+        } else {
+          // Add new restriction
+          updatedRestrictions = [
+            ...(course.courseRestriction[0].day !== ""
+              ? course.courseRestriction
+              : []),
+            {
+              day: selectedOption.value,
+              startEndTimes: [{ start: "", end: "" }],
+            },
+          ];
+        }
+
+        console.log("updated res", updatedRestrictions);
+
+        // Update course with new restrictions
+        const updatedCourse = {
+          ...course,
+          courseRestriction: updatedRestrictions,
+        };
+
+        console.log("updated course", updatedCourse);
+
+        // Return new list with updated course
+        const newGenedConstraints = [...prev];
+        newGenedConstraints[index] = updatedCourse;
+
+        console.log(newGenedConstraints);
+
+        return newGenedConstraints;
+      });
+    },
+    []
+  );
 
   // Handler for changing a time field (start or end) for a specific GenEd Course
-  const handleGenEdTimeRestrictionChange = (
-    genEdIndex: number,
-    restrictionIndex: number,
-    timeIndex: number,
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
-    const { name, value } = e.target;
-    setGenEdList((prev) => {
-      const updated = [...prev];
-      const updatedRequests = [...updated[genEdIndex].courseRestriction];
-      const updatedTimes = [...updatedRequests[restrictionIndex].startEndTimes];
-      updatedTimes[timeIndex] = { ...updatedTimes[timeIndex], [name]: value };
-      updatedRequests[restrictionIndex] = {
-        ...updatedRequests[restrictionIndex],
-        startEndTimes: updatedTimes,
-      };
-      updated[genEdIndex] = {
-        ...updated[genEdIndex],
-        courseRestriction: updatedRequests,
-      };
-      return updated;
-    });
-  };
+  const handleGenEdTimeRestrictionChange = useCallback(
+    (
+      genEdIndex: number,
+      restrictionIndex: number,
+      timeIndex: number,
+      e: ChangeEvent<HTMLInputElement>
+    ) => {
+      const { name, value } = e.target;
+      setGenEdList((prev) => {
+        const updated = [...prev];
+        const updatedRequests = [...updated[genEdIndex].courseRestriction];
+        const updatedTimes = [
+          ...updatedRequests[restrictionIndex].startEndTimes,
+        ];
+        updatedTimes[timeIndex] = { ...updatedTimes[timeIndex], [name]: value };
+        updatedRequests[restrictionIndex] = {
+          ...updatedRequests[restrictionIndex],
+          startEndTimes: updatedTimes,
+        };
+        updated[genEdIndex] = {
+          ...updated[genEdIndex],
+          courseRestriction: updatedRequests,
+        };
+        return updated;
+      });
+    },
+    []
+  );
 
   // Handler to add a new day restriciton to a specific GenEd Course
-  const handleAddDayRestriction = (genEdIndex: number, e: FormEvent) => {
-    e.preventDefault();
-    setGenEdList((prev) => {
-      const updated = [...prev];
-      updated[genEdIndex] = {
-        ...updated[genEdIndex],
-        courseRestriction: [
-          ...updated[genEdIndex].courseRestriction,
-          { day: "", startEndTimes: [{ start: "", end: "" }] },
-        ],
-      };
-      return updated;
-    });
-  };
+  const handleAddDayRestriction = useCallback(
+    (courseCode: string, e: FormEvent) => {
+      e.preventDefault();
+
+      setGenEdList((prev) => {
+        let index = prev.findIndex((gened) => gened.courseCode === courseCode);
+
+        let updatedGened = {
+          ...prev[index],
+          courseRestriction: [
+            ...prev[index].courseRestriction,
+            { day: "", startEndTimes: [{ start: "", end: "" }] },
+          ],
+        };
+
+        let updatedGenedConstraints = [...prev];
+        updatedGenedConstraints[index] = updatedGened;
+
+        return updatedGenedConstraints;
+      });
+    },
+    []
+  );
 
   // Handler to delete a day restriction from a specific GenEd Course
-  const handleDeleteDayRestriction = (
-    genEdIndex: number,
-    restrictionIndex: number
-  ) => {
-    setGenEdList((prev) => {
-      const updated = [...prev];
-      updated[genEdIndex] = {
-        ...updated[genEdIndex],
-        courseRestriction: updated[genEdIndex].courseRestriction.filter(
-          (_, i) => i !== restrictionIndex
-        ),
-      };
-      return updated;
-    });
-  };
-
-  // Handler to add a new time entry to a GenEd Course
-  const handleAddTimeRestriction = (
-    genEdIndex: number,
-    restrictionIndex: number
-  ) => {
-    setGenEdList((prev) => {
-      const updated = [...prev];
-      const updatedRequests = [...updated[genEdIndex].courseRestriction];
-      updatedRequests[restrictionIndex] = {
-        ...updatedRequests[restrictionIndex],
-        startEndTimes: [
-          ...updatedRequests[restrictionIndex].startEndTimes,
-          { start: "", end: "" },
-        ],
-      };
-      updated[genEdIndex] = {
-        ...updated[genEdIndex],
-        courseRestriction: updatedRequests,
-      };
-      return updated;
-    });
-  };
-
-  // Handler to delete a time entry from a GenEd Course
-  const handleDeleteTimeRestriction = (
-    genEdIndex: number,
-    requestIndex: number,
-    timeIndex: number
-  ) => {
-    setGenEdList((prev) => {
-      const updated = [...prev];
-      const updatedRequests = [...updated[genEdIndex].courseRestriction];
-      // Only delete if more than one time entry exists
-      if (updatedRequests[requestIndex].startEndTimes.length > 1) {
-        updatedRequests[requestIndex] = {
-          ...updatedRequests[requestIndex],
-          startEndTimes: updatedRequests[requestIndex].startEndTimes.filter(
-            (_, i) => i !== timeIndex
+  const handleDeleteDayRestriction = useCallback(
+    (genEdIndex: number, restrictionIndex: number) => {
+      setGenEdList((prev) => {
+        const updated = [...prev];
+        updated[genEdIndex] = {
+          ...updated[genEdIndex],
+          courseRestriction: updated[genEdIndex].courseRestriction.filter(
+            (_, i) => i !== restrictionIndex
           ),
         };
-      }
-      updated[genEdIndex] = {
-        ...updated[genEdIndex],
-        courseRestriction: updatedRequests,
-      };
-      return updated;
-    });
-  };
+        return updated;
+      });
+    },
+    []
+  );
 
-  // Handler to add a new form
-  const handleAddGenEdCourse = (e: FormEvent) => {
-    e.preventDefault();
-    setGenEdList((prev) => [
-      ...prev,
-      {
-        courseTitle: "",
-        courseCode: "",
-        courseRestriction: [
-          { day: "", startEndTimes: [{ start: "", end: "" }] },
-        ],
-      },
-    ]);
-  };
+  // Handler to add a new time entry to a GenEd Course
+  const handleAddTimeRestriction = useCallback(
+    (genEdIndex: number, restrictionIndex: number) => {
+      setGenEdList((prev) => {
+        const updated = [...prev];
+        const updatedRequests = [...updated[genEdIndex].courseRestriction];
+        updatedRequests[restrictionIndex] = {
+          ...updatedRequests[restrictionIndex],
+          startEndTimes: [
+            ...updatedRequests[restrictionIndex].startEndTimes,
+            { start: "", end: "" },
+          ],
+        };
+        updated[genEdIndex] = {
+          ...updated[genEdIndex],
+          courseRestriction: updatedRequests,
+        };
+        return updated;
+      });
+    },
+    []
+  );
+
+  // Handler to delete a time entry from a GenEd Course
+  const handleDeleteTimeRestriction = useCallback(
+    (genEdIndex: number, requestIndex: number, timeIndex: number) => {
+      setGenEdList((prev) => {
+        const updated = [...prev];
+        const updatedRequests = [...updated[genEdIndex].courseRestriction];
+        // Only delete if more than one time entry exists
+        if (updatedRequests[requestIndex].startEndTimes.length > 1) {
+          updatedRequests[requestIndex] = {
+            ...updatedRequests[requestIndex],
+            startEndTimes: updatedRequests[requestIndex].startEndTimes.filter(
+              (_, i) => i !== timeIndex
+            ),
+          };
+        }
+        updated[genEdIndex] = {
+          ...updated[genEdIndex],
+          courseRestriction: updatedRequests,
+        };
+        return updated;
+      });
+    },
+    []
+  );
 
   // Handler to delete an entire form
   const handleDeleteGenEdCourse = (genEdIndex: number) => {
@@ -320,251 +372,103 @@ const InputGenEd = () => {
 
       <div className="flex mx-auto gap-5 font-Manrope font-semibold">
         <form onSubmit={handleSave}>
-          {genEdList.map((genEdCourse, genEdIndex) => (
-            <div key={genEdIndex} className="mb-7 flex gap-3">
-              <div className="flex gap-5 bg-[#F1FAFF] px-5 pt-5 rounded-xl shadow-sm w-full">
-                <div className="flex gap-3">
-                  <div className="flex justify-center gap-3">
+          {genEdList.map((genEdCourse, genEdIndex) => {
+            if (genEdIndex === 1) console.log(genEdCourse);
+            return (
+              <div key={genEdIndex} className="mb-7 flex gap-3">
+                <div className="flex gap-5 bg-[#F1FAFF] px-5 pt-5 rounded-xl shadow-sm w-full">
+                  <div className="flex gap-3">
+                    <div className="flex justify-center gap-3">
+                      <div>
+                        <input
+                          disabled
+                          type="text"
+                          name="courseCode"
+                          value={genEdCourse.courseTitle}
+                          // onChange={(e) => handleCourseCodeChange(genEdIndex, e)}
+                          placeholder="Enter"
+                          className="h-[38px] border border-primary rounded-[5px] px-2 w-[200px]"
+                        />
+                      </div>
+                    </div>
                     <div>
                       <input
                         disabled
                         type="text"
                         name="courseCode"
-                        value={genEdCourse.courseTitle}
+                        value={genEdCourse.courseCode}
                         // onChange={(e) => handleCourseCodeChange(genEdIndex, e)}
                         placeholder="Enter"
                         className="h-[38px] border border-primary rounded-[5px] px-2 w-[200px]"
                       />
                     </div>
                   </div>
-                  <div>
-                    <input
-                      disabled
-                      type="text"
-                      name="courseCode"
-                      value={genEdCourse.courseCode}
-                      // onChange={(e) => handleCourseCodeChange(genEdIndex, e)}
-                      placeholder="Enter"
-                      className="h-[38px] border border-primary rounded-[5px] px-2 w-[200px]"
-                    />
+
+                  <div className="w-full">
+                    {/* kapag wala ndi siya nag mmap */}
+                    {genEdCourse.courseRestriction.length > 0 ? (
+                      <div>
+                        {genEdCourse.courseRestriction.map(
+                          (restriction, restrictionIndex) => {
+                            return (
+                              <DayRestriction
+                                key={restrictionIndex}
+                                restriction={restriction}
+                                restrictionIndex={restrictionIndex}
+                                genEdCourse={genEdCourse}
+                                genEdIndex={genEdIndex}
+                                handleAddTimeRestriction={
+                                  handleAddTimeRestriction
+                                }
+                                handleDeleteTimeRestriction={
+                                  handleDeleteTimeRestriction
+                                }
+                                handleGenEdDayRestrictionChange={
+                                  handleGenEdDayRestrictionChange
+                                }
+                                handleGenEdTimeRestrictionChange={
+                                  handleGenEdTimeRestrictionChange
+                                }
+                                handleDeleteDayRestriction={
+                                  handleDeleteDayRestriction
+                                }
+                              />
+                            );
+                          }
+                        )}
+                        {genEdCourse.courseRestriction.length < 6 && (
+                          <button
+                            onClick={(e) =>
+                              handleAddDayRestriction(genEdCourse.courseCode, e)
+                            }
+                            className="bg-primary text-white py-1 px-4 text-xs rounded-md"
+                          >
+                            Add Day
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="bg-[#BFDDF6] p-5 rounded-md mb-5 w-full">
+                        {genEdCourse.courseRestriction.length < 6 && (
+                          <button
+                            onClick={(e) =>
+                              handleAddDayRestriction(genEdCourse.courseCode, e)
+                            }
+                            className="bg-primary text-white py-1 px-4 text-xs rounded-md"
+                          >
+                            Add Day
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                <div className="w-full">
-                  {/* kapag wala ndi siya nag mmap */}
-                  {genEdCourse.courseRestriction.length > 0 ? (
-                    <div>
-                      {genEdCourse.courseRestriction.map(
-                        (restriction, restrictionIndex) => {
-                          return (
-                            <div
-                              key={restrictionIndex}
-                              className="bg-[#BFDDF6] p-5 rounded-md mb-5"
-                            >
-                              <div className="flex gap-3 justify-center">
-                                <div className="flex gap-3 items-center mb-3">
-                                  <label>Day</label>
-                                  <Select
-                                    options={getDayOptions(genEdCourse.courseRestriction)}
-                                    placeholder="Select"
-                                    value={
-                                      dayOptions.find(
-                                        (opt) => opt.value === restriction.day
-                                      ) || null
-                                    }
-                                    onChange={(selectedOption) =>
-                                      handleGenEdDayRestrictionChange(
-                                        genEdCourse.courseCode,
-                                        selectedOption
-                                      )
-                                    }
-                                    styles={customStyles}
-                                  />
-                                </div>
-
-                                <div className="flex flex-col">
-                                  {restriction.startEndTimes.length > 0 ? (
-                                    restriction.startEndTimes.map(
-                                      (time, timeIndex) => {
-                                        let start = time?.start
-                                          ? `${time.start.slice(0, 2)}:${time.start.slice(2)}`
-                                          : "";
-                                        let end = time?.end
-                                          ? `${time.end.slice(0, 2)}:${time.end.slice(2)}`
-                                          : "";
-                                        return (
-                                          <div key={timeIndex} className="mb-3">
-                                            <div className="flex items-center gap-3 justify-center">
-                                              <label>Start</label>
-                                              <input
-                                                type="time"
-                                                name="start"
-                                                value={start}
-                                                onChange={(e) =>
-                                                  handleGenEdTimeRestrictionChange(
-                                                    genEdIndex,
-                                                    restrictionIndex,
-                                                    timeIndex,
-                                                    e
-                                                  )
-                                                }
-                                                className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                                              />
-                                              <label>End</label>
-                                              <input
-                                                type="time"
-                                                name="end"
-                                                value={end}
-                                                onChange={(e) =>
-                                                  handleGenEdTimeRestrictionChange(
-                                                    genEdIndex,
-                                                    restrictionIndex,
-                                                    timeIndex,
-                                                    e
-                                                  )
-                                                }
-                                                className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                                              />
-                                              {restriction.startEndTimes
-                                                .length > 1 && (
-                                                <button
-                                                  type="button"
-                                                  onClick={() =>
-                                                    handleDeleteTimeRestriction(
-                                                      genEdIndex,
-                                                      restrictionIndex,
-                                                      timeIndex
-                                                    )
-                                                  }
-                                                >
-                                                  <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
-                                                </button>
-                                              )}
-
-                                              <button
-                                                type="button"
-                                                onClick={() =>
-                                                  handleAddTimeRestriction(
-                                                    genEdIndex,
-                                                    restrictionIndex
-                                                  )
-                                                }
-                                                className="w-7"
-                                              >
-                                                <img src={add_button} />
-                                              </button>
-                                            </div>
-                                          </div>
-                                        );
-                                      }
-                                    )
-                                  ) : (
-                                    <div className="flex flex-col">
-                                      <div className="mb-3">
-                                        <div className="flex items-center gap-3 justify-center">
-                                          <label>Start</label>
-                                          <input
-                                            type="time"
-                                            name="start"
-                                            value=""
-                                            onChange={(e) =>
-                                              handleGenEdTimeRestrictionChange(
-                                                genEdIndex,
-                                                0,
-                                                0,
-                                                e
-                                              )
-                                            }
-                                            className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                                          />
-                                          <label>End</label>
-                                          <input
-                                            type="time"
-                                            name="end"
-                                            value=""
-                                            onChange={(e) =>
-                                              handleGenEdTimeRestrictionChange(
-                                                genEdIndex,
-                                                0,
-                                                0,
-                                                e
-                                              )
-                                            }
-                                            className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                                          />
-
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              handleDeleteTimeRestriction(
-                                                genEdIndex,
-                                                0,
-                                                0
-                                              )
-                                            }
-                                          >
-                                            <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
-                                          </button>
-
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              handleAddTimeRestriction(
-                                                genEdIndex,
-                                                0
-                                              )
-                                            }
-                                            className="w-7"
-                                          >
-                                            <img src={add_button} />
-                                          </button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                              <div className="flex justify-center gap-3 mt-5">
-                                {genEdCourse.courseRestriction.length > 1 && (
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleDeleteDayRestriction(genEdIndex, 0)
-                                    }
-                                    className="border border-primary text-primary py-1 px-4 text-xs rounded-md"
-                                  >
-                                    Delete
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        }
-                      )}
-                      {genEdCourse.courseRestriction.length < 6 && <button
-                        onClick={(e) => handleAddDayRestriction(genEdIndex, e)}
-                        className="bg-primary text-white py-1 px-4 text-xs rounded-md"
-                      >
-                        Add Day
-                      </button>}
-                    </div>
-                  ) : (
-                    <div className="bg-[#BFDDF6] p-5 rounded-md mb-5 w-full">
-                      {genEdCourse.courseRestriction.length < 6 && <button
-                        onClick={(e) => handleAddDayRestriction(genEdIndex, e)}
-                        className="bg-primary text-white py-1 px-4 text-xs rounded-md"
-                      >
-                        Add Day
-                      </button>}
-                    </div>
-                  )}
-                </div>
+                <button onClick={() => handleDeleteGenEdCourse(genEdIndex)}>
+                  <img src={trash_button} alt="Delete" className="w-9" />
+                </button>
               </div>
-              <button onClick={() => handleDeleteGenEdCourse(genEdIndex)}>
-                <img src={trash_button} alt="Delete" className="w-9" />
-              </button>
-            </div>
-          ))}
+            );
+          })}
           <div className="justify-center flex gap-4 font-Manrope font-semibold">
             <button
               type="submit"
@@ -579,5 +483,232 @@ const InputGenEd = () => {
     </div>
   );
 };
+
+const DayRestriction = React.memo(
+  ({
+    genEdCourse,
+    restriction,
+    genEdIndex,
+    restrictionIndex,
+    handleGenEdDayRestrictionChange,
+    handleGenEdTimeRestrictionChange,
+    handleDeleteTimeRestriction,
+    handleAddTimeRestriction,
+    handleDeleteDayRestriction,
+  }: {
+    genEdCourse: GenEdInfo;
+    restriction: Restriction;
+    genEdIndex: number;
+    restrictionIndex: number;
+    handleGenEdDayRestrictionChange: (
+      courseCode: string,
+      selectedOption: Option | null
+    ) => void;
+    handleGenEdTimeRestrictionChange: (
+      genEdIndex: number,
+      restrictionIndex: number,
+      timeIndex: number,
+      e: ChangeEvent<HTMLInputElement>
+    ) => void;
+    handleDeleteTimeRestriction: (
+      genEdIndex: number,
+      requestIndex: number,
+      timeIndex: number
+    ) => void;
+    handleAddTimeRestriction: (
+      genEdIndex: number,
+      restrictionIndex: number
+    ) => void;
+    handleDeleteDayRestriction: (
+      genEdIndex: number,
+      restrictionIndex: number
+    ) => void;
+  }) => {
+    const dayOptionsMemoized = useMemo(
+      () => getDayOptions(restriction.day, genEdCourse.courseRestriction),
+      [genEdCourse.courseRestriction]
+    );
+
+    const customStylesMemoized = useMemo(() => customStyles, []);
+
+    const onChangeHandler = useCallback(
+      (selectedOption: any) =>
+        handleGenEdDayRestrictionChange(genEdCourse.courseCode, selectedOption),
+      [genEdCourse.courseCode, handleGenEdDayRestrictionChange]
+    );
+
+    const selectedValue = useMemo(
+      () =>
+        dayOptionsMemoized.find((opt) => opt.value === restriction.day) || null,
+      [dayOptionsMemoized, restriction.day]
+    );
+
+    return (
+      <div className="bg-[#BFDDF6] p-5 rounded-md mb-5">
+        <div className="flex gap-3 justify-center">
+          <div className="flex gap-3 items-center mb-3">
+            <label>Day</label>
+            <MemoizedSelect
+              selectedValue={selectedValue}
+              onChangeHandler={onChangeHandler}
+              customStylesMemoized={customStylesMemoized}
+              dayOptionsMemoized={dayOptionsMemoized}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            {restriction.startEndTimes.length > 0 ? (
+              restriction.startEndTimes.map((time, timeIndex) => {
+                let start = time?.start
+                  ? `${time.start.slice(0, 2)}:${time.start.slice(2)}`
+                  : "";
+                let end = time?.end
+                  ? `${time.end.slice(0, 2)}:${time.end.slice(2)}`
+                  : "";
+                return (
+                  <div key={timeIndex} className="mb-3">
+                    <div className="flex items-center gap-3 justify-center">
+                      <label>Start</label>
+                      <input
+                        type="time"
+                        name="start"
+                        value={start}
+                        onChange={(e) =>
+                          handleGenEdTimeRestrictionChange(
+                            genEdIndex,
+                            restrictionIndex,
+                            timeIndex,
+                            e
+                          )
+                        }
+                        className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                      />
+                      <label>End</label>
+                      <input
+                        type="time"
+                        name="end"
+                        value={end}
+                        onChange={(e) =>
+                          handleGenEdTimeRestrictionChange(
+                            genEdIndex,
+                            restrictionIndex,
+                            timeIndex,
+                            e
+                          )
+                        }
+                        className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                      />
+                      {restriction.startEndTimes.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleDeleteTimeRestriction(
+                              genEdIndex,
+                              restrictionIndex,
+                              timeIndex
+                            )
+                          }
+                        >
+                          <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleAddTimeRestriction(genEdIndex, restrictionIndex)
+                        }
+                        className="w-7"
+                      >
+                        <img src={add_button} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="flex flex-col">
+                <div className="mb-3">
+                  <div className="flex items-center gap-3 justify-center">
+                    <label>Start</label>
+                    <input
+                      type="time"
+                      name="start"
+                      value=""
+                      onChange={(e) =>
+                        handleGenEdTimeRestrictionChange(genEdIndex, 0, 0, e)
+                      }
+                      className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                    />
+                    <label>End</label>
+                    <input
+                      type="time"
+                      name="end"
+                      value={genEdCourse?.courseRestriction[0]?.startEndTimes[0]?.end || ""}
+                      onChange={(e) =>
+                        handleGenEdTimeRestrictionChange(genEdIndex, 0, 0, e)
+                      }
+                      className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleDeleteTimeRestriction(genEdIndex, 0, 0)
+                      }
+                    >
+                      <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleAddTimeRestriction(genEdIndex, 0)}
+                      className="w-7"
+                    >
+                      <img src={add_button} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="flex justify-center gap-3 mt-5">
+          <button
+            type="button"
+            onClick={() => handleDeleteDayRestriction(genEdIndex, 0)}
+            className="border border-primary text-primary py-1 px-4 text-xs rounded-md"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    );
+  }
+);
+
+const MemoizedSelect = React.memo(
+  ({
+    dayOptionsMemoized,
+    selectedValue,
+    onChangeHandler,
+    customStylesMemoized,
+  }: {
+    dayOptionsMemoized: any;
+    selectedValue: any;
+    onChangeHandler: any;
+    customStylesMemoized: any;
+  }) => {
+    return (
+      <Select
+        options={dayOptionsMemoized}
+        placeholder="Select"
+        value={selectedValue}
+        onChange={onChangeHandler}
+        styles={customStylesMemoized}
+      />
+    );
+  }
+);
 
 export default InputGenEd;
