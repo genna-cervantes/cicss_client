@@ -75,6 +75,26 @@ const InputYLD: React.FC = () => {
       maxDays: "",
     },
   ]);
+  const [updatedYearLevels, setUpdatedYearLevels] = useState<YearLevelData[]>([])
+
+  const handleUpdate = ({updatedYld}: {updatedYld: YearLevelData}) => {
+    setUpdatedYearLevels((prev) => {
+      let newYearLevels = [...prev]
+      let index = prev.findIndex((yld) => yld.year === updatedYld.year)
+      if (index === -1){
+        newYearLevels.push({...updatedYld})
+      }else{
+        newYearLevels[index] = {...updatedYld}
+      }
+      
+      return newYearLevels;
+    })
+  }
+
+  useEffect(() => {
+    console.log('updated ylds')
+    console.log(updatedYearLevels)
+  }, [updatedYearLevels])
 
   // Handle checkbox change
   const handleDayChange = (
@@ -90,6 +110,9 @@ const InputYLD: React.FC = () => {
           [day]: !newState[yearIndex].allowedDays[day],
         },
       };
+
+      handleUpdate({updatedYld: newState[yearIndex]})
+
       return newState;
     });
   };
@@ -102,6 +125,9 @@ const InputYLD: React.FC = () => {
         ...newState[yearIndex],
         maxDays: value,
       };
+
+      handleUpdate({updatedYld: newState[yearIndex]})
+
       return newState;
     });
   };
@@ -110,17 +136,37 @@ const InputYLD: React.FC = () => {
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
 
-    const results = yearLevels.map((level) => {
-      const checkedDays = Object.entries(level.allowedDays)
-        .filter(([_, isChecked]) => isChecked)
-        .map(([day]) => day);
+    // handle updates
+    const updateYLDData = async () => {
+      for (let i = 0; i < updatedYearLevels.length; i++){
+        let updYearLevel: any = updatedYearLevels[i];
 
-      return {
-        year: `Year Level ${level.year}`,
-        checkedDays,
-        maxValue: level.maxDays || "Not Set",
-      };
-    });
+        let allowedDaysKeys = Object.keys(updYearLevel.allowedDays)
+        let transformedAllowedDays: any = allowedDaysKeys.filter((key) => updYearLevel.allowedDays[key])
+        transformedAllowedDays = transformedAllowedDays.map((ad: string) => ad === 'SA' ? 'S' : ad)
+
+        let transformedUpdYearLevel = {
+          availableDays: transformedAllowedDays,
+          maxDays: updYearLevel.maxDays
+        }
+
+        const res = await fetch(`http://localhost:8080/yldconstraint/CS/${updYearLevel.year}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem("token") ?? ""}`,
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify(transformedUpdYearLevel)
+        })
+
+        if (res.ok){
+          console.log('yey updated')
+        }else{
+          console.log('may error sis')
+        }
+      }
+    }
+    updateYLDData();
   };
 
   // fetch data
@@ -135,19 +181,6 @@ const InputYLD: React.FC = () => {
 
         if (res.ok){
           const data = await res.json()
-          // {
-          //   year: 1,
-          //   allowedDays: {
-          //     M: false,
-          //     T: false,
-          //     W: false,
-          //     TH: false,
-          //     F: false,
-          //     SA: false,
-          //   },
-          //   maxDays: "",
-          // },
-
           setYearLevels((prev) => {
             let newYearLevels = [...prev]
             let index = prev.findIndex((yld) => yld.year === i);
