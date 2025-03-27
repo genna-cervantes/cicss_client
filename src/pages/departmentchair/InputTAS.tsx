@@ -47,7 +47,7 @@ const courseOptions: Option[] = [
   { value: "CS26112", label: "Thesis 1" },
 ];
 
-const dayOptions: Option[] = [
+export const dayOptions: Option[] = [
   { value: "M", label: "Monday" },
   { value: "T", label: "Tuesday" },
   { value: "W", label: "Wednesday" },
