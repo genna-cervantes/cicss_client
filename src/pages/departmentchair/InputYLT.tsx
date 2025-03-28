@@ -49,21 +49,241 @@ const InputYLT = () => {
     fourthYear: [{ day: "", startEndTimes: [{ startTime: "", endTime: "" }] }],
   });
 
-  const handleTimeChange = (
-    year: keyof YearLevels,
-    field: "startTime" | "endTime",
-    value: string
+  const [updatedYearLevels, setUpdatedYearLevels] = useState<{
+    [key: string]: {
+      day: string;
+      startEndTimes: { startTime: string; endTime: string }[];
+    }[];
+  }[]>([]);
+
+  useEffect(() => {
+    console.log("updated");
+    console.log(updatedYearLevels);
+  }, [updatedYearLevels]);
+
+  const handleChangeTimeRestriction = (
+    name: "startTime" | "endTime",
+    value: string,
+    year: string,
+    yearDataIndex: number,
+    timeIndex: number
   ) => {
-    setYearLevels({
-      ...yearLevels,
-      [year]: { ...yearLevels[year], [field]: value },
+    let updatedYear: any;
+    setYearLevels((prev: any) => {
+      updatedYear = prev[year].map((yearData: any, idx: number) =>
+        idx === yearDataIndex
+          ? {
+              ...yearData,
+              startEndTimes: yearData.startEndTimes.map(
+                (time: any, tIdx: number) =>
+                  tIdx === timeIndex ? { ...time, [name]: value } : time
+              ),
+            }
+          : yearData
+      );
+      return {
+        ...prev, // Preserve previous state
+        [year]: updatedYear,
+      };
+    });
+
+    let yearLevel;
+    switch (year) {
+      case "firstYear":
+        yearLevel = 1;
+        break;
+      case "secondYear":
+        yearLevel = 2;
+        break;
+      case "thirdYear":
+        yearLevel = 3;
+        break;
+      case "fourthYear":
+        yearLevel = 4;
+        break;
+      default:
+        yearLevel = 0;
+    }    
+
+    setUpdatedYearLevels((prev) => {
+      // Check if the yearLevel already exists in the array
+      const existingIndex = prev.findIndex((item) => item[yearLevel]);
+    
+      if (existingIndex !== -1) {
+        // If the year level exists, update it
+        return prev.map((item, index) =>
+          index === existingIndex ? { [yearLevel]: updatedYear } : item
+        );
+      } else {
+        // If the year level doesn't exist, add it
+        return [...prev, { [yearLevel]: updatedYear }];
+      }
     });
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleAddTimeRestriction = (
+    year: string,
+    yearDataIndex: number,
+    timeIndex: number
+  ) => {
+    let updatedYear: any;
+    setYearLevels((prev: any) => {
+      updatedYear = prev[year].map((yearData: any, idx: number) => {
+        if (idx === yearDataIndex) {
+          return {
+            ...yearData,
+            startEndTimes: [
+              ...yearData.startEndTimes,
+              { startTime: "", endTime: "" },
+            ],
+          };
+        } else return yearData;
+      });
+      return {
+        ...prev,
+        [year]: updatedYear,
+      };
+    });
+
+    let yearLevel;
+    switch (year) {
+      case "firstYear":
+        yearLevel = 1;
+        break;
+      case "secondYear":
+        yearLevel = 2;
+        break;
+      case "thirdYear":
+        yearLevel = 3;
+        break;
+      case "fourthYear":
+        yearLevel = 4;
+        break;
+      default:
+        yearLevel = 0;
+    }    
+
+    setUpdatedYearLevels((prev) => {
+      // Check if the yearLevel already exists in the array
+      console.log(typeof prev)
+      const existingIndex = prev.findIndex((item) => item[yearLevel]);
+    
+      if (existingIndex !== -1) {
+        // If the year level exists, update it
+        return prev.map((item, index) =>
+          index === existingIndex ? { [yearLevel]: updatedYear } : item
+        );
+      } else {
+        // If the year level doesn't exist, add it
+        return [...prev, { [yearLevel]: updatedYear }];
+      }
+    });
+  };
+
+  const handleDeleteTimeRestriction = (
+    year: string,
+    yearDataIndex: number,
+    timeIndex: number
+  ) => {
+    let updatedYear: any;
+    setYearLevels((prev: any) => {
+      updatedYear = prev[year].map((yearData: any, idx: number) => {
+        if (idx === yearDataIndex) {
+          return {
+            ...yearData,
+            startEndTimes: yearData.startEndTimes.filter(
+              (_: any, i: number) => i !== timeIndex // Remove the item at timeIndex
+            ),
+          };
+        }
+        return yearData;
+      });
+      return {
+        ...prev,
+        [year]: updatedYear,
+      };
+    });
+    let yearLevel;
+
+    switch (year) {
+      case "firstYear":
+        yearLevel = 1;
+        break;
+      case "secondYear":
+        yearLevel = 2;
+        break;
+      case "thirdYear":
+        yearLevel = 3;
+        break;
+      case "fourthYear":
+        yearLevel = 4;
+        break;
+      default:
+        yearLevel = 0;
+    }    
+
+    setUpdatedYearLevels((prev) => {
+      // Check if the yearLevel already exists in the array
+      const existingIndex = prev.findIndex((item) => item[yearLevel]);
+    
+      if (existingIndex !== -1) {
+        // If the year level exists, update it
+        return prev.map((item, index) =>
+          index === existingIndex ? { [yearLevel]: updatedYear } : item
+        );
+      } else {
+        // If the year level doesn't exist, add it
+        return [...prev, { [yearLevel]: updatedYear }];
+      }
+    });
+    
+  };
+
+  const handleSave = async (e: FormEvent) => {
     e.preventDefault();
 
+    console.log('saving')
+    console.log(updatedYearLevels)
+
     // Here you would typically send the data to your backend
+    for (let i = 0; i < updatedYearLevels.length; i++){
+      let updatedYearLevel = updatedYearLevels[i];
+      let yearLevel = Object.keys(updatedYearLevel)[0]
+
+      let transformedRestrictions: any = {
+        M: [],
+        T: [],
+        W: [],
+        TH: [],
+        F: [],
+        S: []
+      }
+
+      updatedYearLevel[yearLevel].forEach((res) => {
+        let transformedStartEndTimes = res.startEndTimes.map((set) => {
+          return {
+            start: `${set.startTime.slice(0,2)}${set.startTime.slice(3)}`,
+            end: `${set.endTime.slice(0,2)}${set.endTime.slice(3)}`,
+          }
+        })
+        transformedRestrictions[res.day] = [...transformedRestrictions[res.day], ...transformedStartEndTimes]
+      })
+
+      const res = await fetch(`http://localhost:8080/yltconstraints/CS/${yearLevel}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem(("token")) ?? ''}`,
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify({restrictions: transformedRestrictions})
+      })
+
+      if (res.ok){
+        console.log('yeyy okay')
+      }else{
+        console.log('error')
+      }
+    }
   };
 
   // fetch data
@@ -86,14 +306,14 @@ const InputYLT = () => {
             .map((key: string) => {
               let transformedStartEndTimes = data.restrictions[key].map(
                 (time: any) => {
-                  let start = time?.start
+                  let startTime = time?.start
                     ? `${time.start.slice(0, 2)}:${time.start.slice(2)}`
                     : "";
-                  let end = time?.end
+                  let endTime = time?.end
                     ? `${time.end.slice(0, 2)}:${time.end.slice(2)}`
                     : "";
 
-                  return { start, end };
+                  return { startTime, endTime };
                 }
               );
 
@@ -156,7 +376,7 @@ const InputYLT = () => {
         </div>
       </section>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSave}>
         <section className="flex flex-col gap-5 mt-11">
           {/* <div
             // key={`${year}-${index}`} // Use a unique key combining year and index
@@ -166,17 +386,17 @@ const InputYLT = () => {
             return (
               <div className="flex w-[70%] justify-around items-center gap-11 mx-auto bg-[#F1FAFF] p-5 rounded-xl shadow-md font-Manrope font-bold">
                 <p>{year}</p>
-                <div className="flex flex-col gap-y-5 w-full items-center">
+                <div className="flex flex-col gap-y-5 items-center">
                   {yearLevels[year].map(
                     (
                       yearData,
-                      index // Use map instead of forEach
+                      yearDataIndex // Use map instead of forEach
                     ) => {
                       // console.log("year data", yearData);
                       return (
                         <div className="w-full">
                           <div className="w-full">
-                            <div className="flex gap-3 items-center font-Manrope font-semibold text-sm">
+                            <div className="flex gap-3 items-center font-Manrope font-semibold text-sm w-full">
                               <Select
                                 isDisabled={true}
                                 options={dayOptions}
@@ -188,66 +408,98 @@ const InputYLT = () => {
                                 }
                                 styles={selectStyles}
                               />
-                              <div className="w-full">
+                              <div className=" bg-[#BFDDF6] rounded-xl px-8 py-4 flex flex-col gap-y-3 w-full">
                                 {yearData.startEndTimes.length > 0 ? (
-                                  yearData.startEndTimes.map((time) => {
-                                    return (
-                                      <>
-                                        <label htmlFor={`${year}-start`}>
-                                          Class Start
-                                        </label>
-                                        <input
-                                          id={`${year}-start`}
-                                          type="time"
-                                          value={time.startTime} // Use yearData instead of yearLevels[year]
-                                          onChange={(e) =>
-                                            handleTimeChange(
-                                              year,
-                                              "startTime",
-                                              e.target.value
-                                            )
-                                          }
-                                          className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                                          required
-                                        />
-                                        <label htmlFor={`${year}-end`}>
-                                          Class End
-                                        </label>
-                                        <input
-                                          id={`${year}-end`}
-                                          type="time"
-                                          value={time.endTime} // Use yearData instead of yearLevels[year]
-                                          onChange={(e) =>
-                                            handleTimeChange(
-                                              year,
-                                              "endTime",
-                                              e.target.value
-                                            )
-                                          }
-                                          className="h-[38px] w-[130px] border border-primary rounded-[5px] py-1 px-2"
-                                          required
-                                        />
-                                        <button
-                                          type="button"
-                                          // onClick={() =>
-                                          //   handleAddTimeRestriction(genEdIndex, restrictionIndex)
-                                          // }
-                                          className="w-7"
-                                        >
-                                          <img src={add_button} />
-                                        </button>
-                                      </>
-                                    );
-                                  })
+                                  yearData.startEndTimes.map(
+                                    (time, timeIndex) => {
+                                      return (
+                                        <div className="flex items-center gap-x-4">
+                                          <label htmlFor={`${year}-start`}>
+                                            Start
+                                          </label>
+                                          <input
+                                            id={`${year}-start`}
+                                            type="time"
+                                            value={time.startTime} // Use yearData instead of yearLevels[year]
+                                            onChange={(e) =>
+                                              handleChangeTimeRestriction(
+                                                "startTime",
+                                                e.target.value,
+                                                year,
+                                                yearDataIndex,
+                                                timeIndex
+                                              )
+                                            }
+                                            className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                                            required
+                                          />
+                                          <label htmlFor={`${year}-end`}>
+                                            End
+                                          </label>
+                                          <input
+                                            id={`${year}-end`}
+                                            type="time"
+                                            value={time.endTime} // Use yearData instead of yearLevels[year]
+                                            onChange={(e) =>
+                                              handleChangeTimeRestriction(
+                                                "endTime",
+                                                e.target.value,
+                                                year,
+                                                yearDataIndex,
+                                                timeIndex
+                                              )
+                                            }
+                                            className="h-[38px] w-[130px] border border-primary rounded-[5px] py-1 px-2"
+                                            required
+                                          />
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              handleAddTimeRestriction(
+                                                year,
+                                                yearDataIndex,
+                                                timeIndex
+                                              )
+                                            }
+                                            className="w-7"
+                                          >
+                                            <img src={add_button} />
+                                          </button>
+                                          {yearData.startEndTimes.length >
+                                            0 && (
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                handleDeleteTimeRestriction(
+                                                  year,
+                                                  yearDataIndex,
+                                                  timeIndex
+                                                )
+                                              }
+                                            >
+                                              <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                                            </button>
+                                          )}
+                                        </div>
+                                      );
+                                    }
+                                  )
                                 ) : (
-                                  <button
-                                    // onClick={(e) =>
-                                    //   // handleAddDayRestriction(genEdCourse.courseCode, e)
-                                    // }
-                                    className="bg-primary text-white py-1 px-4 text-xs rounded-md"
-                                  >
-                                    Add Time
-                                  </button>
+                                  <div className="min-w-full flex justify-center items-center">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleAddTimeRestriction(
+                                          year,
+                                          yearDataIndex,
+                                          0
+                                        )
+                                      }
+                                      className="bg-primary text-white py-1 px-4 text-xs rounded-md"
+                                    >
+                                      Add Time
+                                    </button>
+                                  </div>
                                 )}
                               </div>
                             </div>
