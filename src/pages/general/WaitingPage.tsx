@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const WaitingPage = () => {
-  const [runningGenerator, setRunningGenerator] = useState(false)
+  const [runningGenerator, setRunningGenerator] = useState(false);
   const [error, setError] = useState<string>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -12,21 +12,21 @@ const WaitingPage = () => {
     2: { section: string; specialization: "none" }[];
     3: { section: string; specialization: "none" }[];
     4: { section: string; specialization: "none" }[];
-  }|null>(null);
+  } | null>(null);
 
   const [ITSections, setITSections] = useState<{
     1: { section: string; specialization: "none" }[];
     2: { section: string; specialization: "none" }[];
     3: { section: string; specialization: "none" }[];
     4: { section: string; specialization: "none" }[];
-  }|null>();
+  } | null>();
 
   const [ISSections, setISSections] = useState<{
     1: { section: string; specialization: "none" }[];
     2: { section: string; specialization: "none" }[];
     3: { section: string; specialization: "none" }[];
     4: { section: string; specialization: "none" }[];
-  }|null>();
+  } | null>();
 
   useEffect(() => {
     if (!location.state?.fromButton) {
@@ -36,7 +36,12 @@ const WaitingPage = () => {
 
     const fetchSections = async () => {
       try {
-        const res = await fetch("http://localhost:8080/year_sections/CS");
+        const department = localStorage.getItem("department") ?? "CS";
+        const res = await fetch(`http://localhost:8080/year_sections/CS`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          },
+        });
         const data = await res.json();
         console.log("ung response", data);
 
@@ -53,7 +58,11 @@ const WaitingPage = () => {
           console.log("error with fetching data", data);
         }
 
-        const resIT = await fetch("http://localhost:8080/year_sections/IT");
+        const resIT = await fetch("http://localhost:8080/year_sections/IT", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          },
+        });
         const dataIT = await resIT.json();
         console.log("ung response", dataIT);
 
@@ -68,7 +77,12 @@ const WaitingPage = () => {
           console.log("error with fetching data", dataIT);
         }
 
-        const resIS = await fetch("http://localhost:8080/year_sections/IS");
+        const resIS = await fetch("http://localhost:8080/year_sections/IS", {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem(('token')) ?? ''}`
+          }
+          });
+          
         const dataIS = await resIS.json();
         console.log("ung response", dataIS);
 
@@ -135,7 +149,7 @@ const WaitingPage = () => {
         }
       };
 
-      console.log('running generate sched')
+      console.log("running generate sched");
       setRunningGenerator(true);
       generateSchedule();
 

@@ -19,18 +19,21 @@ const sections = [
 ];
 
 const ViewSchedule = () => {
-  
   const [currentFilter, setCurrentFilter] = useState("Section");
-  const [filter, setFilter] = useState("Section")
+  const [filter, setFilter] = useState("Section");
 
   const [yearSections, setYearSections] = useState<{
     [key: string]: { next: string; prev: string; specialization: string };
   }>({});
 
-  const [profDetails, setProfDetails] = useState<{[key: string]: string}>({})
-  const [roomDetails, setRoomDetails] = useState<{[key: string]: string}>({});
+  const [profDetails, setProfDetails] = useState<{ [key: string]: string }>({});
+  const [roomDetails, setRoomDetails] = useState<{ [key: string]: string }>({});
 
-  const [currentValue, setCurrentValue] = useState<{label: string, name?: string, specialization?: string}>(
+  const [currentValue, setCurrentValue] = useState<{
+    label: string;
+    name?: string;
+    specialization?: string;
+  }>(
     currentFilter === "Section"
       ? { label: "1CSA", specialization: "" }
       : currentFilter === "TAS"
@@ -44,45 +47,59 @@ const ViewSchedule = () => {
   const goToPrevious = () => {
     if (currentFilter === "Section") {
       setCurrentValue({ label: yearSections[currentValue.label].prev });
-    }else if (currentFilter === "Professor"){
+    } else if (currentFilter === "Professor") {
       const keys = Object.keys(profDetails);
       const index = keys.findIndex((tasId) => tasId === currentValue.label);
 
       let prevIndex: number = index === 0 ? keys.length - 1 : index - 1;
 
-      setCurrentValue({ label: keys[prevIndex], name: profDetails[keys[prevIndex]] });  
-    }else if (currentFilter === "Room"){
+      setCurrentValue({
+        label: keys[prevIndex],
+        name: profDetails[keys[prevIndex]],
+      });
+    } else if (currentFilter === "Room") {
       const keys = Object.keys(roomDetails);
       const index = keys.findIndex((roomId) => roomId === currentValue.label);
 
       let prevIndex: number = index === 0 ? keys.length - 1 : index - 1;
 
-      setCurrentValue({ label: keys[prevIndex], name: keys[prevIndex], specialization: roomDetails[keys[prevIndex]] });  
+      setCurrentValue({
+        label: keys[prevIndex],
+        name: keys[prevIndex],
+        specialization: roomDetails[keys[prevIndex]],
+      });
     }
   };
 
   const goToNext = () => {
     if (currentFilter === "Section") {
       setCurrentValue({ label: yearSections[currentValue.label].next });
-    }else if (currentFilter === "Professor"){
+    } else if (currentFilter === "Professor") {
       const keys = Object.keys(profDetails);
       const index = keys.findIndex((tasId) => tasId === currentValue.label);
 
       let nextIndex: number = index === keys.length ? 0 : index + 1;
 
-      setCurrentValue({ label: keys[nextIndex], name: profDetails[keys[nextIndex]] });
-    }else if (currentFilter === "Room"){
+      setCurrentValue({
+        label: keys[nextIndex],
+        name: profDetails[keys[nextIndex]],
+      });
+    } else if (currentFilter === "Room") {
       const keys = Object.keys(roomDetails);
       const index = keys.findIndex((roomId) => roomId === currentValue.label);
 
       let nextIndex: number = index === keys.length ? 0 : index + 1;
 
-      setCurrentValue({ label: keys[nextIndex], name: keys[nextIndex], specialization: roomDetails[keys[nextIndex]] });
+      setCurrentValue({
+        label: keys[nextIndex],
+        name: keys[nextIndex],
+        specialization: roomDetails[keys[nextIndex]],
+      });
     }
   };
 
   useEffect(() => {
-    if (currentFilter === 'Section'){
+    if (currentFilter === "Section") {
       setCurrentValue((prev) => ({
         ...prev,
         specialization:
@@ -97,53 +114,89 @@ const ViewSchedule = () => {
   // const currentSection = sections[currentIndex];
 
   useEffect(() => {
-    if (filter === 'Professor'){
+    if (filter === "Professor") {
       const fetchTASData = async () => {
-        const res = await fetch("http://localhost:8080/tasconstraints/details/CS");
+        const department = localStorage.getItem('department') ?? 'CS'
+        const res = await fetch(
+          `http://localhost:8080/tasconstraints/details/${department}`, {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem(('token')) ?? ''}`
+            }
+            }
+        );
         const data = await res.json();
 
-        setProfDetails(data.reduce((acc: any, prof: any) => ({ ...acc, ...prof }), {}))
+        setProfDetails(
+          data.reduce((acc: any, prof: any) => ({ ...acc, ...prof }), {})
+        );
 
-        if (res.ok){
-          setCurrentValue({label: Object.keys(data[0])[0], name: data[0][Object.keys(data[0])[0]]})
+        if (res.ok) {
+          setCurrentValue({
+            label: Object.keys(data[0])[0],
+            name: data[0][Object.keys(data[0])[0]],
+          });
           setCurrentFilter(filter);
         }
-      }
-  
+      };
+
       fetchTASData();
     }
-    if (filter === 'Section'){
-      setCurrentValue({label: Object.keys(yearSections)[0], specialization: yearSections[Object.keys(yearSections)[0]]?.specialization})
+    if (filter === "Section") {
+      setCurrentValue({
+        label: Object.keys(yearSections)[0],
+        specialization:
+          yearSections[Object.keys(yearSections)[0]]?.specialization,
+      });
       setCurrentFilter(filter);
     }
-    if (filter === 'Room'){
+    if (filter === "Room") {
       const fetchRoomData = async () => {
-        const res = await fetch("http://localhost:8080/rooms/CS");
+        const department = localStorage.getItem('department') ?? 'CS'
+        const res = await fetch(`http://localhost:8080/rooms/${department}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem(('token')) ?? ''}`
+        }
+        });
         const data = await res.json();
-        
-        let roomDetails = data.map((rm: any) => ({[rm.roomId]: rm.roomType}))
-        roomDetails = roomDetails.reduce((acc: any, room: any) => ({ ...acc, ...room }), {})
+
+        let roomDetails = data.map((rm: any) => ({ [rm.roomId]: rm.roomType }));
+        roomDetails = roomDetails.reduce(
+          (acc: any, room: any) => ({ ...acc, ...room }),
+          {}
+        );
         // console.log(roomDetails)
         // console.log(roomDetails.reduce((acc: any, room: any) => ({ ...acc, ...room }), {}))
-        setRoomDetails(roomDetails)
+        setRoomDetails(roomDetails);
 
-        console.log(Object.keys(roomDetails)[0])
-        console.log(roomDetails[Object.keys(roomDetails)[0]])
+        console.log(Object.keys(roomDetails)[0]);
+        console.log(roomDetails[Object.keys(roomDetails)[0]]);
 
-        if (res.ok){
-          setCurrentValue({label: Object.keys(roomDetails)[0], name: Object.keys(roomDetails)[0], specialization: roomDetails[Object.keys(roomDetails)[0]]})
+        if (res.ok) {
+          setCurrentValue({
+            label: Object.keys(roomDetails)[0],
+            name: Object.keys(roomDetails)[0],
+            specialization: roomDetails[Object.keys(roomDetails)[0]],
+          });
           setCurrentFilter(filter);
         }
-      }
-  
+      };
+
       fetchRoomData();
     }
-  }, [filter])
+  }, [filter]);
 
   // fetch values for the sections - nakabase don sa year sections
   useEffect(() => {
     const fetchYearSectionsData = async () => {
-      const res = await fetch("http://localhost:8080/year_sections/CS");
+      const department = localStorage.getItem("department") ?? "CS";
+      const res = await fetch(
+        `http://localhost:8080/year_sections/${department}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          },
+        }
+      );
       const data = await res.json();
 
       if (res.ok) {
@@ -271,12 +324,18 @@ const ViewSchedule = () => {
     };
 
     fetchYearSectionsData();
-    console.log(yearSections)
+    console.log(yearSections);
   }, []);
-  
+
   useEffect(() => {
-    setCurrentValue({label: Object.keys(yearSections)[0], specialization: yearSections[Object.keys(yearSections)[0]]?.specialization === 'none' ? '' : yearSections[Object.keys(yearSections)[0]]?.specialization})
-  }, [yearSections])
+    setCurrentValue({
+      label: Object.keys(yearSections)[0],
+      specialization:
+        yearSections[Object.keys(yearSections)[0]]?.specialization === "none"
+          ? ""
+          : yearSections[Object.keys(yearSections)[0]]?.specialization,
+    });
+  }, [yearSections]);
 
   return (
     <div className="w-full bg-transparent py-4 px-16">
@@ -285,7 +344,9 @@ const ViewSchedule = () => {
         <div className="flex items-center gap-3">
           <div className="font-CyGrotesk text-primary text-[40px] truncate">
             {/* {currentSection.code} */}
-            {currentFilter === 'Section' ? currentValue.label : currentValue.name}
+            {currentFilter === "Section"
+              ? currentValue.label
+              : currentValue.name}
           </div>
           <div className="font-Helvetica-Neue-Heavy bg-custom_yellow px-3 py-1 rounded-3xl">
             {currentValue?.specialization}
@@ -352,76 +413,82 @@ const ViewSchedule = () => {
 
           {/* Dropdown Selector */}
           <div className="relative inline-block">
-            {currentFilter === "Section" && <select
-              className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
-              value={currentValue.label}
-              onChange={(e) =>
-                setCurrentValue({
-                  label: e.target.value,
-                  specialization: yearSections[e.target.value].specialization,
-                })
-              }
-            >
-              <option value="" disabled>
-                Select a Section
-              </option>
-              {Object.keys(yearSections).map((section, index) => {
-                console.log(section);
-                return (
-                  <option key={index} value={section} className="py-2">
-                    {section}
-                  </option>
-                );
-              })}
-            </select>}
+            {currentFilter === "Section" && (
+              <select
+                className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
+                value={currentValue.label}
+                onChange={(e) =>
+                  setCurrentValue({
+                    label: e.target.value,
+                    specialization: yearSections[e.target.value].specialization,
+                  })
+                }
+              >
+                <option value="" disabled>
+                  Select a Section
+                </option>
+                {Object.keys(yearSections).map((section, index) => {
+                  console.log(section);
+                  return (
+                    <option key={index} value={section} className="py-2">
+                      {section}
+                    </option>
+                  );
+                })}
+              </select>
+            )}
 
-            {currentFilter === "Professor" && <select
-              className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
-              value={currentValue.label}
-              onChange={(e: any) =>
-                setCurrentValue({
-                  label: e.target.value,
-                  specialization: "",
-                  name: profDetails[e.target.value]
-                })
-              }
-            >
-              <option value="" disabled>
-                Select a Section
-              </option>
-              {Object.keys(profDetails).map((tasId, index) => {
-                let tasName = profDetails[tasId]
-                return (
-                  <option key={index} value={tasId} className="py-2">
-                    {tasName}
-                  </option>
-                );
-              })}
-            </select>}
+            {currentFilter === "Professor" && (
+              <select
+                className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
+                value={currentValue.label}
+                onChange={(e: any) =>
+                  setCurrentValue({
+                    label: e.target.value,
+                    specialization: "",
+                    name: profDetails[e.target.value],
+                  })
+                }
+              >
+                <option value="" disabled>
+                  Select a Section
+                </option>
+                {Object.keys(profDetails).map((tasId, index) => {
+                  let tasName = profDetails[tasId];
+                  return (
+                    <option key={index} value={tasId} className="py-2">
+                      {tasName}
+                    </option>
+                  );
+                })}
+              </select>
+            )}
 
-            {currentFilter === "Room" && <select
-              className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
-              value={currentValue.label}
-              onChange={(e: any) =>
-                setCurrentValue({
-                  label: e.target.value,
-                  specialization: roomDetails[e.target.value],
-                  name: e.target.value
-                })
-              }
-            >
-              <option value="" disabled>
-                Select a Section
-              </option>
-              {Object.keys(roomDetails).map((roomId, index) => {
-                console.log(typeof roomId)
-                return (
-                  <option key={index} value={roomId} className="py-2">
-                    {roomId}
-                  </option>
-                );
-              })}
-            </select>}
+            {currentFilter === "Room" && (
+              <select
+                className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
+                value={currentValue.label}
+                onChange={(e: any) =>
+                  setCurrentValue({
+                    label: e.target.value,
+                    specialization: roomDetails[e.target.value],
+                    name: e.target.value,
+                  })
+                }
+              >
+                <option value="" disabled>
+                  Select a Section
+                </option>
+                {Object.keys(roomDetails).map((roomId, index) => {
+                  console.log(typeof roomId);
+                  return (
+                    <option key={index} value={roomId} className="py-2">
+                      {roomId}
+                    </option>
+                  );
+                })}
+              </select>
+            )}
 
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
               <svg
