@@ -268,7 +268,8 @@ const InputRooms = () => {
   // CONNECTIONS TO DB
   useEffect(() => {
     const getRooms = async () => {
-      const res = await fetch("http://localhost:8080/rooms/CS", {
+      const department = localStorage.getItem('department') ?? 'CS'
+      const res = await fetch(`http://localhost:8080/rooms/${department}`, {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`,
         }

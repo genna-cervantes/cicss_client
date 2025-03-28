@@ -40,7 +40,8 @@ const InputSectionCounts: React.FC = () => {
   // fetch data
   useEffect(() => {
     const fetchYearSectionsData = async () => {
-      const res = await fetch("http://localhost:8080/year_sections/CS", {
+      const department = localStorage.getItem('department') ?? 'CS'
+      const res = await fetch(`http://localhost:8080/year_sections/${department}`, {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem("token") ?? ""}`
         }

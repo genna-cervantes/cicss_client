@@ -269,7 +269,8 @@ const InputYLT = () => {
         transformedRestrictions[res.day] = [...transformedRestrictions[res.day], ...transformedStartEndTimes]
       })
 
-      const res = await fetch(`http://localhost:8080/yltconstraints/CS/${yearLevel}`, {
+      const department = localStorage.getItem('department') ?? 'CS'
+      const res = await fetch(`http://localhost:8080/yltconstraints/${department}/${yearLevel}`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem(("token")) ?? ''}`,
@@ -289,9 +290,10 @@ const InputYLT = () => {
   // fetch data
   useEffect(() => {
     const fetchYLTData = async () => {
+      const department = localStorage.getItem('department') ?? 'CS'
       for (let i = 1; i < 5; i++) {
         const res = await fetch(
-          `http://localhost:8080/yltconstraints/CS/${i}`,
+          `http://localhost:8080/yltconstraints/${department}/${i}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,

@@ -150,7 +150,8 @@ const InputYLD: React.FC = () => {
           maxDays: updYearLevel.maxDays
         }
 
-        const res = await fetch(`http://localhost:8080/yldconstraint/CS/${updYearLevel.year}`, {
+        const department = localStorage.getItem('department') ?? 'CS'
+        const res = await fetch(`http://localhost:8080/yldconstraint/${department}/${updYearLevel.year}`, {
           method: 'PUT',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -172,8 +173,9 @@ const InputYLD: React.FC = () => {
   // fetch data
   useEffect(() => {
     const fetchYLDData = async () => {
+      const department = localStorage.getItem('department') ?? 'CS'
       for (let i = 1; i < 5; i++){
-        const res = await fetch(`http://localhost:8080/yldconstraint/CS/${i}`, {
+        const res = await fetch(`http://localhost:8080/yldconstraint/${department}/${i}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem("token") ?? ''}`
           }

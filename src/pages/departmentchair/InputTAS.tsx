@@ -597,7 +597,8 @@ const InputTAS: React.FC = () => {
   useEffect(() => {
     const getTASConstraints = async () => {
       console.log("getting tas constraints");
-      const res = await fetch("http://localhost:8080/tasconstraints/CS", {
+      const department = localStorage.getItem('department') ?? 'CS'
+      const res = await fetch(`http://localhost:8080/tasconstraints/${department}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
         },

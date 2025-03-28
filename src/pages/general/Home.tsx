@@ -43,60 +43,28 @@ const Home = () => {
       const data = await res.json();
 
       if (res.ok){
-        let {token, role} = data;
+        let {token, role, department} = data;
         setRole(role);
         localStorage.setItem("role", role);
         localStorage.setItem("token", token);
+        if (department) localStorage.setItem("department", department);
 
         switch (role) {
           case "Department Chair":
             navigate("/departmentchair");
             return;
-            break;
           case "TAS":
             navigate("/tas");
             return;
-            break;
           case "Student":
             navigate("/student");
             return;
-            break;
           default:
             navigate("/");
         }
       }else{
         console.log('may error sisiy')
       }
-
-      // // if department chair
-      // let isDepartmentChair = await checkIfCICSDepartmentChair(userInfo.email);
-      // // console.log(isDepartmentChair);
-      // if (isDepartmentChair) {
-      //   // redirect to dept chair view
-      //   // write sa local storage
-      //   setRole("department-chair");
-      //   localStorage.setItem("role", "department-chair");
-      //   navigate("/departmentchair");
-      //   return;
-      // }
-
-      // // if prof
-      // if (await checkIfCICSTAS(userInfo.email)) {
-      //   // redirect to dept chair view
-      //   setRole("tas");
-      //   localStorage.setItem("role", "tas");
-      //   navigate("/tas");
-      //   return;
-      // }
-
-      // // if student
-      // if (checkIfCICSStudent(userInfo.email)) {
-      //   // redirect to dept chair view
-      //   setRole("student");
-      //   localStorage.setItem("role", "student");
-      //   navigate("/student");
-      //   return;
-      // }
     },
   });
 

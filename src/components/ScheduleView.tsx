@@ -134,8 +134,9 @@ const ScheduleView = ({
       console.log(section);
 
       const fetchSchedule = async () => {
+        const department = localStorage.getItem('department') ?? 'CS'
         const res = await fetch(
-          `http://localhost:3000/schedule/class/CS/${year}/${section}`
+          `http://localhost:3000/schedule/class/${department}/${year}/${section}`
         ); // DEFAULT NA CS MUNA
         const data = await res.json();
         let sched = data;

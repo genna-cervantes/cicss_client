@@ -327,8 +327,9 @@ const InputCourseOfferings = () => {
           totalUnits: course.unit,
         };
 
+        const department = localStorage.getItem('department') ?? 'CS'
         const res = await fetch(
-          `http://localhost:8080/courseofferings/${course.yearLevel}/2/CS`,
+          `http://localhost:8080/courseofferings/${course.yearLevel}/2/${department}`,
           {
             method: "POST",
             headers: {
@@ -368,8 +369,9 @@ const InputCourseOfferings = () => {
           }),
         };
 
+        const department = localStorage.getItem('department') ?? 'CS'
         const res = await fetch(
-          `http://localhost:8080/courseofferings/${updatedCourses[i].yearLevel}/2/CS`,
+          `http://localhost:8080/courseofferings/${updatedCourses[i].yearLevel}/2/${department}`,
           {
             method: "PUT",
             headers: {
@@ -391,11 +393,11 @@ const InputCourseOfferings = () => {
 
     // save deleted courses
     const deleteCourseData = async () => {
+      const department = localStorage.getItem('department') ?? 'CS'
       for (let i = 0; i < deletedCourses.length; i++) {
         let reqObj = deletedCourses[i];
-
         const res = await fetch(
-          `http://localhost:8080/courseofferings/${deletedCourses[i].yearLevel}/2/CS`,
+          `http://localhost:8080/courseofferings/${deletedCourses[i].yearLevel}/2/${department}`,
           {
             method: "DELETE",
             headers: {
@@ -420,9 +422,10 @@ const InputCourseOfferings = () => {
   useEffect(() => {
     const fetchCourseData = async () => {
       try {
+        const department = localStorage.getItem('department') ?? 'CS'
         for (let i = 1; i < 5; i++) {
           const res = await fetch(
-            `http://localhost:8080/courseofferings/${i}/2/CS`,
+            `http://localhost:8080/courseofferings/${i}/2/${department}`,
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
