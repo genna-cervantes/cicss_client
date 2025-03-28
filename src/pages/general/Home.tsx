@@ -20,11 +20,11 @@ const Home = () => {
   const navigate = useNavigate();
 
   switch (role) {
-    case "department-chair":
+    case "Department Chair":
       return <Navigate to="/departmentchair" />;
-    case "tas":
+    case "TAS":
       return <Navigate to="/tas" />;
-    case "student":
+    case "Student":
       return <Navigate to="/student" />;
   }
 

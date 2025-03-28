@@ -1,15 +1,19 @@
 import cicss_logo from "../assets/cicss_logo.png";
 import logout_logo from "../assets/logout_logo.png";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAppContext } from "../context/AppContext";
 
 const Header = () => {
 
   const navigate = useNavigate()
+  const { setRole } = useAppContext();
 
   const handleLogout = () => {
     console.log('logout')
+    setRole("")
     localStorage.removeItem('role')
-    navigate(0)
+    localStorage.removeItem('token')
+    navigate('/')
   }
 
   return (
