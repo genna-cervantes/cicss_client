@@ -96,17 +96,41 @@ const InputTAS: React.FC = () => {
     return dayOptions.filter((option) => !selectedDays.includes(option.value));
   };
 
+  const [nameErrors, setNameErrors] = useState<{ [key: number]: string }>({});
+
   // handler for text fields on the TAS level (name)
   const handleTASFieldChange = (
     tasIndex: number,
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+
+    // For name field, check if it contains at least two words
+    if (name === "name") {
+      const trimmedValue = value.trim();
+      const isValid = trimmedValue.includes(" ");
+
+      if (!isValid && trimmedValue !== "") {
+        setNameErrors((prev) => ({
+          ...prev,
+          [tasIndex]: "Full name required (First & Last name)",
+        }));
+      } else {
+        setNameErrors((prev) => {
+          const updated = { ...prev };
+          delete updated[tasIndex];
+          return updated;
+        });
+      }
+    }
+
+    // Always update the state to maintain responsiveness
     setTasList((prev) => {
       const updated = [...prev];
       updated[tasIndex] = { ...updated[tasIndex], [name]: value };
       return updated;
     });
+
     if (tasList[tasIndex].tasId.startsWith("PF")) {
       setUpdatedTAS((prev) => {
         return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
@@ -461,6 +485,18 @@ const InputTAS: React.FC = () => {
   // LOOP THRU HTE TRACKERS AND QUERY NECESSARY ENDPOINT
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
+
+    // Check if any TAS has an invalid name (empty or single word)
+    const hasInvalidName = tasList.some((tas) => {
+      const trimmedName = tas.name.trim();
+      return trimmedName === "" || !trimmedName.includes(" ");
+    });
+
+    if (hasInvalidName) {
+      alert("All TAS entries must have a full name (first and last name)");
+      return;
+    }
+
     // UPDATES
     // check if may nagbago b talaga
     console.log("UPDATING");
@@ -741,9 +777,18 @@ const InputTAS: React.FC = () => {
                           name="name"
                           value={tas.name}
                           onChange={(e) => handleTASFieldChange(tasIndex, e)}
-                          placeholder="Enter"
-                          className="h-[38px] border border-primary rounded-[5px] px-2 w-[200px]"
+                          placeholder="Enter full name"
+                          className={`h-[38px] border ${
+                            nameErrors[tasIndex]
+                              ? "border-red-500"
+                              : "border-primary"
+                          } rounded-[5px] px-2 w-[200px]`}
                         />
+                        {nameErrors[tasIndex] && (
+                          <div className="text-red-500 text-xs mt-1">
+                            {nameErrors[tasIndex]}
+                          </div>
+                        )}
                       </div>
 
                       {/* TAS units */}
