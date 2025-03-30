@@ -12,6 +12,7 @@ import ScrollButton from "../../components/ScrollButton";
 interface TimeEntry {
   start: string;
   end: string;
+  error?: string;
 }
 
 interface Request {
@@ -76,6 +77,10 @@ const InputTAS: React.FC = () => {
   const [insertedTAS, setInsertedTas] = useState<string[]>([]);
   const [deletedTAS, setDeletedTAS] = useState<string[]>([]);
 
+  const [timeErrors, setTimeErrors] = useState<{
+    [key: number]: { [key: number]: { [key: number]: string } };
+  }>({});
+
   useEffect(() => {
     console.log("updated tas ids: ", updatedTAS);
   }, [updatedTAS]);
@@ -84,7 +89,6 @@ const InputTAS: React.FC = () => {
     console.log("deleted tas ids: ", deletedTAS);
   }, [deletedTAS]);
 
-  // Function to get available day options (days that haven't been selected yet for this TAS)
   const getAvailableDayOptions = (
     tasIndex: number,
     currentReqIndex: number
@@ -98,6 +102,55 @@ const InputTAS: React.FC = () => {
 
   const [nameErrors, setNameErrors] = useState<{ [key: number]: string }>({});
 
+  // Function to validate time entries
+  const validateTimeEntry = (
+    tasIndex: number,
+    requestIndex: number,
+    timeIndex: number,
+    startTime: string,
+    endTime: string
+  ): string => {
+    if (!startTime || !endTime) return "";
+
+    const startMinutes = convertTimeToMinutes(startTime);
+    const endMinutes = convertTimeToMinutes(endTime);
+
+    if (endMinutes <= startMinutes) {
+      return "End time must be after start time";
+    }
+
+    // Check for overlapping time slots within the same day
+    const currentRestriction = tasList[tasIndex].restrictions[requestIndex];
+    for (let i = 0; i < currentRestriction.startEndTimes.length; i++) {
+      if (i === timeIndex) continue;
+
+      const otherStart = convertTimeToMinutes(
+        currentRestriction.startEndTimes[i].start
+      );
+      const otherEnd = convertTimeToMinutes(
+        currentRestriction.startEndTimes[i].end
+      );
+
+      if (
+        otherStart &&
+        otherEnd &&
+        ((startMinutes >= otherStart && startMinutes < otherEnd) ||
+          (endMinutes > otherStart && endMinutes <= otherEnd) ||
+          (startMinutes <= otherStart && endMinutes >= otherEnd))
+      ) {
+        return "Time slots cannot overlap";
+      }
+    }
+
+    return "";
+  };
+
+  const convertTimeToMinutes = (timeStr: string): number => {
+    if (!timeStr) return 0;
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    return hours * 60 + minutes;
+  };
+
   // handler for text fields on the TAS level (name)
   const handleTASFieldChange = (
     tasIndex: number,
@@ -105,7 +158,7 @@ const InputTAS: React.FC = () => {
   ) => {
     const { name, value } = e.target;
 
-    // For name field, check if it contains at least two words
+    // For name field it should contain at least two words
     if (name === "name") {
       const trimmedValue = value.trim();
       const isValid = trimmedValue.includes(" ");
@@ -124,7 +177,6 @@ const InputTAS: React.FC = () => {
       }
     }
 
-    // Always update the state to maintain responsiveness
     setTasList((prev) => {
       const updated = [...prev];
       updated[tasIndex] = { ...updated[tasIndex], [name]: value };
@@ -173,14 +225,18 @@ const InputTAS: React.FC = () => {
   };
 
   const handleUnitsFieldChange = (tasIndex: number, unitsValue: number) => {
+    // value must between 0 and 30
+    const validValue = Math.min(Math.max(0, unitsValue), 30);
+
     setTasList((prev) => {
       const updated = [...prev];
       updated[tasIndex] = {
         ...updated[tasIndex],
-        units: unitsValue,
+        units: validValue,
       };
       return updated;
     });
+
     if (tasList[tasIndex].tasId.startsWith("PF")) {
       setUpdatedTAS((prev) => {
         return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
@@ -240,6 +296,7 @@ const InputTAS: React.FC = () => {
     e: ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
+
     setTasList((prev) => {
       const updated = [...prev];
       const updatedRequests = [...updated[tasIndex].restrictions];
@@ -258,6 +315,96 @@ const InputTAS: React.FC = () => {
       };
       return updated;
     });
+
+    const updatedTime = {
+      ...tasList[tasIndex].restrictions[requestIndex].startEndTimes[timeIndex],
+      [name]: value,
+    };
+
+    const startTime = name === "start" ? value : updatedTime.start;
+    const endTime = name === "end" ? value : updatedTime.end;
+
+    if (startTime && endTime) {
+      let error = "";
+      const startMinutes = convertTimeToMinutes(startTime);
+      const endMinutes = convertTimeToMinutes(endTime);
+
+      if (endMinutes <= startMinutes) {
+        error = "End time must be after start time";
+      } else if (endMinutes - startMinutes < 30) {
+        //change depende sa ano dapat
+        error = "Time slot must be at least 30 minutes";
+      } else if (endMinutes - startMinutes > 300) {
+        //change depende sa ano dapat
+        error = "Time slot cannot exceed 5 hours";
+      }
+      if (!error) {
+        for (
+          let i = 0;
+          i < tasList[tasIndex].restrictions[requestIndex].startEndTimes.length;
+          i++
+        ) {
+          if (i === timeIndex) continue;
+
+          const otherTime =
+            tasList[tasIndex].restrictions[requestIndex].startEndTimes[i];
+          if (!otherTime.start || !otherTime.end) continue;
+
+          const otherStart = convertTimeToMinutes(otherTime.start);
+          const otherEnd = convertTimeToMinutes(otherTime.end);
+
+          // Check for overlap
+          if (
+            (startMinutes >= otherStart && startMinutes < otherEnd) ||
+            (endMinutes > otherStart && endMinutes <= otherEnd) ||
+            (startMinutes <= otherStart && endMinutes >= otherEnd)
+          ) {
+            error = "Time slots cannot overlap";
+            break;
+          }
+        }
+      }
+
+      // Check for valid time window (7am-9pm)
+      const earliestAllowedTime = 7 * 60; // 7:00 AM (depende pa)
+      const latestAllowedTime = 21 * 60; // 9:00 PM (depende pa)
+
+      if (!error) {
+        if (startMinutes < earliestAllowedTime) {
+          error = "Start time cannot be earlier than 7:00 AM";
+        } else if (endMinutes > latestAllowedTime) {
+          error = "End time cannot be later than 9:00 PM";
+        }
+      }
+      setTimeErrors((prev) => {
+        const updatedErrors = { ...prev };
+
+        if (!updatedErrors[tasIndex]) {
+          updatedErrors[tasIndex] = {};
+        }
+
+        if (!updatedErrors[tasIndex][requestIndex]) {
+          updatedErrors[tasIndex][requestIndex] = {};
+        }
+
+        if (error) {
+          updatedErrors[tasIndex][requestIndex][timeIndex] = error;
+        } else {
+          delete updatedErrors[tasIndex][requestIndex][timeIndex];
+
+          if (Object.keys(updatedErrors[tasIndex][requestIndex]).length === 0) {
+            delete updatedErrors[tasIndex][requestIndex];
+          }
+
+          if (Object.keys(updatedErrors[tasIndex]).length === 0) {
+            delete updatedErrors[tasIndex];
+          }
+        }
+
+        return updatedErrors;
+      });
+    }
+
     if (tasList[tasIndex].tasId.startsWith("PF")) {
       setUpdatedTAS((prev) => {
         return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
@@ -280,6 +427,30 @@ const InputTAS: React.FC = () => {
   // Handler to add a new day (request) to a specific TAS form
   const handleTASAddDay = (tasIndex: number, e: FormEvent) => {
     e.preventDefault();
+
+    // Check if there are any existing restrictions with invalid data
+    const hasExistingErrors =
+      Object.keys(timeErrors[tasIndex] || {}).length > 0;
+    const hasEmptyDays = tasList[tasIndex].restrictions.some(
+      (restriction) =>
+        restriction.day === "" &&
+        restriction.startEndTimes.some((time) => time.start || time.end)
+    );
+
+    const hasIncompleteTime = tasList[tasIndex].restrictions.some(
+      (restriction) =>
+        restriction.startEndTimes.some(
+          (time) => (time.start && !time.end) || (!time.start && time.end)
+        )
+    );
+
+    if (hasExistingErrors || hasEmptyDays || hasIncompleteTime) {
+      alert(
+        "Please fix existing validation errors before adding a new time restriction"
+      );
+      return;
+    }
+
     setTasList((prev) => {
       const updated = [...prev];
       updated[tasIndex] = {
@@ -291,6 +462,7 @@ const InputTAS: React.FC = () => {
       };
       return updated;
     });
+
     if (tasList[tasIndex].tasId.startsWith("PF")) {
       setUpdatedTAS((prev) => {
         return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
@@ -331,6 +503,21 @@ const InputTAS: React.FC = () => {
       return updated;
     });
 
+    // Clear any errors for the deleted restriction
+    setTimeErrors((prev) => {
+      if (prev[tasIndex] && prev[tasIndex][requestIndex]) {
+        const updatedErrors = { ...prev };
+        delete updatedErrors[tasIndex][requestIndex];
+
+        if (Object.keys(updatedErrors[tasIndex]).length === 0) {
+          delete updatedErrors[tasIndex];
+        }
+
+        return updatedErrors;
+      }
+      return prev;
+    });
+
     if (tasList[tasIndex].tasId.startsWith("PF")) {
       setUpdatedTAS((prev) => {
         return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
@@ -352,6 +539,25 @@ const InputTAS: React.FC = () => {
 
   // Handler to add a new time entry to a specific TAS request
   const handleTASAddTime = (tasIndex: number, requestIndex: number) => {
+    const hasExistingErrors =
+      Object.keys(timeErrors[tasIndex]?.[requestIndex] || {}).length > 0;
+
+    const hasIncompleteTime = tasList[tasIndex].restrictions[
+      requestIndex
+    ].startEndTimes.some(
+      (time) => (time.start && !time.end) || (!time.start && time.end)
+    );
+
+    if (hasExistingErrors || hasIncompleteTime) {
+      alert("Please fix existing time entries before adding a new one");
+      return;
+    }
+
+    if (!tasList[tasIndex].restrictions[requestIndex].day) {
+      alert("Please select a day before adding time slots");
+      return;
+    }
+
     setTasList((prev) => {
       const updated = [...prev];
       const updatedRequests = [...updated[tasIndex].restrictions];
@@ -368,6 +574,7 @@ const InputTAS: React.FC = () => {
       };
       return updated;
     });
+
     if (tasList[tasIndex].tasId.startsWith("PF")) {
       setUpdatedTAS((prev) => {
         return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
@@ -410,6 +617,30 @@ const InputTAS: React.FC = () => {
       };
       return updated;
     });
+
+    // Clear any errors for the deleted time entry
+    setTimeErrors((prev) => {
+      if (
+        prev[tasIndex] &&
+        prev[tasIndex][requestIndex] &&
+        prev[tasIndex][requestIndex][timeIndex]
+      ) {
+        const updatedErrors = { ...prev };
+        delete updatedErrors[tasIndex][requestIndex][timeIndex];
+
+        if (Object.keys(updatedErrors[tasIndex][requestIndex]).length === 0) {
+          delete updatedErrors[tasIndex][requestIndex];
+        }
+
+        if (Object.keys(updatedErrors[tasIndex]).length === 0) {
+          delete updatedErrors[tasIndex];
+        }
+
+        return updatedErrors;
+      }
+      return prev;
+    });
+
     if (tasList[tasIndex].tasId.startsWith("PF")) {
       setUpdatedTAS((prev) => {
         return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
@@ -440,7 +671,7 @@ const InputTAS: React.FC = () => {
         name: "",
         units: 0,
         courses: [],
-        restrictions: [], // Start with empty restrictions array for new TAS
+        restrictions: [],
       },
     ]);
     setInsertedTas((prev) => [...prev, tempId]);
@@ -450,11 +681,22 @@ const InputTAS: React.FC = () => {
   const handleDeleteTAS = (tasIndex: number) => {
     setTasList((prev) => prev.filter((_, i) => i !== tasIndex));
     setDeletedTAS((prev) => [...prev, tasList[tasIndex].tasId]);
+
+    // Clear any errors for the deleted TAS
+    setTimeErrors((prev) => {
+      if (prev[tasIndex]) {
+        const updatedErrors = { ...prev };
+        delete updatedErrors[tasIndex];
+        return updatedErrors;
+      }
+      return prev;
+    });
   };
 
   // Handler to add the first day/time restriction when none exist
   const handleAddFirstRestriction = (tasIndex: number, e: FormEvent) => {
     e.preventDefault();
+
     setTasList((prev) => {
       const updated = [...prev];
       updated[tasIndex] = {
@@ -463,6 +705,16 @@ const InputTAS: React.FC = () => {
       };
       return updated;
     });
+
+    setTimeErrors((prev) => {
+      if (prev[tasIndex]) {
+        const updatedErrors = { ...prev };
+        delete updatedErrors[tasIndex];
+        return updatedErrors;
+      }
+      return prev;
+    });
+
     if (tasList[tasIndex].tasId.startsWith("PF")) {
       setUpdatedTAS((prev) => {
         return prev.some((item) => item.tasId === tasList[tasIndex].tasId)
@@ -482,6 +734,11 @@ const InputTAS: React.FC = () => {
     }
   };
 
+  // Function to check if there are any time validation errors
+  const hasTimeValidationErrors = (): boolean => {
+    return Object.keys(timeErrors).length > 0;
+  };
+
   // LOOP THRU HTE TRACKERS AND QUERY NECESSARY ENDPOINT
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
@@ -494,6 +751,59 @@ const InputTAS: React.FC = () => {
 
     if (hasInvalidName) {
       alert("All TAS entries must have a full name (first and last name)");
+      return;
+    }
+
+    // Check if there are any time validation errors
+    if (hasTimeValidationErrors()) {
+      alert("Please fix all time validation errors before saving");
+      return;
+    }
+
+    // Manual validation check for invalid time entries
+    const hasInvalidTimeEntries = tasList.some((tas, tasIndex) =>
+      tas.restrictions.some((restriction, reqIndex) =>
+        restriction.startEndTimes.some((time, timeIndex) => {
+          if (time.start && time.end) {
+            const startMinutes = convertTimeToMinutes(time.start);
+            const endMinutes = convertTimeToMinutes(time.end);
+            return endMinutes <= startMinutes;
+          }
+          return false;
+        })
+      )
+    );
+
+    if (hasInvalidTimeEntries) {
+      alert("End time must be after start time in all time entries");
+      return;
+    }
+
+    const hasEmptyDays = tasList.some((tas) =>
+      tas.restrictions.some(
+        (restriction) =>
+          restriction.day === "" &&
+          restriction.startEndTimes.some((time) => time.start || time.end)
+      )
+    );
+
+    if (hasEmptyDays) {
+      alert("Please select a day for all time restrictions");
+      return;
+    }
+
+    const hasEmptyTimes = tasList.some((tas) =>
+      tas.restrictions.some((restriction) =>
+        restriction.startEndTimes.some(
+          (time) => (time.start && !time.end) || (!time.start && time.end)
+        )
+      )
+    );
+
+    if (hasEmptyTimes) {
+      alert(
+        "Please fill in both start and end times for all time restrictions"
+      );
       return;
     }
 
@@ -891,7 +1201,13 @@ const InputTAS: React.FC = () => {
                                                   e
                                                 )
                                               }
-                                              className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                                              className={`h-[38px] border w-[130px] ${
+                                                timeErrors[tasIndex]?.[
+                                                  reqIndex
+                                                ]?.[timeIndex]
+                                                  ? "border-red-500"
+                                                  : "border-primary"
+                                              } rounded-[5px] py-1 px-2`}
                                             />
                                           </div>
 
@@ -911,7 +1227,13 @@ const InputTAS: React.FC = () => {
                                                   e
                                                 )
                                               }
-                                              className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                                              className={`h-[38px] border w-[130px] ${
+                                                timeErrors[tasIndex]?.[
+                                                  reqIndex
+                                                ]?.[timeIndex]
+                                                  ? "border-red-500"
+                                                  : "border-primary"
+                                              } rounded-[5px] py-1 px-2`}
                                             />
                                           </div>
 
@@ -946,6 +1268,18 @@ const InputTAS: React.FC = () => {
                                               <img src={add_button} alt="Add" />
                                             </button>
                                           </div>
+
+                                          {timeErrors[tasIndex]?.[reqIndex]?.[
+                                            timeIndex
+                                          ] && (
+                                            <div className="text-red-500 text-xs absolute mt-[70px] ml-1">
+                                              {
+                                                timeErrors[tasIndex][reqIndex][
+                                                  timeIndex
+                                                ]
+                                              }
+                                            </div>
+                                          )}
                                         </div>
                                       )
                                     )
