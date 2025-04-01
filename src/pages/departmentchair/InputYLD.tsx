@@ -75,26 +75,28 @@ const InputYLD: React.FC = () => {
       maxDays: "",
     },
   ]);
-  const [updatedYearLevels, setUpdatedYearLevels] = useState<YearLevelData[]>([])
+  const [updatedYearLevels, setUpdatedYearLevels] = useState<YearLevelData[]>(
+    []
+  );
 
-  const handleUpdate = ({updatedYld}: {updatedYld: YearLevelData}) => {
+  const handleUpdate = ({ updatedYld }: { updatedYld: YearLevelData }) => {
     setUpdatedYearLevels((prev) => {
-      let newYearLevels = [...prev]
-      let index = prev.findIndex((yld) => yld.year === updatedYld.year)
-      if (index === -1){
-        newYearLevels.push({...updatedYld})
-      }else{
-        newYearLevels[index] = {...updatedYld}
+      let newYearLevels = [...prev];
+      let index = prev.findIndex((yld) => yld.year === updatedYld.year);
+      if (index === -1) {
+        newYearLevels.push({ ...updatedYld });
+      } else {
+        newYearLevels[index] = { ...updatedYld };
       }
-      
+
       return newYearLevels;
-    })
-  }
+    });
+  };
 
   useEffect(() => {
-    console.log('updated ylds')
-    console.log(updatedYearLevels)
-  }, [updatedYearLevels])
+    console.log("updated ylds");
+    console.log(updatedYearLevels);
+  }, [updatedYearLevels]);
 
   // Handle checkbox change
   const handleDayChange = (
@@ -111,7 +113,7 @@ const InputYLD: React.FC = () => {
         },
       };
 
-      handleUpdate({updatedYld: newState[yearIndex]})
+      handleUpdate({ updatedYld: newState[yearIndex] });
 
       return newState;
     });
@@ -126,7 +128,7 @@ const InputYLD: React.FC = () => {
         maxDays: value,
       };
 
-      handleUpdate({updatedYld: newState[yearIndex]})
+      handleUpdate({ updatedYld: newState[yearIndex] });
 
       return newState;
     });
@@ -138,86 +140,96 @@ const InputYLD: React.FC = () => {
 
     // handle updates
     const updateYLDData = async () => {
-      for (let i = 0; i < updatedYearLevels.length; i++){
+      for (let i = 0; i < updatedYearLevels.length; i++) {
         let updYearLevel: any = updatedYearLevels[i];
 
-        let allowedDaysKeys = Object.keys(updYearLevel.allowedDays)
-        let transformedAllowedDays: any = allowedDaysKeys.filter((key) => updYearLevel.allowedDays[key])
-        transformedAllowedDays = transformedAllowedDays.map((ad: string) => ad === 'SA' ? 'S' : ad)
+        let allowedDaysKeys = Object.keys(updYearLevel.allowedDays);
+        let transformedAllowedDays: any = allowedDaysKeys.filter(
+          (key) => updYearLevel.allowedDays[key]
+        );
+        transformedAllowedDays = transformedAllowedDays.map((ad: string) =>
+          ad === "SA" ? "S" : ad
+        );
 
         let transformedUpdYearLevel = {
           availableDays: transformedAllowedDays,
-          maxDays: updYearLevel.maxDays
-        }
+          maxDays: updYearLevel.maxDays,
+        };
 
-        const department = localStorage.getItem('department') ?? 'CS'
-        const res = await fetch(`http://localhost:8080/yldconstraint/${department}/${updYearLevel.year}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem("token") ?? ""}`,
-            'Content-type': 'application/json'
-          },
-          body: JSON.stringify(transformedUpdYearLevel)
-        })
+        const department = localStorage.getItem("department") ?? "CS";
+        const res = await fetch(
+          `http://localhost:8080/yldconstraint/${department}/${updYearLevel.year}`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+              "Content-type": "application/json",
+            },
+            body: JSON.stringify(transformedUpdYearLevel),
+          }
+        );
 
-        if (res.ok){
-          console.log('yey updated')
-        }else{
-          console.log('may error sis')
+        if (res.ok) {
+          console.log("yey updated");
+        } else {
+          console.log("may error sis");
         }
       }
-    }
+    };
     updateYLDData();
   };
 
   // fetch data
   useEffect(() => {
     const fetchYLDData = async () => {
-      const department = localStorage.getItem('department') ?? 'CS'
-      for (let i = 1; i < 5; i++){
-        const res = await fetch(`http://localhost:8080/yldconstraint/${department}/${i}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem("token") ?? ''}`
+      const department = localStorage.getItem("department") ?? "CS";
+      for (let i = 1; i < 5; i++) {
+        const res = await fetch(
+          `http://localhost:8080/yldconstraint/${department}/${i}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            },
           }
-        })
+        );
 
-        if (res.ok){
-          const data = await res.json()
+        if (res.ok) {
+          const data = await res.json();
           setYearLevels((prev) => {
-            let newYearLevels = [...prev]
+            let newYearLevels = [...prev];
             let index = prev.findIndex((yld) => yld.year === i);
             let newYld = {
               year: i,
               allowedDays: {
-                M: data.availableDays.includes('M'),
-                T: data.availableDays.includes('T'),
-                W: data.availableDays.includes('W'),
-                TH: data.availableDays.includes('TH'),
-                F: data.availableDays.includes('F'),
-                SA: data.availableDays.includes('S'),
+                M: data.availableDays.includes("M"),
+                T: data.availableDays.includes("T"),
+                W: data.availableDays.includes("W"),
+                TH: data.availableDays.includes("TH"),
+                F: data.availableDays.includes("F"),
+                SA: data.availableDays.includes("S"),
               },
-              maxDays: data.maxDays.toString()
-            }
+              maxDays: data.maxDays.toString(),
+            };
             newYearLevels[index] = newYld;
             return newYearLevels;
-          })
+          });
 
-          console.log(data)
-        }else{
-          console.log('error with fetching data')
+          console.log(data);
+        } else {
+          console.log("error with fetching data");
         }
       }
-    }
+    };
 
     fetchYLDData();
-  }, [])
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
       <div className="mx-auto py-10">
         <Navbar />
       </div>
-      <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center">
+      <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center justify-center">
         <div className="text-primary text-[35px]">
           Year Level - Day Constraints
         </div>
@@ -225,49 +237,47 @@ const InputYLD: React.FC = () => {
           1st Semester A.Y 2025-2026
         </div>
       </section>
-      <div className="flex text-center font-Manrope font-extrabold ml-[660px] mt-11 mb-7">
-        <p>
-          Allowed Days <p className="text-xs">(Check All That Applies)</p>
-        </p>
-        <p className="ml-[220px]">
-          Maximum Days Of <br /> Recurrence
-        </p>
-      </div>
 
       <form onSubmit={handleSave} className="flex flex-col mx-auto">
         <section>
           {yearLevels.map((level, index) => (
             <div
               key={index}
-              className="flex gap-20 items-center bg-[rgba(241,250,255,0.5)] rounded-xl p-9 shadow-lg mb-5 year-level"
+              className="flex flex-col bg-[rgba(241,250,255,0.5)] rounded-xl p-8 shadow-lg mb-5 mt-7"
             >
-              <p className="year-label">Year Level {level.year}</p>
-              <div className="flex">
-                <div className="flex gap-5 font-Manrope font-semibold">
-                  {days.map((day) => (
-                    <div key={day} className="flex gap-2 items-center">
-                      <p>{day}</p>
-                      <input
-                        type="checkbox"
-                        className="w-7 h-7 border border-primary"
-                        checked={level.allowedDays[day]}
-                        onChange={() => handleDayChange(index, day)}
-                        id={`checkbox-${level.year}-${day}`}
-                      />
-                    </div>
-                  ))}
-                </div>
+              <div className="flex font-Manrope font-extrabold text-primary mb-5">
+                <div className="ml-64 mr-5">Allowed Days</div>
+                <div className="ml-52">Max Days</div>
               </div>
-              <div className="flex gap-2 items-center">
-                <p>Max</p>
-                <input
-                  type="number"
-                  className="w-24 h-7 border border-primary rounded-sm p-2"
-                  value={level.maxDays}
-                  onChange={(e) => handleMaxDaysChange(index, e.target.value)}
-                  min="0"
-                  max="7"
-                />
+              <div className="flex gap-12 items-center ">
+                <p className="year-label">Year Level {level.year}</p>
+                <div className="flex">
+                  <div className="flex gap-3 font-Manrope font-semibold">
+                    {days.map((day) => (
+                      <div key={day} className="flex gap-2 items-center">
+                        <p>{day}</p>
+                        <input
+                          type="checkbox"
+                          className="w-7 h-7 border border-primary"
+                          checked={level.allowedDays[day]}
+                          onChange={() => handleDayChange(index, day)}
+                          id={`checkbox-${level.year}-${day}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex gap-2 items-center">
+                  <p>Max</p>
+                  <input
+                    type="number"
+                    className="w-24 h-7 border border-primary rounded-sm p-2"
+                    value={level.maxDays}
+                    onChange={(e) => handleMaxDaysChange(index, e.target.value)}
+                    min="0"
+                    max="7"
+                  />
+                </div>
               </div>
             </div>
           ))}

@@ -23,13 +23,6 @@ type YearLevels = {
   }[];
 };
 
-const yearLevelNames: Record<keyof YearLevels, string> = {
-  firstYear: "1st Year",
-  secondYear: "2nd Year",
-  thirdYear: "3rd Year",
-  fourthYear: "4th Year",
-};
-
 const selectStyles = {
   control: (provided: any) => ({
     ...provided,
@@ -49,12 +42,14 @@ const InputYLT = () => {
     fourthYear: [{ day: "", startEndTimes: [{ startTime: "", endTime: "" }] }],
   });
 
-  const [updatedYearLevels, setUpdatedYearLevels] = useState<{
-    [key: string]: {
-      day: string;
-      startEndTimes: { startTime: string; endTime: string }[];
-    }[];
-  }[]>([]);
+  const [updatedYearLevels, setUpdatedYearLevels] = useState<
+    {
+      [key: string]: {
+        day: string;
+        startEndTimes: { startTime: string; endTime: string }[];
+      }[];
+    }[]
+  >([]);
 
   useEffect(() => {
     console.log("updated");
@@ -103,12 +98,12 @@ const InputYLT = () => {
         break;
       default:
         yearLevel = 0;
-    }    
+    }
 
     setUpdatedYearLevels((prev) => {
       // Check if the yearLevel already exists in the array
       const existingIndex = prev.findIndex((item) => item[yearLevel]);
-    
+
       if (existingIndex !== -1) {
         // If the year level exists, update it
         return prev.map((item, index) =>
@@ -161,13 +156,13 @@ const InputYLT = () => {
         break;
       default:
         yearLevel = 0;
-    }    
+    }
 
     setUpdatedYearLevels((prev) => {
       // Check if the yearLevel already exists in the array
-      console.log(typeof prev)
+      console.log(typeof prev);
       const existingIndex = prev.findIndex((item) => item[yearLevel]);
-    
+
       if (existingIndex !== -1) {
         // If the year level exists, update it
         return prev.map((item, index) =>
@@ -220,12 +215,12 @@ const InputYLT = () => {
         break;
       default:
         yearLevel = 0;
-    }    
+    }
 
     setUpdatedYearLevels((prev) => {
       // Check if the yearLevel already exists in the array
       const existingIndex = prev.findIndex((item) => item[yearLevel]);
-    
+
       if (existingIndex !== -1) {
         // If the year level exists, update it
         return prev.map((item, index) =>
@@ -236,19 +231,18 @@ const InputYLT = () => {
         return [...prev, { [yearLevel]: updatedYear }];
       }
     });
-    
   };
 
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
 
-    console.log('saving')
-    console.log(updatedYearLevels)
+    console.log("saving");
+    console.log(updatedYearLevels);
 
     // Here you would typically send the data to your backend
-    for (let i = 0; i < updatedYearLevels.length; i++){
+    for (let i = 0; i < updatedYearLevels.length; i++) {
       let updatedYearLevel = updatedYearLevels[i];
-      let yearLevel = Object.keys(updatedYearLevel)[0]
+      let yearLevel = Object.keys(updatedYearLevel)[0];
 
       let transformedRestrictions: any = {
         M: [],
@@ -256,33 +250,39 @@ const InputYLT = () => {
         W: [],
         TH: [],
         F: [],
-        S: []
-      }
+        S: [],
+      };
 
       updatedYearLevel[yearLevel].forEach((res) => {
         let transformedStartEndTimes = res.startEndTimes.map((set) => {
           return {
-            start: `${set.startTime.slice(0,2)}${set.startTime.slice(3)}`,
-            end: `${set.endTime.slice(0,2)}${set.endTime.slice(3)}`,
-          }
-        })
-        transformedRestrictions[res.day] = [...transformedRestrictions[res.day], ...transformedStartEndTimes]
-      })
+            start: `${set.startTime.slice(0, 2)}${set.startTime.slice(3)}`,
+            end: `${set.endTime.slice(0, 2)}${set.endTime.slice(3)}`,
+          };
+        });
+        transformedRestrictions[res.day] = [
+          ...transformedRestrictions[res.day],
+          ...transformedStartEndTimes,
+        ];
+      });
 
-      const department = localStorage.getItem('department') ?? 'CS'
-      const res = await fetch(`http://localhost:8080/yltconstraints/${department}/${yearLevel}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem(("token")) ?? ''}`,
-          'Content-type': 'application/json'
-        },
-        body: JSON.stringify({restrictions: transformedRestrictions})
-      })
+      const department = localStorage.getItem("department") ?? "CS";
+      const res = await fetch(
+        `http://localhost:8080/yltconstraints/${department}/${yearLevel}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify({ restrictions: transformedRestrictions }),
+        }
+      );
 
-      if (res.ok){
-        console.log('yeyy okay')
-      }else{
-        console.log('error')
+      if (res.ok) {
+        console.log("yeyy okay");
+      } else {
+        console.log("error");
       }
     }
   };
@@ -290,7 +290,7 @@ const InputYLT = () => {
   // fetch data
   useEffect(() => {
     const fetchYLTData = async () => {
-      const department = localStorage.getItem('department') ?? 'CS'
+      const department = localStorage.getItem("department") ?? "CS";
       for (let i = 1; i < 5; i++) {
         const res = await fetch(
           `http://localhost:8080/yltconstraints/${department}/${i}`,
@@ -369,7 +369,7 @@ const InputYLT = () => {
       <div className="mx-auto py-10">
         <Navbar />
       </div>
-      <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center">
+      <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center justify-center">
         <div className="text-primary text-[35px]">
           Year Level - Time Constraints
         </div>
