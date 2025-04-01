@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 
 interface YearLevelData {
@@ -13,6 +13,15 @@ interface YearLevelData {
   };
   maxDays: string;
 }
+// Array of day labels
+const days: Array<keyof YearLevelData["allowedDays"]> = [
+  "M",
+  "T",
+  "W",
+  "TH",
+  "F",
+  "SA",
+];
 
 const InputYLD: React.FC = () => {
   // Initialize form state
@@ -66,6 +75,26 @@ const InputYLD: React.FC = () => {
       maxDays: "",
     },
   ]);
+  const [updatedYearLevels, setUpdatedYearLevels] = useState<YearLevelData[]>([])
+
+  const handleUpdate = ({updatedYld}: {updatedYld: YearLevelData}) => {
+    setUpdatedYearLevels((prev) => {
+      let newYearLevels = [...prev]
+      let index = prev.findIndex((yld) => yld.year === updatedYld.year)
+      if (index === -1){
+        newYearLevels.push({...updatedYld})
+      }else{
+        newYearLevels[index] = {...updatedYld}
+      }
+      
+      return newYearLevels;
+    })
+  }
+
+  useEffect(() => {
+    console.log('updated ylds')
+    console.log(updatedYearLevels)
+  }, [updatedYearLevels])
 
   // Handle checkbox change
   const handleDayChange = (
@@ -81,6 +110,9 @@ const InputYLD: React.FC = () => {
           [day]: !newState[yearIndex].allowedDays[day],
         },
       };
+
+      handleUpdate({updatedYld: newState[yearIndex]})
+
       return newState;
     });
   };
@@ -93,6 +125,9 @@ const InputYLD: React.FC = () => {
         ...newState[yearIndex],
         maxDays: value,
       };
+
+      handleUpdate({updatedYld: newState[yearIndex]})
+
       return newState;
     });
   };
@@ -101,55 +136,81 @@ const InputYLD: React.FC = () => {
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
 
-    const results = yearLevels.map((level) => {
-      const checkedDays = Object.entries(level.allowedDays)
-        .filter(([_, isChecked]) => isChecked)
-        .map(([day]) => day);
+    // handle updates
+    const updateYLDData = async () => {
+      for (let i = 0; i < updatedYearLevels.length; i++){
+        let updYearLevel: any = updatedYearLevels[i];
 
-      return {
-        year: `Year Level ${level.year}`,
-        checkedDays,
-        maxValue: level.maxDays || "Not Set",
-      };
-    });
+        let allowedDaysKeys = Object.keys(updYearLevel.allowedDays)
+        let transformedAllowedDays: any = allowedDaysKeys.filter((key) => updYearLevel.allowedDays[key])
+        transformedAllowedDays = transformedAllowedDays.map((ad: string) => ad === 'SA' ? 'S' : ad)
 
-    console.log("Year Level 1: ");
-    console.log(
-      "   Checked Days: ",
-      results[0].checkedDays.join(", ") || "None"
-    );
-    console.log("   Max Days: ", results[0].maxValue);
+        let transformedUpdYearLevel = {
+          availableDays: transformedAllowedDays,
+          maxDays: updYearLevel.maxDays
+        }
 
-    console.log("Year Level 2: ");
-    console.log(
-      "   Checked Days: ",
-      results[1].checkedDays.join(", ") || "None"
-    );
-    console.log("   Max Days: ", results[1].maxValue);
+        const department = localStorage.getItem('department') ?? 'CS'
+        const res = await fetch(`http://localhost:8080/yldconstraint/${department}/${updYearLevel.year}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem("token") ?? ""}`,
+            'Content-type': 'application/json'
+          },
+          body: JSON.stringify(transformedUpdYearLevel)
+        })
 
-    console.log("Year Level 3: ");
-    console.log(
-      "   Checked Days: ",
-      results[2].checkedDays.join(", ") || "None"
-    );
-    console.log("   Max Days: ", results[2].maxValue);
-
-    console.log("Year Level 4: ");
-    console.log(
-      "   Checked Days: ",
-      results[3].checkedDays.join(", ") || "None"
-    );
-    console.log("   Max Days: ", results[3].maxValue);
+        if (res.ok){
+          console.log('yey updated')
+        }else{
+          console.log('may error sis')
+        }
+      }
+    }
+    updateYLDData();
   };
-  // Array of day labels
-  const days: Array<keyof YearLevelData["allowedDays"]> = [
-    "M",
-    "T",
-    "W",
-    "TH",
-    "F",
-    "SA",
-  ];
+
+  // fetch data
+  useEffect(() => {
+    const fetchYLDData = async () => {
+      const department = localStorage.getItem('department') ?? 'CS'
+      for (let i = 1; i < 5; i++){
+        const res = await fetch(`http://localhost:8080/yldconstraint/${department}/${i}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem("token") ?? ''}`
+          }
+        })
+
+        if (res.ok){
+          const data = await res.json()
+          setYearLevels((prev) => {
+            let newYearLevels = [...prev]
+            let index = prev.findIndex((yld) => yld.year === i);
+            let newYld = {
+              year: i,
+              allowedDays: {
+                M: data.availableDays.includes('M'),
+                T: data.availableDays.includes('T'),
+                W: data.availableDays.includes('W'),
+                TH: data.availableDays.includes('TH'),
+                F: data.availableDays.includes('F'),
+                SA: data.availableDays.includes('S'),
+              },
+              maxDays: data.maxDays.toString()
+            }
+            newYearLevels[index] = newYld;
+            return newYearLevels;
+          })
+
+          console.log(data)
+        }else{
+          console.log('error with fetching data')
+        }
+      }
+    }
+
+    fetchYLDData();
+  }, [])
 
   return (
     <div className="min-h-screen flex flex-col">

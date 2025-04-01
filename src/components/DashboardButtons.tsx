@@ -11,15 +11,19 @@ const DashboardButtons: React.FC<DashboardButtonsProps> = ({ Label, Path }) => {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <div className="flex font-Manrope font-bold bg-custom_lightblue w-[600px] items-center justify-between py-5 px-5 rounded-xl shadow-lg">
-        <div>{Label}</div>
+    <div className="w-full">
+      <div
+        className="flex font-Manrope font-bold 
+                   bg-custom_lightblue items-center justify-between 
+                   py-5 px-3 md:px-5 rounded-xl shadow-lg"
+      >
+        <div className="truncate mr-2">{Label}</div>
         <button
-          className="flex border border-primary rounded-md px-6 py-[5px] items-center justify-between gap-3 hover:shadow-lg"
+          className="flex flex-shrink-0 border border-primary rounded-md px-3 md:px-6 py-[5px] items-center justify-between gap-2 md:gap-3 hover:shadow-lg"
           onClick={() => navigate(Path)}
         >
-          <img src={pencil} alt="Edit Icon" className="w-5" />
-          <div className="text-primary">Edit</div>
+          <img src={pencil} alt="Edit Icon" className="w-4 md:w-5" />
+          <div className="text-primary whitespace-nowrap">Edit</div>
         </button>
       </div>
     </div>

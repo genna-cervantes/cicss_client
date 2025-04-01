@@ -8,14 +8,7 @@ function GenerateButton() {
 
   // calls the generate function
   const handleClick = async () => {
-    const res = await fetch('http://localhost:3000/generate-schedule')
-    const data = await res.json();
-
-    if (res.ok && data){
-      navigate('/departmentchair/schedule-view')
-    }else{
-      setError('may error sa pag generate sis')
-    }
+    navigate("/departmentchair/waiting", {state: {fromButton: true}})
   }
 
   useEffect(() => {

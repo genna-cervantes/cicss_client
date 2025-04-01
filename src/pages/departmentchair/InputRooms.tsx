@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import add_button_white from "../../assets/add_button_white.png";
 import trash_button from "../../assets/trash_button.png";
+import ScrollButton from "../../components/ScrollButton";
 
 interface RoomInfo {
   roomId: string;
@@ -60,12 +61,12 @@ const InputRooms = () => {
   const [deletedRooms, setDeletedRooms] = useState<string[]>([]);
 
   useEffect(() => {
-    console.log('updated', updatedRooms)
-  }, [updatedRooms])
+    console.log("updated", updatedRooms);
+  }, [updatedRooms]);
 
   useEffect(() => {
-    console.log('inserted', insertedRooms)
-  }, [insertedRooms])
+    console.log("inserted", insertedRooms);
+  }, [insertedRooms]);
 
   // Update the roomCode for a specific form.
   const handleRoomCodeChange = (
@@ -73,7 +74,10 @@ const InputRooms = () => {
     selectedOption: Option | null
   ) => {
     if (insertedRooms.find((r) => r === rooms[index].roomId)) {
-      setInsertedRooms((prev) => [...prev, selectedOption ? selectedOption.value : rooms[index].roomId])
+      setInsertedRooms((prev) => [
+        ...prev,
+        selectedOption ? selectedOption.value : rooms[index].roomId,
+      ]);
     }
     setRooms((prev) => {
       const updated = [...prev];
@@ -147,14 +151,17 @@ const InputRooms = () => {
   const handleAddRoom = (e: FormEvent) => {
     e.preventDefault();
     let tempId = uuidv4();
-    setRooms((prev) => [...prev, { roomId: tempId, department: "", roomType: "" }]);
+    setRooms((prev) => [
+      ...prev,
+      { roomId: tempId, department: "", roomType: "" },
+    ]);
     setInsertedRooms((prev) => [...prev, tempId]);
   };
 
   // Delete a specific form.
   const handleDeleteRoom = (index: number) => {
     setRooms((prev) => prev.filter((_, i) => i !== index));
-    setDeletedRooms((prev) => [...prev, rooms[index].roomId])
+    setDeletedRooms((prev) => [...prev, rooms[index].roomId]);
   };
 
   // Save handler for demonstration (logs the rooms array).
@@ -189,6 +196,7 @@ const InputRooms = () => {
       const res = await fetch("http://localhost:8080/rooms", {
         method: "PUT",
         headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify(reqObj),
@@ -229,7 +237,10 @@ const InputRooms = () => {
 
       const res = await fetch("http://localhost:8080/rooms", {
         method: "POST",
-        headers: { "Content-type": "application/json" },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          "Content-type": "application/json",
+        },
         body: JSON.stringify(reqObj),
       });
 
@@ -242,29 +253,34 @@ const InputRooms = () => {
     }
 
     // DELETES
-    for (let i = 0; i < deletedRooms.length; i++){
+    for (let i = 0; i < deletedRooms.length; i++) {
       const res = await fetch("http://localhost:8080/rooms", {
         method: "DELETE",
         headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({roomId: deletedRooms[i]}),
+        body: JSON.stringify({ roomId: deletedRooms[i] }),
       });
 
       if (res.ok) {
         console.log("yey ok"); // PLS CHANGE THIS TO MESSAGE KAHIT SA BABA NUNG BUTTONS LNG
       } else {
-        const data = await res.json()
+        const data = await res.json();
         console.log("nooo", data);
       }
     }
-    
   };
 
   // CONNECTIONS TO DB
   useEffect(() => {
     const getRooms = async () => {
-      const res = await fetch("http://localhost:8080/rooms/CS"); // MAKE DYNAMIC AH
+      const department = localStorage.getItem("department") ?? "CS";
+      const res = await fetch(`http://localhost:8080/rooms/${department}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+        },
+      }); // MAKE DYNAMIC AH
       const data = await res.json();
 
       if (res.ok) {
@@ -279,120 +295,142 @@ const InputRooms = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="mx-auto py-10">
-        <Navbar />
+    <>
+      {/* Mobile/Small screen warning */}
+      <div className="sm:hidden flex flex-col items-center justify-center h-screen mx-5">
+        <div className="text-center p-8 bg-white rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-blue-800 mb-4">
+            Limited Access
+          </h2>
+          <p className="text-gray-600 mb-6">
+            This page is optimized for laptop or desktop use. Please open it
+            <br />
+            on a larger screen for the best experience.
+          </p>
+        </div>
       </div>
-      <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center">
-        <div className="text-primary text-[35px]">Rooms Constraints</div>
-        <div className="bg-custom_yellow p-2 rounded-md">
-          1st Semester A.Y 2025-2026
-        </div>
-      </section>
-      <section className="flex font-Manrope font-extrabold my-11 ml-[360px] gap-36">
-        <div className="flex gap-28">
-          <p>No.</p>
-          <p>Room Code</p>
-        </div>
-        <div className="flex gap-44">
-          <p>Department</p>
-          <p>Type</p>
-        </div>
-      </section>
 
-      <form className="flex flex-col">
-        {rooms.map((room, index) => {
-          return (
-            <div
-              key={index}
-              className="flex gap-5 mx-auto font-Manrope font-semibold mb-7"
-            >
-              <div className="flex bg-[rgba(241,250,255,0.5)] rounded-xl shadow-md gap-16 p-10 items-center">
-                <label className="block font-semibold mb-2">
-                  Room {index + 1}
-                </label>
-                <Select
-                  isDisabled={room.roomId.startsWith("RM")}
-                  options={roomCodes}
-                  className="w-44"
-                  placeholder="Select"
-                  styles={{
-                    control: (provided: any) => ({
-                      ...provided,
-                      border: "1px solid #02296D",
-                      borderRadius: "6px",
-                    }),
-                  }}
-                  value={
-                    roomCodes.find((option) => option.value === room.roomId) ||
-                    null
-                  }
-                  onChange={(option) => handleRoomCodeChange(index, option)}
-                />
-                <Select
-                  options={department}
-                  className="w-44"
-                  placeholder="Select"
-                  styles={{
-                    control: (provided: any) => ({
-                      ...provided,
-                      border: "1px solid #02296D",
-                      borderRadius: "6px",
-                    }),
-                  }}
-                  value={
-                    department.find(
-                      (option) => option.value === room.department
-                    ) || null
-                  }
-                  onChange={(option) => handleDepartmentChange(index, option)}
-                />
-                <Select
-                  options={roomType}
-                  className="w-44"
-                  placeholder="Select"
-                  styles={{
-                    control: (provided: any) => ({
-                      ...provided,
-                      border: "1px solid #02296D",
-                      borderRadius: "6px",
-                    }),
-                  }}
-                  value={
-                    roomType.find((option) => option.value === room.roomType) ||
-                    null
-                  }
-                  onChange={(option) => handleRoomTypeChange(index, option)}
-                />
+      {/* Main */}
+      <div className="hidden min-h-screen sm:flex flex-col">
+        <div className="mx-auto py-10">
+          <ScrollButton />
+          <Navbar />
+        </div>
+        <section className="px-4 md:px-16 flex flex-col md:flex-row gap-4  font-Helvetica-Neue-Heavy items-center justify-center">
+          <div className="text-primary text-[28px] md:text-[35px] text-center md:text-left">
+            Rooms Constraints
+          </div>
+          <div className="bg-custom_yellow p-2 rounded-md">
+            1st Semester A.Y 2025-2026
+          </div>
+        </section>
+
+        <form className="flex flex-col">
+          {rooms.map((room, index) => {
+            return (
+              <div
+                key={index}
+                className="flex gap-5 mx-auto font-Manrope font-semibold mb-3 mt-4"
+              >
+                <div className=" bg-[rgba(241,250,255,0.5)] rounded-xl shadow-md p-6 space-y-2">
+                  <div className="flex font-Manrope font-bold text-primary">
+                    <div className="ml-4 mr-5">No.</div>
+                    <div className="ml-20 mr-16">Code</div>
+                    <div className="ml-14">Department</div>
+                    <div className="ml-28">Type</div>
+                  </div>
+                  <div className="flex gap-10 items-center">
+                    <label className="block font-semibold mb-2">
+                      Room {index + 1}
+                    </label>
+                    <Select
+                      isDisabled={room.roomId.startsWith("RM")}
+                      options={roomCodes}
+                      className="w-36"
+                      placeholder="Select"
+                      styles={{
+                        control: (provided: any) => ({
+                          ...provided,
+                          border: "1px solid #02296D",
+                          borderRadius: "6px",
+                        }),
+                      }}
+                      value={
+                        roomCodes.find(
+                          (option) => option.value === room.roomId
+                        ) || null
+                      }
+                      onChange={(option) => handleRoomCodeChange(index, option)}
+                    />
+                    <Select
+                      options={department}
+                      className="w-36"
+                      placeholder="Select"
+                      styles={{
+                        control: (provided: any) => ({
+                          ...provided,
+                          border: "1px solid #02296D",
+                          borderRadius: "6px",
+                        }),
+                      }}
+                      value={
+                        department.find(
+                          (option) => option.value === room.department
+                        ) || null
+                      }
+                      onChange={(option) =>
+                        handleDepartmentChange(index, option)
+                      }
+                    />
+                    <Select
+                      options={roomType}
+                      className="w-36"
+                      placeholder="Select"
+                      styles={{
+                        control: (provided: any) => ({
+                          ...provided,
+                          border: "1px solid #02296D",
+                          borderRadius: "6px",
+                        }),
+                      }}
+                      value={
+                        roomType.find(
+                          (option) => option.value === room.roomType
+                        ) || null
+                      }
+                      onChange={(option) => handleRoomTypeChange(index, option)}
+                    />
+                  </div>
+                </div>
+                <button type="button" onClick={() => handleDeleteRoom(index)}>
+                  <img src={trash_button} alt="Delete" className="w-7" />
+                </button>
               </div>
-              <button type="button" onClick={() => handleDeleteRoom(index)}>
-                <img src={trash_button} alt="Delete" className="w-7" />
+            );
+          })}
+
+          <div className="mx-auto flex gap-4">
+            <div>
+              <button
+                onClick={handleSave}
+                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white"
+              >
+                Save
               </button>
             </div>
-          );
-        })}
-
-        <div className="mx-auto flex gap-4">
-          <div>
-            <button
-              onClick={handleSave}
-              className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white"
-            >
-              Save
-            </button>
+            <div>
+              <button
+                onClick={handleAddRoom}
+                className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm"
+              >
+                Add
+                <img src={add_button_white} className="w-4" alt="Add" />
+              </button>
+            </div>
           </div>
-          <div>
-            <button
-              onClick={handleAddRoom}
-              className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm"
-            >
-              Add
-              <img src={add_button_white} className="w-4" alt="Add" />
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
+        </form>
+      </div>
+    </>
   );
 };
 

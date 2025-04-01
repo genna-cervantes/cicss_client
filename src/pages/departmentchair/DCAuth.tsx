@@ -7,11 +7,11 @@ import Footer from "../../components/Footer";
 const DCAuth = () => {
   const { role } = useAppContext();
 
-  if (role !== "department-chair") {
-    if (role == "student") {
+  if (role !== "Department Chair") {
+    if (role == "Student") {
       return <Navigate to="/student" replace />;
     }
-    if (role == "tas") {
+    if (role == "TAS") {
       return <Navigate to="/tas" replace />;
     }
 

@@ -3,11 +3,9 @@ import {
   createCalendar,
   createViewWeek,
 } from "@schedule-x/calendar";
-import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
 import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
 import React, { useEffect, useState } from "react";
 import { weekDates } from "../utils/constants";
-import GenerateButton from "./GenerateButton";
 import timeGridEvent from "../pages/departmentchair/TimeGridEvent";
 
 const dayKeysToFull: any = {
@@ -27,11 +25,20 @@ const transformMilitaryTimeRawToTime = (rawMilitaryTime: string) => {
   return `${rawMilitaryTime.slice(0, 2)}:${rawMilitaryTime.slice(2)}`;
 };
 
-const transformToScheduleEvents = (rawSchedule: any) => {
+const transformToScheduleEvents = (rawSchedule: any, filter: string, value: string) => {
   let transformedEvents = [];
+
+  console.log(rawSchedule)
 
   const dayKeys = Object.keys(rawSchedule);
   for (let i = 0; i < dayKeys.length; i++) {
+
+    if (dayKeys[i] === 'violations' || dayKeys[i] === 'units'){
+      continue;
+    }
+
+    // call the generate function again - error 
+
     let daySched = rawSchedule[dayKeys[i]];
     let schoolDay = dayKeysToFull[dayKeys[i]];
 
@@ -40,14 +47,18 @@ const transformToScheduleEvents = (rawSchedule: any) => {
 
       console.log('schedBlock')
       console.log(schedBlock)
+      console.log(filter)
+      console.log(value)
+
+      // nag eerror pag walang schedule ung prof na un -- gawing empty
 
       let transformedSchedBlock = {
         id: schedBlock.id,
-        title: schedBlock.course.subjectCode,
+        title: filter !== 'Section' ? schedBlock.course : schedBlock.course.subjectCode,
         start: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.start)}`,
         end: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.end)}`,
-        location: schedBlock.room.roomId,
-        people: [schedBlock.tas.tas_name], // magkaiba pa ung convnetiona mp
+        location: filter !== 'Room' ? schedBlock.room.roomId : '',
+        people: [filter === 'Section' ? schedBlock.tas.tas_name : `${schedBlock.year}${schedBlock.section}`], // magkaiba pa ung convnetiona mp
         description: JSON.stringify({type: schedBlock.course.type, violations: schedBlock.violations ?? []})
       };
 
@@ -65,16 +76,6 @@ const ScheduleView = ({
   filter: string;
   value: string;
 }) => {
-  const [events, setEvents] = useState([
-    {
-      id: 1,
-      title: "Machine Learning",
-      start: `${weekDates.Monday} 08:00`,
-      end: `${weekDates.Monday} 12:00`,
-      location: "Room 1903",
-      people: ["Jessie James Suarez"],
-    },
-  ]);
 
   const [scheduleEvents, setScheduleEvents] = useState<any>();
   const [transformedScheduleEvents, setTransformedScheduleEvents] =
@@ -86,15 +87,23 @@ const ScheduleView = ({
     const fetchSchedule = async () => {
       const res = await fetch("http://localhost:3000/schedule/class/CS/1/CSA"); // DEFAULT NA SIMULA
       const data = await res.json();
+      let sched = data;
+
+      if (data?.error){
+        sched = {}
+      }
 
       if (res.ok) {
-        setScheduleEvents(data);
+        setScheduleEvents(sched);
       } else {
         setError("may error sa pag kuha ng sched");
       }
     };
 
-    fetchSchedule();
+    if (filter === 'Section'){
+      fetchSchedule();
+    }
+
   }, []);
 
   // rendering when schedule is fetched
@@ -106,7 +115,8 @@ const ScheduleView = ({
     // console.log(transformToScheduleEvents(scheduleEvents))
 
     if (scheduleEvents) {
-      let transformedEvents = transformToScheduleEvents(scheduleEvents);
+
+      let transformedEvents = transformToScheduleEvents(scheduleEvents, filter, value);
       setTransformedScheduleEvents(transformedEvents);
     }
   }, [scheduleEvents]);
@@ -124,20 +134,76 @@ const ScheduleView = ({
       console.log(section);
 
       const fetchSchedule = async () => {
+        const department = localStorage.getItem('department') ?? 'CS'
         const res = await fetch(
-          `http://localhost:3000/schedule/class/CS/${year}/${section}`
+          `http://localhost:3000/schedule/class/${department}/${year}/${section}`
         ); // DEFAULT NA CS MUNA
         const data = await res.json();
+        let sched = data;
+
+        if (data?.error){
+          sched = {}
+        }
 
         if (res.ok) {
-          setScheduleEvents(data);
+          setScheduleEvents(sched);
         } else {
           setError("may error sa pag kuha ng sched");
         }
       };
 
       fetchSchedule();
+    }else if (filter === "Professor"){
+      let tasId = value;
+
+      console.log('tas', tasId)
+      
+      const fetchSchedule = async () => {
+        const res = await fetch(`http://localhost:3000/schedule/tas/${tasId}`)
+        const data = await res.json()
+        let sched = data;
+
+        if (data?.error){
+          sched = {}
+        }
+
+        console.log('data', data)
+        
+        if (res.ok) {
+          setScheduleEvents(sched);
+        } else {
+          setError("may error sa pag kuha ng sched - tas");
+        }
+      }
+
+      fetchSchedule();
+    }else if (filter === "Room"){
+      let roomId = value;
+
+      console.log('room', roomId)
+      
+      const fetchSchedule = async () => {
+        const res = await fetch(`http://localhost:3000/schedule/room/${roomId}`)
+        const data = await res.json()
+        let sched = data;
+
+        if (data?.error){
+          sched = {}
+        }
+
+        console.log('data', data)
+        
+        if (res.ok) {
+          setScheduleEvents(sched);
+        } else {
+          setError("may error sa pag kuha ng sched - tas");
+        }
+      }
+
+      fetchSchedule();
     }
+
+
   }, [filter, value]);
 
   let calendar: CalendarApp;
@@ -163,7 +229,8 @@ const ScheduleView = ({
 
   return (
     <div>
-      <div className="pointer-events-none">
+      {/* <div className="pointer-events-none"> */}
+      <div>
         <ScheduleXCalendar calendarApp={calendar} customComponents={{timeGridEvent: timeGridEvent}}/>
       </div>
     </div>
