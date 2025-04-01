@@ -273,7 +273,7 @@ const InputYLD: React.FC = () => {
         <div className="mx-auto py-10">
           <Navbar />
         </div>
-        <section className="px-4 md:px-16 flex flex-col LG:flex-row gap-4 md:gap-11 font-Helvetica-Neue-Heavy items-center justify-center">
+        <section className="px-4 md:px-16 flex flex-col lg:flex-row gap-4 md:gap-11 font-Helvetica-Neue-Heavy items-center justify-center">
           <div className="text-primary text-2xl md:text-[35px]">
             Year Level - Day Constraints
           </div>
@@ -344,7 +344,7 @@ const InputYLD: React.FC = () => {
           <div className="flex mx-auto">
             <button
               type="submit"
-              className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-11 mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md"
+              className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-11 mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
             >
               Save
             </button>

@@ -831,7 +831,7 @@ const InputGenEd = () => {
                                       e
                                     )
                                   }
-                                  className="bg-primary text-white py-2 px-5 text-xs rounded-md"
+                                  className="bg-primary text-white py-2 px-5 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
                                 >
                                   Add Day and Time Constraint
                                 </button>
@@ -848,7 +848,7 @@ const InputGenEd = () => {
                                     e
                                   )
                                 }
-                                className="bg-primary text-white py-2 px-5 text-xs rounded-md"
+                                className="bg-primary text-white py-2 px-5 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
                               >
                                 Add Day and Time Constraint
                               </button>
@@ -864,7 +864,7 @@ const InputGenEd = () => {
             <div className="justify-center flex gap-4 font-Manrope font-semibold">
               <button
                 type="submit"
-                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white"
+                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
               >
                 Save
               </button>
@@ -1110,7 +1110,7 @@ const DayRestriction = React.memo(
             onClick={() =>
               handleDeleteDayRestriction(genEdIndex, restrictionIndex)
             }
-            className="border border-primary text-primary py-1 px-4 text-xs rounded-md"
+            className="border border-primary text-primary py-1 px-4 text-xs rounded-md transition-all duration-300 active:scale-95 active:shadow-lg"
           >
             Delete
           </button>
