@@ -1080,7 +1080,7 @@ const DayRestriction = React.memo(
                       className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
                     />
                   </div>
-                  <div className="flex items-end gap-1">
+                  <div className="flex items-center justify-center gap-1">
                     <button
                       type="button"
                       onClick={() =>

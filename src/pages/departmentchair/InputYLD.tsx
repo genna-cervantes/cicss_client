@@ -119,13 +119,26 @@ const InputYLD: React.FC = () => {
     });
   };
 
-  // Handle max days input change
+  // Handle max days input change with proper validation
   const handleMaxDaysChange = (yearIndex: number, value: string) => {
+    let numValue = parseInt(value);
+
+    let validatedValue =
+      value === ""
+        ? ""
+        : isNaN(numValue)
+        ? "1"
+        : numValue < 1
+        ? "1"
+        : numValue > 7
+        ? "7"
+        : value;
+
     setYearLevels((prevState) => {
       const newState = [...prevState];
       newState[yearIndex] = {
         ...newState[yearIndex],
-        maxDays: value,
+        maxDays: validatedValue,
       };
 
       handleUpdate({ updatedYld: newState[yearIndex] });
@@ -137,6 +150,21 @@ const InputYLD: React.FC = () => {
   // Handle form submission
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
+
+    const hasInvalidMaxDays = yearLevels.some(
+      (level) =>
+        level.maxDays === "" ||
+        level.maxDays === null ||
+        level.maxDays === undefined ||
+        level.maxDays === "0"
+    );
+
+    if (hasInvalidMaxDays) {
+      alert(
+        "Please specify Maximum Days for all year levels. Values must be between 1 and 7."
+      );
+      return;
+    }
 
     // handle updates
     const updateYLDData = async () => {
@@ -225,74 +253,105 @@ const InputYLD: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="mx-auto py-10">
-        <Navbar />
+    <>
+      {/* Mobile/Small screen warning */}
+      <div className="sm:hidden flex flex-col items-center justify-center h-screen mx-5">
+        <div className="text-center p-8 bg-white rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-blue-800 mb-4">
+            Limited Access
+          </h2>
+          <p className="text-gray-600 mb-6">
+            This page is optimized for laptop or desktop use. Please open it
+            <br />
+            on a larger screen for the best experience.
+          </p>
+        </div>
       </div>
-      <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center justify-center">
-        <div className="text-primary text-[35px]">
-          Year Level - Day Constraints
-        </div>
-        <div className="bg-custom_yellow p-2 rounded-md">
-          1st Semester A.Y 2025-2026
-        </div>
-      </section>
 
-      <form onSubmit={handleSave} className="flex flex-col mx-auto">
-        <section>
-          {yearLevels.map((level, index) => (
-            <div
-              key={index}
-              className="flex flex-col bg-[rgba(241,250,255,0.5)] rounded-xl p-8 shadow-lg mb-5 mt-7"
-            >
-              <div className="flex font-Manrope font-extrabold text-primary mb-5">
-                <div className="ml-64 mr-5">Allowed Days</div>
-                <div className="ml-52">Max Days</div>
-              </div>
-              <div className="flex gap-12 items-center ">
-                <p className="year-label">Year Level {level.year}</p>
-                <div className="flex">
-                  <div className="flex gap-3 font-Manrope font-semibold">
-                    {days.map((day) => (
-                      <div key={day} className="flex gap-2 items-center">
-                        <p>{day}</p>
-                        <input
-                          type="checkbox"
-                          className="w-7 h-7 border border-primary"
-                          checked={level.allowedDays[day]}
-                          onChange={() => handleDayChange(index, day)}
-                          id={`checkbox-${level.year}-${day}`}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <p>Max</p>
-                  <input
-                    type="number"
-                    className="w-24 h-7 border border-primary rounded-sm p-2"
-                    value={level.maxDays}
-                    onChange={(e) => handleMaxDaysChange(index, e.target.value)}
-                    min="0"
-                    max="7"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
+      {/* Main */}
+      <div className="min-h-screen hidden sm:flex flex-col">
+        <div className="mx-auto py-10">
+          <Navbar />
+        </div>
+        <section className="px-4 md:px-16 flex flex-col LG:flex-row gap-4 md:gap-11 font-Helvetica-Neue-Heavy items-center justify-center">
+          <div className="text-primary text-2xl md:text-[35px]">
+            Year Level - Day Constraints
+          </div>
+          <div className="bg-custom_yellow p-2 rounded-md">
+            1st Semester A.Y 2025-2026
+          </div>
         </section>
 
-        <div className="flex mx-auto">
-          <button
-            type="submit"
-            className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-11 mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md"
-          >
-            Save
-          </button>
-        </div>
-      </form>
-    </div>
+        <form onSubmit={handleSave} className="flex flex-col mx-auto">
+          <section>
+            {yearLevels.map((level, index) => (
+              <div
+                key={index}
+                className="flex flex-col bg-[rgba(241,250,255,0.5)] rounded-xl p-8 shadow-lg mb-5 mt-7"
+              >
+                <div className="flex font-Manrope font-extrabold text-primary mb-5">
+                  <div className="ml-64 mr-5">Allowed Days</div>
+                  <div className="ml-52">Max Days</div>
+                </div>
+                <div className="flex gap-12 items-center ">
+                  <p className="year-label">Year Level {level.year}</p>
+                  <div className="flex">
+                    <div className="flex gap-3 font-Manrope font-semibold">
+                      {days.map((day) => (
+                        <div key={day} className="flex gap-2 items-center">
+                          <p>{day}</p>
+                          <input
+                            type="checkbox"
+                            className="w-7 h-7 border border-primary"
+                            checked={level.allowedDays[day]}
+                            onChange={() => handleDayChange(index, day)}
+                            id={`checkbox-${level.year}-${day}`}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex gap-2 items-center">
+                    <p>Max</p>
+                    <input
+                      type="number"
+                      className="w-24 h-7 border border-primary rounded-sm p-2"
+                      value={level.maxDays}
+                      onChange={(e) =>
+                        handleMaxDaysChange(index, e.target.value)
+                      }
+                      onKeyDown={(e) => {
+                        if (
+                          e.key === "-" ||
+                          e.key === "e" ||
+                          (e.key === "0" &&
+                            (e.target as HTMLInputElement).value === "")
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                      min="1"
+                      max="7"
+                      step="1"
+                      placeholder="1-7"
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </section>
+
+          <div className="flex mx-auto">
+            <button
+              type="submit"
+              className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-11 mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 };
 
