@@ -6,6 +6,7 @@ import DashboardButtonsSC from "../../components/DashboardButtonsSC";
 import StudentChartCard from "../../components/StudentChartCard";
 import TeacherChartCard from "../../components/TeacherChartCard";
 import { NavLink } from "react-router-dom";
+import GenerateButton from "../../components/GenerateButton";
 
 const Dashboard = () => {
   return (
@@ -59,11 +60,12 @@ const Dashboard = () => {
 
           {/* Right */}
           <div className="lg:col-span-7 flex flex-col gap-5 xl:gap-8">
-            <NavLink to="schedule-view" className="block w-full">
+            {/* <NavLink to="schedule-view" className="block w-full">
               <div className="p-2 lg:p-3 xl:p-4 text-center bg-secondary rounded-md font-Manrope font-bold text-2xl md:text-3xl xl:text-4xl text-white shadow-md hover:bg-primary overflow-hidden">
                 Generate Schedule
               </div>
-            </NavLink>
+            </NavLink> */}
+            <GenerateButton />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 xl:gap-8">
               <div className="w-full">

@@ -3,6 +3,7 @@ import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import ScheduleView from "../../components/ScheduleView";
 import GenerateButton from "../../components/GenerateButton";
 import merge from "lodash.merge";
+import { useNavigate } from "react-router-dom";
 
 const sections = [
   { code: "1CSA", next: "1CSB" },
@@ -42,6 +43,8 @@ const ViewSchedule = () => {
           ? { label: "RM1901" }
           : { label: "" }
   );
+
+  const navigate = useNavigate();
 
   // Navigate to the previous section
   const goToPrevious = () => {
@@ -505,7 +508,16 @@ const ViewSchedule = () => {
       <div>
         <ScheduleView value={currentValue.label} filter={currentFilter} />
       </div>
-      <GenerateButton />
+      {/* <GenerateButton /> */}
+      <button>
+        Regenerate
+      </button>
+      <button onClick={() => navigate("/")}>
+        Save as Draft
+      </button>
+      <button>
+        Lock
+      </button>
     </div>
   );
 };
