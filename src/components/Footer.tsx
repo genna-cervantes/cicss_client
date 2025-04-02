@@ -13,7 +13,7 @@ const Footer = () => {
           <ul className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8 font-bold text-sm">
             <li>
               <NavLink
-                to="#"
+                to="help"
                 className="hover:text-primary-dark transition-colors"
               >
                 Help
@@ -21,7 +21,7 @@ const Footer = () => {
             </li>
             <li>
               <NavLink
-                to="#"
+                to="terms-conditions"
                 className="hover:text-primary-dark transition-colors"
               >
                 Terms and Conditions

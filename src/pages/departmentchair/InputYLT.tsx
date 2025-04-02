@@ -578,186 +578,213 @@ const InputYLT = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="mx-auto py-10">
-        <Navbar />
+    <>
+      {/* Mobile/Small screen warning */}
+      <div className="sm:hidden flex flex-col items-center justify-center h-screen mx-5">
+        <div className="text-center p-8 bg-white rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold text-blue-800 mb-4">
+            Limited Access
+          </h2>
+          <p className="text-gray-600 mb-6">
+            This page is optimized for laptop or desktop use. Please open it
+            <br />
+            on a larger screen for the best experience.
+          </p>
+        </div>
       </div>
-      <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center justify-center">
-        <div className="text-primary text-[35px]">
-          Year Level - Time Constraints
-        </div>
-        <div className="bg-custom_yellow p-2 rounded-md">
-          1st Semester A.Y 2025-2026
-        </div>
-      </section>
 
-      <form onSubmit={handleSave}>
-        <section className="flex flex-col gap-5 mt-11">
-          {(Object.keys(yearLevels) as Array<keyof YearLevels>).map((year) => {
-            return (
-              <div className="flex flex-col w-5/12 items-center justify-around gap-5 mx-auto bg-[#F1FAFF] p-5 rounded-xl shadow-md">
-                <p className="text-primary font-Manrope font-extrabold">
-                  {year}
-                </p>
-                <div className="w-9/12">
-                  <div className="gap-5">
-                    {yearLevels[year].map(
-                      (
-                        yearData,
-                        yearDataIndex // Use map instead of forEach
-                      ) => {
-                        // console.log("year data", yearData);
-                        return (
-                          <div className="w-full">
-                            <div className="w-full">
-                              <div className=" gap-3 items-center font-Manrope font-semibold text-sm w-full">
-                                <div className="w-[140px] h-[38px] flex items-center  text-primary font-Manrope font-extrabold">
-                                  {getDayFullName(yearData.day)}
-                                </div>
-                                <div className=" bg-[#BFDDF6] rounded-xl px-8 py-4 flex flex-col gap-y-3 w-full">
-                                  {yearData.startEndTimes.length > 0 ? (
-                                    yearData.startEndTimes.map(
-                                      (time, timeIndex) => {
-                                        return (
-                                          <div className="flex flex-col w-full">
-                                            <div className="flex items-center gap-x-4">
-                                              <label htmlFor={`${year}-start`}>
-                                                Start
-                                              </label>
-                                              <input
-                                                id={`${year}-start`}
-                                                type="time"
-                                                value={time.startTime}
-                                                onChange={(e) =>
-                                                  handleChangeTimeRestriction(
-                                                    "startTime",
-                                                    e.target.value,
-                                                    year,
-                                                    yearDataIndex,
-                                                    timeIndex
-                                                  )
-                                                }
-                                                className={`h-[38px] border w-[130px] ${
-                                                  timeErrors[year]?.[
-                                                    yearDataIndex
-                                                  ]?.[timeIndex]
-                                                    ? "border-red-500"
-                                                    : "border-primary"
-                                                } rounded-[5px] py-1 px-2`}
-                                                required
-                                                step="1800"
-                                              />
-                                              <label htmlFor={`${year}-end`}>
-                                                End
-                                              </label>
-                                              <input
-                                                id={`${year}-end`}
-                                                type="time"
-                                                value={time.endTime}
-                                                onChange={(e) =>
-                                                  handleChangeTimeRestriction(
-                                                    "endTime",
-                                                    e.target.value,
-                                                    year,
-                                                    yearDataIndex,
-                                                    timeIndex
-                                                  )
-                                                }
-                                                className={`h-[38px] w-[130px] border ${
-                                                  timeErrors[year]?.[
-                                                    yearDataIndex
-                                                  ]?.[timeIndex]
-                                                    ? "border-red-500"
-                                                    : "border-primary"
-                                                } rounded-[5px] py-1 px-2`}
-                                                required
-                                                step="1800"
-                                              />
-                                              <button
-                                                type="button"
-                                                onClick={() =>
-                                                  handleAddTimeRestriction(
-                                                    year,
-                                                    yearDataIndex,
-                                                    timeIndex
-                                                  )
-                                                }
-                                                className="w-7"
-                                              >
-                                                <img src={add_button} />
-                                              </button>
-                                              {yearData.startEndTimes.length >
-                                                0 && (
-                                                <button
-                                                  type="button"
-                                                  onClick={() =>
-                                                    handleDeleteTimeRestriction(
-                                                      year,
-                                                      yearDataIndex,
-                                                      timeIndex
-                                                    )
-                                                  }
-                                                >
-                                                  <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
-                                                </button>
-                                              )}
-                                            </div>
-                                            {timeErrors[year]?.[
-                                              yearDataIndex
-                                            ]?.[timeIndex] && (
-                                              <div className="text-red-500 text-xs mt-1 ml-12">
-                                                {
-                                                  timeErrors[year][
-                                                    yearDataIndex
-                                                  ][timeIndex]
-                                                }
-                                              </div>
-                                            )}
-                                          </div>
-                                        );
-                                      }
-                                    )
-                                  ) : (
-                                    <div className="min-w-full flex justify-center items-center">
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          handleAddTimeRestriction(
-                                            year,
-                                            yearDataIndex,
-                                            0
-                                          )
-                                        }
-                                        className="bg-primary text-white py-1 px-4 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
-                                      >
-                                        Add Time Restriction
-                                      </button>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+      {/* Main */}
+      <div className="min-h-screen hidden sm:flex flex-col">
+        <div className="mx-auto py-10">
+          <Navbar />
+        </div>
+        <section className="px-4 md:px-8 lg:px-16 flex flex-col md:flex-row gap-4 md:gap-11 font-Helvetica-Neue-Heavy items-center justify-center">
+          <div className="text-primary text-2xl md:text-[35px] text-center md:text-left">
+            Year Level - Time Constraints
+          </div>
+          <div className="bg-custom_yellow p-2 rounded-md">
+            1st Semester A.Y 2025-2026
+          </div>
         </section>
 
-        <div className="flex justify-center">
-          <button
-            type="submit"
-            className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-11 mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
-          >
-            Save
-          </button>
-        </div>
-      </form>
-    </div>
+        <form onSubmit={handleSave}>
+          <section className="flex flex-col gap-5 mt-8 md:mt-11 px-4 md:px-8">
+            {(Object.keys(yearLevels) as Array<keyof YearLevels>).map(
+              (year) => {
+                return (
+                  <div className="flex flex-col items-center  gap-5 mx-auto bg-[#F1FAFF] p-4 md:p-5 rounded-xl shadow-md">
+                    <p className="text-primary font-Manrope font-extrabold">
+                      {year}
+                    </p>
+                    <div className="items-center">
+                      <div className="gap-5">
+                        {yearLevels[year].map(
+                          (
+                            yearData,
+                            yearDataIndex // Use map instead of forEach
+                          ) => {
+                            // console.log("year data", yearData);
+                            return (
+                              <div className="">
+                                <div className="">
+                                  <div className="gap-3 items-center justify-center font-Manrope font-semibold text-sm">
+                                    <div className="h-[38px] flex items-center text-primary font-Manrope font-extrabold">
+                                      {getDayFullName(yearData.day)}
+                                    </div>
+                                    <div className="bg-[#BFDDF6] rounded-xl px-3 sm:px-4 md:px-8 py-4 flex flex-col gap-y-3 w-full ">
+                                      {yearData.startEndTimes.length > 0 ? (
+                                        yearData.startEndTimes.map(
+                                          (time, timeIndex) => {
+                                            return (
+                                              <div className="flex flex-col w-full">
+                                                <div className="flex flex-wrap md:flex-nowrap items-center gap-x-2 md:gap-x-4 gap-y-2">
+                                                  <label
+                                                    htmlFor={`${year}-start`}
+                                                    className="text-xs sm:text-sm"
+                                                  >
+                                                    Start
+                                                  </label>
+                                                  <input
+                                                    id={`${year}-start`}
+                                                    type="time"
+                                                    value={time.startTime}
+                                                    onChange={(e) =>
+                                                      handleChangeTimeRestriction(
+                                                        "startTime",
+                                                        e.target.value,
+                                                        year,
+                                                        yearDataIndex,
+                                                        timeIndex
+                                                      )
+                                                    }
+                                                    className={`h-[38px] border w-[100px] sm:w-[130px] ${
+                                                      timeErrors[year]?.[
+                                                        yearDataIndex
+                                                      ]?.[timeIndex]
+                                                        ? "border-red-500"
+                                                        : "border-primary"
+                                                    } rounded-[5px] py-1 px-2 text-xs sm:text-sm`}
+                                                    required
+                                                    step="1800"
+                                                  />
+                                                  <label
+                                                    htmlFor={`${year}-end`}
+                                                    className="text-xs sm:text-sm"
+                                                  >
+                                                    End
+                                                  </label>
+                                                  <input
+                                                    id={`${year}-end`}
+                                                    type="time"
+                                                    value={time.endTime}
+                                                    onChange={(e) =>
+                                                      handleChangeTimeRestriction(
+                                                        "endTime",
+                                                        e.target.value,
+                                                        year,
+                                                        yearDataIndex,
+                                                        timeIndex
+                                                      )
+                                                    }
+                                                    className={`h-[38px] w-[100px] sm:w-[130px] border ${
+                                                      timeErrors[year]?.[
+                                                        yearDataIndex
+                                                      ]?.[timeIndex]
+                                                        ? "border-red-500"
+                                                        : "border-primary"
+                                                    } rounded-[5px] py-1 px-2 text-xs sm:text-sm`}
+                                                    required
+                                                    step="1800"
+                                                  />
+                                                  <div className="flex gap-x-2 ml-auto">
+                                                    <button
+                                                      type="button"
+                                                      onClick={() =>
+                                                        handleAddTimeRestriction(
+                                                          year,
+                                                          yearDataIndex,
+                                                          timeIndex
+                                                        )
+                                                      }
+                                                      className="w-6 sm:w-7"
+                                                    >
+                                                      <img src={add_button} />
+                                                    </button>
+                                                    {yearData.startEndTimes
+                                                      .length > 0 && (
+                                                      <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                          handleDeleteTimeRestriction(
+                                                            year,
+                                                            yearDataIndex,
+                                                            timeIndex
+                                                          )
+                                                        }
+                                                      >
+                                                        <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                                                      </button>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                                {timeErrors[year]?.[
+                                                  yearDataIndex
+                                                ]?.[timeIndex] && (
+                                                  <div className="text-red-500 text-xs mt-1 ml-0 md:ml-12">
+                                                    {
+                                                      timeErrors[year][
+                                                        yearDataIndex
+                                                      ][timeIndex]
+                                                    }
+                                                  </div>
+                                                )}
+                                              </div>
+                                            );
+                                          }
+                                        )
+                                      ) : (
+                                        <div className="flex justify-center mx-36 my-1">
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              handleAddTimeRestriction(
+                                                year,
+                                                yearDataIndex,
+                                                0
+                                              )
+                                            }
+                                            className="bg-primary text-white py-1 px-4 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+                                          >
+                                            Add Time Restriction
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+            )}
+          </section>
+
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-8 md:mt-11 mb-16 md:mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+            >
+              Save
+            </button>
+          </div>
+        </form>
+      </div>
+    </>
   );
 };
 

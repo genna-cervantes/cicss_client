@@ -25,6 +25,8 @@ import ManualEdit from "./pages/departmentchair/ManualEdit";
 import ViewSchedule from "./pages/departmentchair/ViewSchedule";
 import WaitingPage from "./pages/general/WaitingPage";
 import Ratings from "./pages/departmentchair/Ratings";
+import TermsAndConditions from "./pages/general/TermsAndConditions";
+import Help from "./pages/general/Help";
 
 const App: React.FC = () => {
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
@@ -58,6 +60,8 @@ const App: React.FC = () => {
             <Route path="manual-edit" element={<ManualEdit />} />
             <Route path="waiting" element={<WaitingPage />} />
             <Route path="ratings" element={<Ratings />} />
+            <Route path="terms-conditions" element={<TermsAndConditions />} />
+            <Route path="help" element={<Help />} />
             {/* catch all */}
             <Route
               path="*"
