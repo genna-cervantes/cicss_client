@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 
 const WaitingPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [scheduleExists, setScheduleExists] = useState<boolean>(searchParams.get("exists") === "true");
+
   const [runningGenerator, setRunningGenerator] = useState(false);
   const [error, setError] = useState<string>();
   const navigate = useNavigate();
@@ -32,6 +35,10 @@ const WaitingPage = () => {
     if (!location.state?.fromButton) {
       navigate("/");
       return;
+    }
+
+    if (scheduleExists){
+      navigate("/departmentchair/view-schedule");
     }
 
     const fetchSections = async () => {
