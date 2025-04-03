@@ -43,10 +43,11 @@ const Home = () => {
       const data = await res.json();
 
       if (res.ok) {
-        let { token, role } = data;
+        let { token, role, email } = data;
         setRole(role);
         localStorage.setItem("role", role);
         localStorage.setItem("token", token);
+        localStorage.setItem("email", email);
 
         switch (role) {
           case "Department Chair":
