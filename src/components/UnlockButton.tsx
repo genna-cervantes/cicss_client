@@ -2,13 +2,13 @@ import React from "react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
-const LockButton = () => {
+const UnlockButton = () => {
   const { department } = useAppContext();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleClick = async () => {
     const res = await fetch(
-      `http://localhost:3000/schedule/lock/${department}`
+      `http://localhost:3000/schedule/unlock/${department}`
     );
 
     if (res.ok) {
@@ -16,18 +16,18 @@ const LockButton = () => {
 
       if (data.success) {
         console.log("yeyy");
-        navigate("/departmentchair/lock-schedule")
+        navigate("/departmentchair/view-schedule");
       } else {
-        console.log("oh no may error sa pag lock");
+        console.log("oh no may error sa pag unlock");
       }
     }
   };
 
   return (
     <button onClick={() => handleClick()} className="">
-      Lock Schedule
+      Unock Schedule
     </button>
   );
 };
 
-export default LockButton;
+export default UnlockButton;

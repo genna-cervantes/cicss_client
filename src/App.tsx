@@ -27,6 +27,7 @@ import WaitingPage from "./pages/general/WaitingPage";
 import Ratings from "./pages/departmentchair/Ratings";
 import TermsAndConditions from "./pages/general/TermsAndConditions";
 import Help from "./pages/general/Help";
+import LockPage from "./pages/departmentchair/LockPage";
 
 const App: React.FC = () => {
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
@@ -56,12 +57,19 @@ const App: React.FC = () => {
             <Route path="input-gened" element={<InputGenEd />} />
             <Route path="input-yld" element={<InputYLD />} />
             <Route path="input-ylt" element={<InputYLT />} />
+
             <Route path="view-schedule" element={<ViewSchedule />} />
             <Route path="manual-edit" element={<ManualEdit />} />
+            <Route path="lock-schedule" element={<LockPage />} />
+
             <Route path="waiting" element={<WaitingPage />} />
+
             <Route path="ratings" element={<Ratings />} />
+
             <Route path="terms-conditions" element={<TermsAndConditions />} />
             <Route path="help" element={<Help />} />
+
+
             {/* catch all */}
             <Route
               path="*"
