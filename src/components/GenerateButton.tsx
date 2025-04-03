@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
  
-function GenerateViewButton({regenerate = true}: {regenerate?: boolean}) {
+function GenerateViewButton({regenerate = false}: {regenerate?: boolean}) {
 
   const [scheduleExists, setScheduleExists] = useState(false);
   const navigate = useNavigate()

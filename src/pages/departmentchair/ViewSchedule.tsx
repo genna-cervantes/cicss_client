@@ -4,6 +4,7 @@ import ScheduleView from "../../components/ScheduleView";
 import GenerateButton from "../../components/GenerateButton";
 import merge from "lodash.merge";
 import { useNavigate } from "react-router-dom";
+import LockButton from "../../components/LockButton";
 
 const sections = [
   { code: "1CSA", next: "1CSB" },
@@ -509,15 +510,10 @@ const ViewSchedule = () => {
         <ScheduleView value={currentValue.label} filter={currentFilter} />
       </div>
       <GenerateButton regenerate={true} />
-      {/* <button>
-        Regenerate
-      </button> */}
       <button onClick={() => navigate("/")}>
         Save as Draft
       </button>
-      <button>
-        Lock
-      </button>
+      <LockButton />
     </div>
   );
 };
