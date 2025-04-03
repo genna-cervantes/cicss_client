@@ -37,10 +37,11 @@ const WaitingPage = () => {
       return;
     }
 
-    if (scheduleExists){
+    if (scheduleExists && !location.state?.regenerate){
       navigate("/departmentchair/view-schedule");
     }
 
+    // generate / regenerate
     const fetchSections = async () => {
       try {
         const department = localStorage.getItem("department") ?? "CS";

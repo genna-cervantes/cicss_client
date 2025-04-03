@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
  
-function GenerateViewButton() {
+function GenerateViewButton({regenerate = true}: {regenerate?: boolean}) {
 
   const [scheduleExists, setScheduleExists] = useState(false);
   const navigate = useNavigate()
@@ -11,9 +11,9 @@ function GenerateViewButton() {
   const handleClick = async () => {
 
     if (scheduleExists){
-      navigate("/departmentchair/waiting?exists=true", {state: {fromButton: true}})
+      navigate("/departmentchair/waiting?exists=true", {state: {fromButton: true, regenerate}})
     }else{
-      navigate("/departmentchair/waiting", {state: {fromButton: true}})
+      navigate("/departmentchair/waiting", {state: {fromButton: true, regenerate}})
 
     }
 
@@ -50,7 +50,7 @@ function GenerateViewButton() {
           onClick={handleClick}
           className="w-full px-56 py-2.5 bg-secondary rounded-md font-Manrope font-bold text-[30px] text-white shadow-md hover:bg-primary"
         >
-          {scheduleExists ? "View Schedule" : "Generate Schedule"}
+          {regenerate ? "Regenerate Schedule" : scheduleExists ? "View Schedule" : "Generate Schedule"}
         </button>
       </div>
     </div>

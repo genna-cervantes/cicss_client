@@ -47,7 +47,7 @@ const StudentAuth = () => {
       if (res.ok) {
         const data = await res.json();
 
-        if (!data.role || data.role !== "Department Chair") {
+        if (!data.role || data.role !== "Student") {
           navigate("/");
           setRole("");
           localStorage.setItem("token", "");

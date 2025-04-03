@@ -508,10 +508,10 @@ const ViewSchedule = () => {
       <div>
         <ScheduleView value={currentValue.label} filter={currentFilter} />
       </div>
-      {/* <GenerateButton /> */}
-      <button>
+      <GenerateButton regenerate={true} />
+      {/* <button>
         Regenerate
-      </button>
+      </button> */}
       <button onClick={() => navigate("/")}>
         Save as Draft
       </button>
