@@ -773,7 +773,7 @@ const InputCourseOfferings = () => {
               <button
                 type="button"
                 onClick={() => handleDeleteAddedCourse(index)}
-                className="w-7"
+                className="w-7 transition-all duration-300 active:scale-95 active:shadow-lg"
               >
                 <img src={trash_button} alt="Remove" />
               </button>
@@ -783,7 +783,7 @@ const InputCourseOfferings = () => {
             <div>
               <button
                 onClick={handleSave}
-                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white"
+                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
               >
                 Save
               </button>
@@ -791,7 +791,7 @@ const InputCourseOfferings = () => {
             <div>
               <button
                 onClick={handleAddCourse}
-                className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm"
+                className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
               >
                 Add
                 <img src={add_button_white} className="w-4" alt="Add" />

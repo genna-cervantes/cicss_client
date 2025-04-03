@@ -1263,7 +1263,7 @@ const InputTAS: React.FC = () => {
                                                   reqIndex
                                                 )
                                               }
-                                              className="w-7 h-[38px] flex items-center justify-center"
+                                              className="w-7 h-[38px] flex items-center justify-center transition-all duration-300 active:scale-95 active:shadow-lg"
                                             >
                                               <img src={add_button} alt="Add" />
                                             </button>
@@ -1329,7 +1329,7 @@ const InputTAS: React.FC = () => {
                                           onClick={() =>
                                             handleTASAddTime(tasIndex, reqIndex)
                                           }
-                                          className="w-7 h-[38px] flex items-center justify-center"
+                                          className="w-7 h-[38px] flex items-center justify-center transition-all duration-300 active:scale-95 active:shadow-lg"
                                         >
                                           <img src={add_button} alt="Add" />
                                         </button>
@@ -1344,7 +1344,7 @@ const InputTAS: React.FC = () => {
                                   onClick={() =>
                                     handleTASDeleteDay(tasIndex, reqIndex)
                                   }
-                                  className="border border-primary text-primary py-1 px-4 text-xs rounded-md"
+                                  className="border border-primary text-primary py-1 px-4 text-xs rounded-md transition-all duration-300 active:scale-95  active:shadow-lg"
                                 >
                                   Delete
                                 </button>
@@ -1358,7 +1358,7 @@ const InputTAS: React.FC = () => {
                             onClick={(e) =>
                               handleAddFirstRestriction(tasIndex, e)
                             }
-                            className="bg-primary text-white py-2 px-6 text-xs rounded-md"
+                            className="bg-primary text-white py-2 px-6 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
                           >
                             Add Day and Time Restriction
                           </button>
@@ -1370,7 +1370,7 @@ const InputTAS: React.FC = () => {
                             <div className="w-full flex justify-center items-center my-4">
                               <button
                                 onClick={(e) => handleTASAddDay(tasIndex, e)}
-                                className="bg-primary text-white py-2 px-6 text-xs rounded-md"
+                                className="bg-primary text-white py-2 px-6 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
                               >
                                 Add Day and Time Restriction
                               </button>
@@ -1381,20 +1381,24 @@ const InputTAS: React.FC = () => {
                   </div>
                 </div>
                 <button onClick={() => handleDeleteTAS(tasIndex)}>
-                  <img src={trash_button} alt="Delete" className="w-9" />
+                  <img
+                    src={trash_button}
+                    alt="Delete"
+                    className="w-7 transition-all duration-300 active:scale-95 active:shadow-lg"
+                  />
                 </button>
               </div>
             ))}
             <div className="justify-center flex gap-4 font-Manrope font-semibold">
               <button
                 type="submit"
-                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white"
+                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg "
               >
                 Save
               </button>
               <button
                 onClick={handleAddTAS}
-                className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm"
+                className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
               >
                 Add
                 <img src={add_button_white} className="w-4" />

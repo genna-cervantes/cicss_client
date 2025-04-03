@@ -6,11 +6,12 @@ import DashboardButtonsSC from "../../components/DashboardButtonsSC";
 import StudentChartCard from "../../components/StudentChartCard";
 import TeacherChartCard from "../../components/TeacherChartCard";
 import { NavLink } from "react-router-dom";
+import GenerateButton from "../../components/GenerateButton";
 
 const Dashboard = () => {
   return (
     <div className="w-full">
-      {/* Mobile/Small screen warning - only shows on screens smaller than lg breakpoint */}
+      {/* Mobile/Small screen warning - only shows on screens smaller than sm breakpoint */}
       <div className="lg:hidden flex flex-col items-center justify-center h-screen">
         <div className="text-center p-8 bg-white rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-blue-800 mb-4">
@@ -24,7 +25,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <main className="hidden lg:block justify-between max-w-full">
+      <main className="hidden lg:block justify-between max-w-full min-h-screen">
         <section className="flex items-center justify-between py-7 px-2 lg:px-12 xl:px-16 2xl:px-24">
           <Greeting userName="Cherry Rose" />
           <Semester />
@@ -59,11 +60,12 @@ const Dashboard = () => {
 
           {/* Right */}
           <div className="lg:col-span-7 flex flex-col gap-5 xl:gap-8">
-            <NavLink to="schedule-view" className="block w-full">
+            {/* <NavLink to="schedule-view" className="block w-full">
               <div className="p-2 lg:p-3 xl:p-4 text-center bg-secondary rounded-md font-Manrope font-bold text-2xl md:text-3xl xl:text-4xl text-white shadow-md hover:bg-primary overflow-hidden">
                 Generate Schedule
               </div>
-            </NavLink>
+            </NavLink> */}
+            <GenerateButton />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 xl:gap-8">
               <div className="w-full">
