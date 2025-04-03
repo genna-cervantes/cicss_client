@@ -119,8 +119,10 @@ const TermsAndConditions = () => {
               jesideno@ust.edu.ph
               <br />
               Information Technology: Asst. Prof. Leonid C. Lintag, MIT –
-              lclintag@ust.edu.ph For further assistance, contact your
-              department chair.
+              lclintag@ust.edu.ph
+              <br />
+              <br />
+              For further assistance, contact your department chair.
             </div>
           </p>
         </div>

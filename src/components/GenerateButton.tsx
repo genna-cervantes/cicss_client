@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 function GenerateViewButton({regenerate = false}: {regenerate?: boolean}) {
 
   const [scheduleExists, setScheduleExists] = useState(false);
-  const navigate = useNavigate()
-  const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
 
   // calls the generate function
   const handleClick = async () => {
@@ -16,32 +16,30 @@ function GenerateViewButton({regenerate = false}: {regenerate?: boolean}) {
       navigate("/departmentchair/waiting", {state: {fromButton: true, regenerate}})
 
     }
-
-  }
+  };
 
   useEffect(() => {
     const checkIfScheduleExists = async () => {
-      const res = await fetch('http://localhost:3000/schedule/class/CS/1/CSA', {
+      const res = await fetch("http://localhost:3000/schedule/class/CS/1/CSA", {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem("token") ?? ''}`,
-          'Content-type': 'application/json'
-        }
-      })
-      
-      if (res.ok){
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          "Content-type": "application/json",
+        },
+      });
+
+      if (res.ok) {
         const data = await res.json();
 
         setScheduleExists(true);
       }
-    }
+    };
 
-    checkIfScheduleExists()
-
-  }, [])
+    checkIfScheduleExists();
+  }, []);
 
   useEffect(() => {
-    console.log(error)
-  }, [error])
+    console.log(error);
+  }, [error]);
 
   return (
     <div>
