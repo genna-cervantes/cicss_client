@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
 const LockButton = () => {
-  const { department } = useAppContext();
-  const navigate = useNavigate()
+  const { department, setIsLocked, isLocked } = useAppContext();
+  const navigate = useNavigate();
 
   const handleClick = async () => {
     const res = await fetch(
@@ -16,12 +16,19 @@ const LockButton = () => {
 
       if (data.success) {
         console.log("yeyy");
-        navigate("/departmentchair/lock-schedule")
+        setIsLocked(true);
+        localStorage.setItem("isLocked", "true");
       } else {
         console.log("oh no may error sa pag lock");
       }
     }
   };
+
+  useEffect(() => {
+    if (isLocked){
+        navigate("/departmentchair/lock-schedule");
+    }
+  }, [isLocked]);
 
   return (
     <button onClick={() => handleClick()} className="">

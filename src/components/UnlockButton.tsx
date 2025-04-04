@@ -3,7 +3,7 @@ import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
 const UnlockButton = () => {
-  const { department } = useAppContext();
+  const { department, setIsLocked } = useAppContext();
   const navigate = useNavigate();
 
   const handleClick = async () => {
@@ -16,6 +16,7 @@ const UnlockButton = () => {
 
       if (data.success) {
         console.log("yeyy");
+        setIsLocked(false);
         navigate("/departmentchair/view-schedule");
       } else {
         console.log("oh no may error sa pag unlock");

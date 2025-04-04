@@ -5,6 +5,7 @@ import GenerateButton from "../../components/GenerateButton";
 import merge from "lodash.merge";
 import { useNavigate } from "react-router-dom";
 import LockButton from "../../components/LockButton";
+import { useAppContext } from "../../context/AppContext";
 
 const sections = [
   { code: "1CSA", next: "1CSB" },
@@ -46,6 +47,19 @@ const ViewSchedule = () => {
   );
 
   const navigate = useNavigate();
+
+  const {isLocked, isReady} = useAppContext()
+
+  useEffect(() => {
+    console.log(isLocked)
+    if (isReady){
+      navigate("/departmentchair/ready-schedule")
+      return;
+    }
+    if (isLocked){
+      navigate("/departmentchair/lock-schedule")
+    }
+  }, [isLocked, isReady])
 
   // Navigate to the previous section
   const goToPrevious = () => {

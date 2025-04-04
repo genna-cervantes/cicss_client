@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 
 const ReadyButton = () => {
-  const { department } = useAppContext();
+  const { department, setIsReady, isReady } = useAppContext();
   const navigate = useNavigate();
 
   const handleClick = async () => {
@@ -16,7 +16,8 @@ const ReadyButton = () => {
     if (res.ok) {
       const data = await res.json();
       if (data.success) {
-        navigate("/departmentchair/ready-schedule");
+        setIsReady(true);
+        localStorage.setItem("isReady", "true")
       } else {
         console.log("error with readying schedule");
       }
@@ -24,6 +25,11 @@ const ReadyButton = () => {
     }
     console.log("error with readying schedule");
   };
+  useEffect(() => {
+      if (isReady){
+        navigate("/departmentchair/ready-schedule");
+      } 
+  }, [isReady]);
 
   return <button onClick={handleClick}>Ready</button>;
 };
