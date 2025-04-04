@@ -7,69 +7,70 @@ import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
 import React, { useEffect, useState } from "react";
 import { weekDates } from "../utils/constants";
 import timeGridEvent from "../pages/departmentchair/TimeGridEvent";
+import { transformToScheduleEvents } from "./ScheduleView";
 
-export const dayKeysToFull: any = {
-  M: "Monday",
-  T: "Tuesday",
-  W: "Wednesday",
-  TH: "Thursday",
-  F: "Friday",
-  S: "Saturday",
-};
+// export const dayKeysToFull: any = {
+//   M: "Monday",
+//   T: "Tuesday",
+//   W: "Wednesday",
+//   TH: "Thursday",
+//   F: "Friday",
+//   S: "Saturday",
+// };
 
-export const transformMilitaryTimeRawToTime = (rawMilitaryTime: string) => {
-  if (rawMilitaryTime.length === 3) {
-    rawMilitaryTime = "0" + rawMilitaryTime;
-  }
+// export const transformMilitaryTimeRawToTime = (rawMilitaryTime: string) => {
+//   if (rawMilitaryTime.length === 3) {
+//     rawMilitaryTime = "0" + rawMilitaryTime;
+//   }
 
-  return `${rawMilitaryTime.slice(0, 2)}:${rawMilitaryTime.slice(2)}`;
-};
+//   return `${rawMilitaryTime.slice(0, 2)}:${rawMilitaryTime.slice(2)}`;
+// };
 
-export const transformToScheduleEvents = (rawSchedule: any, filter: string, value: string) => {
-  let transformedEvents = [];
+// export const transformToScheduleEvents = (rawSchedule: any, filter: string, value: string) => {
+//   let transformedEvents = [];
 
-  // console.log(rawSchedule)
+//   // console.log(rawSchedule)
 
-  const dayKeys = Object.keys(rawSchedule);
-  for (let i = 0; i < dayKeys.length; i++) {
+//   const dayKeys = Object.keys(rawSchedule);
+//   for (let i = 0; i < dayKeys.length; i++) {
 
-    if (dayKeys[i] === 'violations' || dayKeys[i] === 'units'){
-      continue;
-    }
+//     if (dayKeys[i] === 'violations' || dayKeys[i] === 'units'){
+//       continue;
+//     }
 
-    // call the generate function again - error 
+//     // call the generate function again - error 
 
-    let daySched = rawSchedule[dayKeys[i]];
-    let schoolDay = dayKeysToFull[dayKeys[i]];
+//     let daySched = rawSchedule[dayKeys[i]];
+//     let schoolDay = dayKeysToFull[dayKeys[i]];
 
-    for (let j = 0; j < daySched.length; j++) {
-      let schedBlock = daySched[j];
+//     for (let j = 0; j < daySched.length; j++) {
+//       let schedBlock = daySched[j];
 
-      // console.log('schedBlock')
-      // console.log(schedBlock)
-      // console.log(filter)
-      // console.log(value)
+//       // console.log('schedBlock')
+//       // console.log(schedBlock)
+//       // console.log(filter)
+//       // console.log(value)
 
-      // nag eerror pag walang schedule ung prof na un -- gawing empty
+//       // nag eerror pag walang schedule ung prof na un -- gawing empty
 
-      let transformedSchedBlock = {
-        id: schedBlock.id,
-        title: filter !== 'Section' ? schedBlock.course : schedBlock.course.subjectCode,
-        start: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.start)}`,
-        end: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.end)}`,
-        location: filter !== 'Room' ? schedBlock.room.roomId : '',
-        people: [filter === 'Section' ? schedBlock.tas.tas_name : `${schedBlock.year}${schedBlock.section}`], // magkaiba pa ung convnetiona mp
-        description: JSON.stringify({type: schedBlock.course.type, category: schedBlock.course.category, violations: schedBlock.violations ?? []})
-      };
+//       let transformedSchedBlock = {
+//         id: schedBlock.id,
+//         title: filter !== 'Section' ? schedBlock.course : schedBlock.course.subjectCode,
+//         start: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.start)}`,
+//         end: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.end)}`,
+//         location: filter !== 'Room' ? schedBlock.room.roomId : '',
+//         people: [filter === 'Section' ? schedBlock.tas.tas_name : `${schedBlock.year}${schedBlock.section}`], // magkaiba pa ung convnetiona mp
+//         description: JSON.stringify({type: schedBlock.course.type, violations: schedBlock.violations ?? []})
+//       };
 
-      transformedEvents.push(transformedSchedBlock);
-    }
-  }
+//       transformedEvents.push(transformedSchedBlock);
+//     }
+//   }
 
-  return transformedEvents;
-};
+//   return transformedEvents;
+// };
 
-const ScheduleView = ({
+const ManualEditScheduleView = ({
   filter = "Section",
   value = "1CSA",
 }: {
@@ -228,13 +229,15 @@ const ScheduleView = ({
   }
 
   return (
-    <div>
-      {/* <div className="pointer-events-none"> */}
-      <div>
-        <ScheduleXCalendar calendarApp={calendar} customComponents={{timeGridEvent: timeGridEvent}}/>
-      </div>
-    </div>
+        // <ScheduleXCalendar calendarApp={calendar} customComponents={{timeGridEvent: timeGridEvent}}/>
+        <ScheduleXCalendar calendarApp={calendar} />
+        // <h1>helo</h1>
+    // <div>
+    //   {/* <div className="pointer-events-none"> */}
+    //   <div>
+    //   </div>
+    // </div>   
   );
 };
 
-export default ScheduleView;
+export default ManualEditScheduleView;

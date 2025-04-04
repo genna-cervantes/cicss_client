@@ -29,6 +29,7 @@ import TermsAndConditions from "./pages/general/TermsAndConditions";
 import Help from "./pages/general/Help";
 import LockPage from "./pages/departmentchair/LockPage";
 import ReadyPage from "./pages/departmentchair/ReadyPage";
+import ManualEditViewSchedule from "./components/ManualEditViewSchedule";
 
 const App: React.FC = () => {
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
@@ -60,7 +61,7 @@ const App: React.FC = () => {
             <Route path="input-ylt" element={<InputYLT />} />
 
             <Route path="view-schedule" element={<ViewSchedule />} />
-            <Route path="manual-edit" element={<ManualEdit />} />
+            <Route path="manual-edit" element={<ManualEditViewSchedule />} />
             <Route path="lock-schedule" element={<LockPage />} />
             <Route path="ready-schedule" element={<ReadyPage />} />
 

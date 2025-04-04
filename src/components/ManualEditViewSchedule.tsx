@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
-import ScheduleView from "../../components/ScheduleView";
-import GenerateButton from "../../components/GenerateButton";
 import merge from "lodash.merge";
 import { useNavigate } from "react-router-dom";
-import LockButton from "../../components/LockButton";
-import { useAppContext } from "../../context/AppContext";
+import ScheduleView from "./ScheduleView";
+import GenerateViewButton from "./GenerateButton";
+import LockButton from "./LockButton";
+import ManualEditScheduleView from "./ManualEditScheduleView";
+import ManualEdit from "../pages/departmentchair/ManualEdit";
 
 const sections = [
   { code: "1CSA", next: "1CSB" },
@@ -21,7 +22,7 @@ const sections = [
   { code: "3CSF", label: "Data Science" },
 ];
 
-const ViewSchedule = () => {
+const ManualEditViewSchedule = () => {
   const [currentFilter, setCurrentFilter] = useState("Section");
   const [filter, setFilter] = useState("Section");
 
@@ -47,19 +48,6 @@ const ViewSchedule = () => {
   );
 
   const navigate = useNavigate();
-
-  // const {isLocked, isReady} = useAppContext()
-
-  // useEffect(() => {
-  //   console.log(isLocked)
-  //   if (isReady){
-  //     navigate("/departmentchair/ready-schedule")
-  //     return;
-  //   }
-  //   if (isLocked){
-  //     navigate("/departmentchair/lock-schedule")
-  //   }
-  // }, [isLocked, isReady])
 
   // Navigate to the previous section
   const goToPrevious = () => {
@@ -134,13 +122,14 @@ const ViewSchedule = () => {
   useEffect(() => {
     if (filter === "Professor") {
       const fetchTASData = async () => {
-        const department = localStorage.getItem('department') ?? 'CS'
+        const department = localStorage.getItem("department") ?? "CS";
         const res = await fetch(
-          `http://localhost:8080/tasconstraints/details/${department}`, {
+          `http://localhost:8080/tasconstraints/details/${department}`,
+          {
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem(('token')) ?? ''}`
-            }
-            }
+              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            },
+          }
         );
         const data = await res.json();
 
@@ -169,11 +158,11 @@ const ViewSchedule = () => {
     }
     if (filter === "Room") {
       const fetchRoomData = async () => {
-        const department = localStorage.getItem('department') ?? 'CS'
+        const department = localStorage.getItem("department") ?? "CS";
         const res = await fetch(`http://localhost:8080/rooms/${department}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem(('token')) ?? ''}`
-        }
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          },
         });
         const data = await res.json();
 
@@ -448,7 +437,7 @@ const ViewSchedule = () => {
                     </option>
                   );
                 })}
-              </select>
+              </select> 
             )}
 
             {currentFilter === "Professor" && (
@@ -515,15 +504,14 @@ const ViewSchedule = () => {
         </div>
       </div>
       <div>
-        <ScheduleView value={currentValue.label} filter={currentFilter} />
+        {/* <ManualEditSched  uleView value={currentValue.label} filter={currentFilter} /> */}
+        <ManualEdit filter={currentFilter} value={currentValue.label} />
       </div>
-      <GenerateButton regenerate={true} />
-      <button onClick={() => navigate("/")}>
-        Save as Draft
-      </button>
-      <LockButton />
+      {/* <GenerateViewButton regenerate={true} />
+      <button onClick={() => navigate("/")} >Save as Draft</button>
+      <LockButton /> */}
     </div>
   );
 };
 
-export default ViewSchedule;
+export default ManualEditViewSchedule;
