@@ -5,6 +5,12 @@ interface AppContextType {
   role: string | null;
   setRole: (role: string) => void;
   semester: string;
+  department: string,
+  setDepartment: (department: string) => void,
+  isLocked: boolean
+  setIsLocked: (isLocked: boolean) => void,
+  isReady: boolean
+  setIsReady: (isReady: boolean) => void,
 }
 
 const getCurrentSemester = (): string => {
@@ -18,14 +24,17 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 // Provider Component
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [role, setRole] = useState<string>(localStorage.getItem("role") ?? "");
+  const [department, setDepartment] = useState<string>(localStorage.getItem("department") ?? "");
   const [semester, setSemester] = useState<string>(getCurrentSemester());
+  const [isLocked, setIsLocked] = useState<boolean>(localStorage.getItem("isLocked") === "true" ? true : false)
+  const [isReady, setIsReady] = useState<boolean>(localStorage.getItem("isReady") === "true" ? true : false)
 
   useEffect(() => {
     setSemester(getCurrentSemester());
   }, []);
 
   return (
-    <AppContext.Provider value={{ role, setRole, semester }}>
+    <AppContext.Provider value={{ role, setRole, semester, department, setDepartment, isLocked, setIsLocked, isReady, setIsReady }}>
       {children}
     </AppContext.Provider>
   );

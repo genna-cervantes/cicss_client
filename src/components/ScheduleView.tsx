@@ -28,7 +28,7 @@ const transformMilitaryTimeRawToTime = (rawMilitaryTime: string) => {
 const transformToScheduleEvents = (rawSchedule: any, filter: string, value: string) => {
   let transformedEvents = [];
 
-  console.log(rawSchedule)
+  // console.log(rawSchedule)
 
   const dayKeys = Object.keys(rawSchedule);
   for (let i = 0; i < dayKeys.length; i++) {
@@ -45,10 +45,10 @@ const transformToScheduleEvents = (rawSchedule: any, filter: string, value: stri
     for (let j = 0; j < daySched.length; j++) {
       let schedBlock = daySched[j];
 
-      console.log('schedBlock')
-      console.log(schedBlock)
-      console.log(filter)
-      console.log(value)
+      // console.log('schedBlock')
+      // console.log(schedBlock)
+      // console.log(filter)
+      // console.log(value)
 
       // nag eerror pag walang schedule ung prof na un -- gawing empty
 
@@ -108,10 +108,10 @@ const ScheduleView = ({
 
   // rendering when schedule is fetched
   useEffect(() => {
-    console.log("raw schedule events");
-    console.log(scheduleEvents);
+    // console.log("raw schedule events");
+    // console.log(scheduleEvents);
 
-    console.log("transformed schedule events");
+    // console.log("transformed schedule events");
     // console.log(transformToScheduleEvents(scheduleEvents))
 
     if (scheduleEvents) {
@@ -123,15 +123,15 @@ const ScheduleView = ({
 
   // update schedule when go to next or previous
   useEffect(() => {
-    console.log("filter", filter);
-    console.log("value", value);
+    // console.log("filter", filter);
+    // console.log("value", value);
 
     if (filter === "Section") {
       let year = value.slice(0, 1);
       let section = value.slice(1);
 
-      console.log(year);
-      console.log(section);
+      // console.log(year);
+      // console.log(section);
 
       const fetchSchedule = async () => {
         const department = localStorage.getItem('department') ?? 'CS'
@@ -156,7 +156,7 @@ const ScheduleView = ({
     }else if (filter === "Professor"){
       let tasId = value;
 
-      console.log('tas', tasId)
+      // console.log('tas', tasId)
       
       const fetchSchedule = async () => {
         const res = await fetch(`http://localhost:3000/schedule/tas/${tasId}`)
@@ -167,7 +167,7 @@ const ScheduleView = ({
           sched = {}
         }
 
-        console.log('data', data)
+        // console.log('data', data)
         
         if (res.ok) {
           setScheduleEvents(sched);
@@ -180,7 +180,7 @@ const ScheduleView = ({
     }else if (filter === "Room"){
       let roomId = value;
 
-      console.log('room', roomId)
+      // console.log('room', roomId)
       
       const fetchSchedule = async () => {
         const res = await fetch(`http://localhost:3000/schedule/room/${roomId}`)
@@ -191,7 +191,7 @@ const ScheduleView = ({
           sched = {}
         }
 
-        console.log('data', data)
+        // console.log('data', data)
         
         if (res.ok) {
           setScheduleEvents(sched);
@@ -222,7 +222,7 @@ const ScheduleView = ({
       // [eventsServicePlugin]
     );
 
-    console.log(transformedScheduleEvents)
+    // console.log(transformedScheduleEvents)
   } else {
     return <>waiting...</>;
   }

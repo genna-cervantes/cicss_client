@@ -6,13 +6,16 @@ import { useAppContext } from "../context/AppContext";
 const Header = () => {
 
   const navigate = useNavigate()
-  const { setRole } = useAppContext();
+  const { setRole, setDepartment } = useAppContext();
 
   const handleLogout = () => {
     console.log('logout')
     setRole("")
+    setDepartment("")
     localStorage.removeItem('role')
     localStorage.removeItem('token')
+    localStorage.removeItem('department')
+    localStorage.removeItem('email')
     navigate('/')
   }
 

@@ -4,6 +4,8 @@ import ScheduleView from "../../components/ScheduleView";
 import GenerateButton from "../../components/GenerateButton";
 import merge from "lodash.merge";
 import { useNavigate } from "react-router-dom";
+import LockButton from "../../components/LockButton";
+import { useAppContext } from "../../context/AppContext";
 
 const sections = [
   { code: "1CSA", next: "1CSB" },
@@ -45,6 +47,19 @@ const ViewSchedule = () => {
   );
 
   const navigate = useNavigate();
+
+  const {isLocked, isReady} = useAppContext()
+
+  useEffect(() => {
+    console.log(isLocked)
+    if (isReady){
+      navigate("/departmentchair/ready-schedule")
+      return;
+    }
+    if (isLocked){
+      navigate("/departmentchair/lock-schedule")
+    }
+  }, [isLocked, isReady])
 
   // Navigate to the previous section
   const goToPrevious = () => {
@@ -170,9 +185,6 @@ const ViewSchedule = () => {
         // console.log(roomDetails)
         // console.log(roomDetails.reduce((acc: any, room: any) => ({ ...acc, ...room }), {}))
         setRoomDetails(roomDetails);
-
-        console.log(Object.keys(roomDetails)[0]);
-        console.log(roomDetails[Object.keys(roomDetails)[0]]);
 
         if (res.ok) {
           setCurrentValue({
@@ -320,14 +332,13 @@ const ViewSchedule = () => {
         );
         setYearSections(combinedSections);
 
-        console.log("year sections", combinedSections);
+        // console.log("year sections", combinedSections);
       } else {
         console.log("error with fetching data", data);
       }
     };
 
     fetchYearSectionsData();
-    console.log(yearSections);
   }, []);
 
   useEffect(() => {
@@ -431,7 +442,6 @@ const ViewSchedule = () => {
                   Select a Section
                 </option>
                 {Object.keys(yearSections).map((section, index) => {
-                  console.log(section);
                   return (
                     <option key={index} value={section} className="py-2">
                       {section}
@@ -483,7 +493,6 @@ const ViewSchedule = () => {
                   Select a Section
                 </option>
                 {Object.keys(roomDetails).map((roomId, index) => {
-                  console.log(typeof roomId);
                   return (
                     <option key={index} value={roomId} className="py-2">
                       {roomId}
@@ -508,16 +517,11 @@ const ViewSchedule = () => {
       <div>
         <ScheduleView value={currentValue.label} filter={currentFilter} />
       </div>
-      {/* <GenerateButton /> */}
-      <button>
-        Regenerate
-      </button>
+      <GenerateButton regenerate={true} />
       <button onClick={() => navigate("/")}>
         Save as Draft
       </button>
-      <button>
-        Lock
-      </button>
+      <LockButton />
     </div>
   );
 };

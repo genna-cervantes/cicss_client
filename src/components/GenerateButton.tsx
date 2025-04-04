@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+ 
+function GenerateViewButton({regenerate = false}: {regenerate?: boolean}) {
 
-function GenerateViewButton() {
   const [scheduleExists, setScheduleExists] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
   // calls the generate function
   const handleClick = async () => {
-    if (scheduleExists) {
-      navigate("/departmentchair/waiting?exists=true", {
-        state: { fromButton: true },
-      });
-    } else {
-      navigate("/departmentchair/waiting", { state: { fromButton: true } });
+
+    if (scheduleExists){
+      console.log('schedule exists')
+      navigate("/departmentchair/waiting?exists=true", {state: {fromButton: true, regenerate}})
+    }else{
+      console.log('schedule not exists')
+      navigate("/departmentchair/waiting", {state: {fromButton: true, regenerate}})
+
     }
   };
 
@@ -47,7 +50,7 @@ function GenerateViewButton() {
           onClick={handleClick}
           className="w-full px-56 py-2.5 bg-secondary rounded-md font-Manrope font-bold text-[30px] text-white shadow-md hover:bg-primary"
         >
-          {scheduleExists ? "View Schedule" : "Generate Schedule"}
+          {regenerate ? "Regenerate Schedule" : scheduleExists ? "View Schedule" : "Generate Schedule"}
         </button>
       </div>
     </div>
