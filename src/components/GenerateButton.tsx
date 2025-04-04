@@ -11,8 +11,10 @@ function GenerateViewButton({regenerate = false}: {regenerate?: boolean}) {
   const handleClick = async () => {
 
     if (scheduleExists){
+      console.log('schedule exists')
       navigate("/departmentchair/waiting?exists=true", {state: {fromButton: true, regenerate}})
     }else{
+      console.log('schedule not exists')
       navigate("/departmentchair/waiting", {state: {fromButton: true, regenerate}})
 
     }

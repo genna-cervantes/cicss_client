@@ -37,9 +37,12 @@ const WaitingPage = () => {
       return;
     }
 
+    console.log('reg', location.state?.regenerate)
     if (scheduleExists && !location.state?.regenerate){
       navigate("/departmentchair/view-schedule");
     }
+
+    console.log('new sched')
 
     // generate / regenerate
     const fetchSections = async () => {
@@ -115,6 +118,7 @@ const WaitingPage = () => {
 
   useEffect(() => {
     if (CSSections && ITSections && ISSections && !runningGenerator) {
+      console.log('running gen')
       const generateSchedule = async () => {
         try {
           // if (firstYearSections.length === 0 || secondYearSections.length === 0 || thirdYearSections.length === 0 || fourthYearSections.length === 0){
@@ -162,11 +166,11 @@ const WaitingPage = () => {
       generateSchedule();
 
       console.log("done");
-    }
 
-    return () => {
-      console.log("Cleanup when the component unmounts");
-    };
+      return () => {
+        console.log("Cleanup when the component unmounts");
+      };
+    }
   }, [CSSections, ITSections, ISSections]);
 
   return (

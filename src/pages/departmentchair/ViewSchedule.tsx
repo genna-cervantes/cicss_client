@@ -172,9 +172,6 @@ const ViewSchedule = () => {
         // console.log(roomDetails.reduce((acc: any, room: any) => ({ ...acc, ...room }), {}))
         setRoomDetails(roomDetails);
 
-        console.log(Object.keys(roomDetails)[0]);
-        console.log(roomDetails[Object.keys(roomDetails)[0]]);
-
         if (res.ok) {
           setCurrentValue({
             label: Object.keys(roomDetails)[0],
@@ -321,14 +318,13 @@ const ViewSchedule = () => {
         );
         setYearSections(combinedSections);
 
-        console.log("year sections", combinedSections);
+        // console.log("year sections", combinedSections);
       } else {
         console.log("error with fetching data", data);
       }
     };
 
     fetchYearSectionsData();
-    console.log(yearSections);
   }, []);
 
   useEffect(() => {
@@ -432,7 +428,6 @@ const ViewSchedule = () => {
                   Select a Section
                 </option>
                 {Object.keys(yearSections).map((section, index) => {
-                  console.log(section);
                   return (
                     <option key={index} value={section} className="py-2">
                       {section}
@@ -484,7 +479,6 @@ const ViewSchedule = () => {
                   Select a Section
                 </option>
                 {Object.keys(roomDetails).map((roomId, index) => {
-                  console.log(typeof roomId);
                   return (
                     <option key={index} value={roomId} className="py-2">
                       {roomId}
