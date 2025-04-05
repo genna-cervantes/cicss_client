@@ -25,19 +25,53 @@ export const transformMilitaryTimeRawToTime = (rawMilitaryTime: string) => {
   return `${rawMilitaryTime.slice(0, 2)}:${rawMilitaryTime.slice(2)}`;
 };
 
-export const transformToScheduleEvents = (rawSchedule: any, filter: string, value: string) => {
+export const getViolations = (rawSchedule: any) => {
+  let violations = [];
+
+  const dayKeys = Object.keys(rawSchedule);
+  for (let i = 0; i < dayKeys.length; i++) {
+    if (dayKeys[i] === "violations" || dayKeys[i] === "units") {
+      continue;
+    }
+
+    // call the generate function again - error
+
+    let daySched = rawSchedule[dayKeys[i]];
+    let schoolDay = dayKeysToFull[dayKeys[i]];
+
+    for (let j = 0; j < daySched.length; j++) {
+      let schedBlock = daySched[j];
+
+      // console.log('schedBlock')
+      // console.log(schedBlock)
+      // console.log(filter)
+      // console.log(value)
+
+      // nag eerror pag walang schedule ung prof na un -- gawing empty
+
+      violations.push(...(schedBlock.violations ?? []));
+    }
+  }
+
+  return violations;
+};
+
+export const transformToScheduleEvents = (
+  rawSchedule: any,
+  filter: string,
+  value: string
+) => {
   let transformedEvents = [];
 
   // console.log(rawSchedule)
 
   const dayKeys = Object.keys(rawSchedule);
   for (let i = 0; i < dayKeys.length; i++) {
-
-    if (dayKeys[i] === 'violations' || dayKeys[i] === 'units'){
+    if (dayKeys[i] === "violations" || dayKeys[i] === "units") {
       continue;
     }
 
-    // call the generate function again - error 
+    // call the generate function again - error
 
     let daySched = rawSchedule[dayKeys[i]];
     let schoolDay = dayKeysToFull[dayKeys[i]];
@@ -54,12 +88,23 @@ export const transformToScheduleEvents = (rawSchedule: any, filter: string, valu
 
       let transformedSchedBlock = {
         id: schedBlock.id,
-        title: filter !== 'Section' ? schedBlock.course : schedBlock.course.subjectCode,
+        title:
+          filter !== "Section"
+            ? schedBlock.course
+            : schedBlock.course.subjectCode,
         start: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.start)}`,
         end: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.end)}`,
-        location: filter !== 'Room' ? schedBlock.room.roomId : '',
-        people: [filter === 'Section' ? schedBlock.tas.tas_name : `${schedBlock.year}${schedBlock.section}`], // magkaiba pa ung convnetiona mp
-        description: JSON.stringify({type: schedBlock.course.type, category: schedBlock.course.category, violations: schedBlock.violations ?? []})
+        location: filter !== "Room" ? schedBlock.room.roomId : "",
+        people: [
+          filter === "Section"
+            ? schedBlock.tas.tas_name
+            : `${schedBlock.year}${schedBlock.section}`,
+        ], // magkaiba pa ung convnetiona mp
+        description: JSON.stringify({
+          type: schedBlock.course.type,
+          category: schedBlock.course.category,
+          violations: schedBlock.violations ?? [],
+        }),
       };
 
       transformedEvents.push(transformedSchedBlock);
@@ -76,7 +121,6 @@ const ScheduleView = ({
   filter: string;
   value: string;
 }) => {
-
   const [scheduleEvents, setScheduleEvents] = useState<any>();
   const [transformedScheduleEvents, setTransformedScheduleEvents] =
     useState<any>();
@@ -89,8 +133,8 @@ const ScheduleView = ({
       const data = await res.json();
       let sched = data;
 
-      if (data?.error){
-        sched = {}
+      if (data?.error) {
+        sched = {};
       }
 
       if (res.ok) {
@@ -100,10 +144,9 @@ const ScheduleView = ({
       }
     };
 
-    if (filter === 'Section'){
+    if (filter === "Section") {
       fetchSchedule();
     }
-
   }, []);
 
   // rendering when schedule is fetched
@@ -115,8 +158,11 @@ const ScheduleView = ({
     // console.log(transformToScheduleEvents(scheduleEvents))
 
     if (scheduleEvents) {
-
-      let transformedEvents = transformToScheduleEvents(scheduleEvents, filter, value);
+      let transformedEvents = transformToScheduleEvents(
+        scheduleEvents,
+        filter,
+        value
+      );
       setTransformedScheduleEvents(transformedEvents);
     }
   }, [scheduleEvents]);
@@ -134,15 +180,15 @@ const ScheduleView = ({
       // console.log(section);
 
       const fetchSchedule = async () => {
-        const department = localStorage.getItem('department') ?? 'CS'
+        const department = localStorage.getItem("department") ?? "CS";
         const res = await fetch(
           `http://localhost:3000/schedule/class/${department}/${year}/${section}`
         ); // DEFAULT NA CS MUNA
         const data = await res.json();
         let sched = data;
 
-        if (data?.error){
-          sched = {}
+        if (data?.error) {
+          sched = {};
         }
 
         if (res.ok) {
@@ -153,57 +199,57 @@ const ScheduleView = ({
       };
 
       fetchSchedule();
-    }else if (filter === "Professor"){
+    } else if (filter === "Professor") {
       let tasId = value;
 
       // console.log('tas', tasId)
-      
+
       const fetchSchedule = async () => {
-        const res = await fetch(`http://localhost:3000/schedule/tas/${tasId}`)
-        const data = await res.json()
+        const res = await fetch(`http://localhost:3000/schedule/tas/${tasId}`);
+        const data = await res.json();
         let sched = data;
 
-        if (data?.error){
-          sched = {}
+        if (data?.error) {
+          sched = {};
         }
 
         // console.log('data', data)
-        
+
         if (res.ok) {
           setScheduleEvents(sched);
         } else {
           setError("may error sa pag kuha ng sched - tas");
         }
-      }
+      };
 
       fetchSchedule();
-    }else if (filter === "Room"){
+    } else if (filter === "Room") {
       let roomId = value;
 
       // console.log('room', roomId)
-      
+
       const fetchSchedule = async () => {
-        const res = await fetch(`http://localhost:3000/schedule/room/${roomId}`)
-        const data = await res.json()
+        const res = await fetch(
+          `http://localhost:3000/schedule/room/${roomId}`
+        );
+        const data = await res.json();
         let sched = data;
 
-        if (data?.error){
-          sched = {}
+        if (data?.error) {
+          sched = {};
         }
 
         // console.log('data', data)
-        
+
         if (res.ok) {
           setScheduleEvents(sched);
         } else {
           setError("may error sa pag kuha ng sched - tas");
         }
-      }
+      };
 
       fetchSchedule();
     }
-
-
   }, [filter, value]);
 
   let calendar: CalendarApp;
@@ -231,7 +277,10 @@ const ScheduleView = ({
     <div>
       {/* <div className="pointer-events-none"> */}
       <div>
-        <ScheduleXCalendar calendarApp={calendar} customComponents={{timeGridEvent: timeGridEvent}}/>
+        <ScheduleXCalendar
+          calendarApp={calendar}
+          customComponents={{ timeGridEvent: timeGridEvent }}
+        />
       </div>
     </div>
   );
