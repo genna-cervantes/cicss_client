@@ -28,12 +28,14 @@ const Footer = () => {
               </NavLink>
             </li>
             <li>
-              <NavLink
-                to="#"
+              <a
+                href="https://docs.google.com/forms/d/e/1FAIpQLSc_az9m6XQ3L0QQX0vo7VB3icgRIFC-dSL3Hebuid4MvFhfiQ/viewform"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hover:text-primary-dark transition-colors"
               >
                 Send Feedback
-              </NavLink>
+              </a>
             </li>
           </ul>
         </nav>
