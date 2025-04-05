@@ -33,6 +33,12 @@ const InputSectionCounts: React.FC = () => {
     [key: string]: string;
   }>({});
 
+  // Add state for status message
+  const [statusMessage, setStatusMessage] = useState<{
+    type: "success" | "error" | null;
+    text: string;
+  }>({ type: null, text: "" });
+
   const handleSectionCountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const numValue = value ? parseInt(value, 10) : "";
@@ -80,6 +86,10 @@ const InputSectionCounts: React.FC = () => {
         setFourthYearSections(data.fourthYearSections);
       } else {
         console.log("error with fetching data", data);
+        setStatusMessage({
+          type: "error",
+          text: "Failed to load section data",
+        });
       }
     };
 
@@ -113,8 +123,15 @@ const InputSectionCounts: React.FC = () => {
   const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Clear any previous status messages
+    setStatusMessage({ type: null, text: "" });
+
     // Validate before submitting
     if (!validateForm()) {
+      setStatusMessage({
+        type: "error",
+        text: "Please fix validation errors before saving",
+      });
       return;
     }
 
@@ -132,22 +149,36 @@ const InputSectionCounts: React.FC = () => {
 
     console.log(reqBody);
 
-    const res = await fetch("http://localhost:8080/year_sections", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(reqBody),
-    });
+    try {
+      const res = await fetch("http://localhost:8080/year_sections", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(reqBody),
+      });
 
-    if (res.ok) {
-      console.log("yeeyyyy saved"); // gawan ng message pls thanks
-    } else {
-      console.log("may error UGH");
+      if (res.ok) {
+        console.log("Successfully Added");
+        setStatusMessage({
+          type: "success",
+          text: "Sections successfully saved!",
+        });
+      } else {
+        console.log("Unable to Add");
+        setStatusMessage({
+          type: "error",
+          text: "Failed to save sections. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error("Error saving sections:", error);
+      setStatusMessage({
+        type: "error",
+        text: "An error occurred while saving. Please check your connection and try again.",
+      });
     }
-
-    // updates
   };
 
   return (
@@ -180,7 +211,7 @@ const InputSectionCounts: React.FC = () => {
           </div>
         </section>
 
-        <section className="flex justify-center font-Manrope font-semibold mt-6 w-full">
+        <section className="flex justify-center font-Manrope font-semibold mt-6 w-full mb-5">
           <div className="space-y-10">
             {/* Upper */}
             <div className="flex flex-col lg:flex-row lg:space-x-10 space-y-10 lg:space-y-0">
@@ -567,9 +598,23 @@ const InputSectionCounts: React.FC = () => {
             </div>
           </div>
         </section>
+
+        {/* Status Message Display */}
+        {statusMessage.type && (
+          <div
+            className={`mx-auto mt-6 p-3 rounded-md text-center font-medium ${
+              statusMessage.type === "success"
+                ? "bg-green-100 text-green-800 border border-green-300"
+                : "bg-red-100 text-red-800 border border-red-300"
+            }`}
+          >
+            {statusMessage.text}
+          </div>
+        )}
+
         <button
           type="submit"
-          className="border-2 border-primary py-1 px-1 w-36 text-primary mx-auto mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white font-Manrope font-semibold transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+          className="border-2 border-primary py-1 px-1 w-36 text-primary mx-auto mt-7 mb-24 rounded-sm hover:bg-primary hover:text-white font-Manrope font-semibold transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
         >
           Save
         </button>

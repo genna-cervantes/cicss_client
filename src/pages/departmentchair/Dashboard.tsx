@@ -27,7 +27,7 @@ const Dashboard = () => {
 
       <main className="hidden lg:block justify-between max-w-full min-h-screen">
         <section className="flex items-center justify-between py-7 px-2 lg:px-12 xl:px-16 2xl:px-24">
-          <Greeting userName="Cherry Rose" />
+          <Greeting userName="CS Chair" />
           <Semester />
         </section>
 
