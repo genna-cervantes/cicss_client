@@ -85,6 +85,7 @@ export const transformToScheduleEvents = (
       // console.log(value)
 
       // nag eerror pag walang schedule ung prof na un -- gawing empty
+      console.log(schedBlock)
 
       let transformedSchedBlock = {
         id: schedBlock.id,

@@ -46,6 +46,7 @@ const Home = () => {
         let { token, role, email, department } = data;
         setRole(role);
         setDepartment(department);
+        localStorage.setItem("department", department);
         localStorage.setItem("role", role);
         localStorage.setItem("token", token);
         localStorage.setItem("email", email);
