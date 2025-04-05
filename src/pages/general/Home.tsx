@@ -16,7 +16,7 @@ import GoogleLogo from "../../assets/google_logo.png";
 import Footer from "../../components/Footer";
 
 const Home = () => {
-  const { role, setRole } = useAppContext();
+  const { role, setRole, setDepartment } = useAppContext();
   const navigate = useNavigate();
 
   switch (role) {
@@ -43,10 +43,12 @@ const Home = () => {
       const data = await res.json();
 
       if (res.ok) {
-        let { token, role } = data;
+        let { token, role, email, department } = data;
         setRole(role);
+        setDepartment(department);
         localStorage.setItem("role", role);
         localStorage.setItem("token", token);
+        localStorage.setItem("email", email);
 
         switch (role) {
           case "Department Chair":
