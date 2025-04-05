@@ -126,6 +126,17 @@ const TermsAndConditions = () => {
             </div>
           </p>
         </div>
+
+        <div className="flex items-center space-x-3 mt-5">
+          <input type="checkbox" id="termsAcceptance" />
+          <label htmlFor="termsAcceptance" className="font-Manrope">
+            I confirm that I have read and accept the terms and conditions and
+            privacy policy
+          </label>
+          <button className="bg-primary text-white py-1 px-3 rounded-xl font-Manrope font-extrabold hover:bg-transparent hover:border hover:border-primary hover:text-primary">
+            Submit
+          </button>
+        </div>
       </div>
     </div>
   );
