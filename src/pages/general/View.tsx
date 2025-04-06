@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import ViewSchedule from "../departmentchair/ViewSchedule";
+import { generateRandomString } from "../../utils/utils";
 
-const View = () => {
+const View = ({role}: {role: string}) => {
   const [isFirstModalOpen, setIsFirstModalOpen] = useState(false);
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
@@ -72,10 +74,35 @@ const View = () => {
     setHoveredRating(0);
   };
 
-  const handleSubmitRating = () => {
+  const handleSubmitRating = async () => {
     // get the data here
-    closeRatingModal();
-    openSuccessModal();
+
+    console.log(rating)
+    const reqObj = 
+      {
+        ratingId: generateRandomString(10),
+        rating: rating,
+        raterName: localStorage.getItem("email") ?? "No Name",
+        raterSection: selectedSection,
+        raterType: role
+    }
+    
+    const res = await fetch('http://localhost:8080/ratings', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem("token") ?? ""}`,
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(reqObj)
+    })
+
+    if (res.ok){
+      openSuccessModal();
+      closeRatingModal();
+    }else{
+      console.log('error')
+    }
+
   };
 
   const handleButtonMouseDown = () => {
@@ -96,9 +123,12 @@ const View = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 py-6">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-6">
       {/*Put the schedule and the filter component here */}
+      <ViewSchedule role={role} />
+
       <button
+        type="button"
         onClick={handleButtonClick}
         onMouseDown={handleButtonMouseDown}
         onMouseUp={handleButtonMouseUp}

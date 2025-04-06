@@ -84,7 +84,7 @@ const App: React.FC = () => {
             <Route index element={<TASDashboard />} />
 
             {/* add routes for tas here */}
-            <Route path="view" element={<View />} />
+            <Route path="view" element={<View role="TAS" />} />
 
             <Route path="*" element={<Navigate to="/tas" replace />} />
           </Route>
@@ -93,7 +93,7 @@ const App: React.FC = () => {
             <Route index element={<StudentDashboard />} />
 
             {/* add routes for student here */}
-            <Route path="view" element={<View />} />
+            <Route path="view" element={<View role="Student" />} />
             <Route path="schedule" element={<div>student schedule</div>} />
 
             <Route path="*" element={<Navigate to="/student" replace />} />

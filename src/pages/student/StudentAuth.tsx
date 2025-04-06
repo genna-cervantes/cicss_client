@@ -5,11 +5,11 @@ import { Navigate, Outlet, useNavigate } from "react-router-dom";
 const StudentAuth = () => {
   const { role, setRole } = useAppContext();
 
-  if (role !== "student") {
-    if (role == "department-chair") {
+  if (role !== "Student") {
+    if (role == "Department Chair") {
       return <Navigate to="/departmentchair" replace />;
     }
-    if (role == "tas") {
+    if (role == "TAS") {
       return <Navigate to="/tas" replace />;
     }
 

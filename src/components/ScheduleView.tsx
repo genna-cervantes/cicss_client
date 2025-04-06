@@ -4,9 +4,10 @@ import {
   createViewWeek,
 } from "@schedule-x/calendar";
 import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { weekDates } from "../utils/constants";
 import timeGridEvent from "../pages/departmentchair/TimeGridEvent";
+import TimeGridEvent from "../pages/departmentchair/TimeGridEvent";
 
 export const dayKeysToFull: any = {
   M: "Monday",
@@ -115,6 +116,9 @@ const ScheduleView = ({
   filter: string;
   value: string;
 }) => {
+
+  const calendarRef = useRef<any>(null);
+
   const [scheduleEvents, setScheduleEvents] = useState<any>();
   const [transformedScheduleEvents, setTransformedScheduleEvents] =
     useState<any>();
@@ -174,7 +178,10 @@ const ScheduleView = ({
       // console.log(section);
 
       const fetchSchedule = async () => {
-        const department = localStorage.getItem("department") ?? "CS";
+        let department = localStorage.getItem("department") || "CS";
+        if (department == 'undefined') {
+          department = "CS"
+        }
         const res = await fetch(
           `http://localhost:3000/schedule/class/${department}/${year}/${section}`
         ); // DEFAULT NA CS MUNA
@@ -247,8 +254,10 @@ const ScheduleView = ({
   }, [filter, value]);
 
   let calendar: CalendarApp;
-  if (transformedScheduleEvents) {
-    calendar = createCalendar(
+  
+  if (!calendarRef.current) {
+    calendarRef.current = 
+    createCalendar(
       {
         views: [createViewWeek()],
         events: transformedScheduleEvents,
@@ -263,17 +272,26 @@ const ScheduleView = ({
     );
 
     // console.log(transformedScheduleEvents)
-  } else {
-    return <>waiting...</>;
-  }
+  } 
+
+  useEffect(() => {
+    if (transformedScheduleEvents && calendarRef.current) {
+      calendarRef.current.events.set(transformedScheduleEvents);
+    }
+    // setChangedSchedBlocks(transformedScheduleEvents)
+  }, [transformedScheduleEvents]);
+
+  const memoizedCustomComponents = useMemo(() => ({
+      timeGridEvent: TimeGridEvent, // Your custom component for the time grid
+    }), []);
 
   return (
     <div>
       {/* <div className="pointer-events-none"> */}
       <div>
         <ScheduleXCalendar
-          calendarApp={calendar}
-          customComponents={{ timeGridEvent: timeGridEvent }}
+          calendarApp={calendarRef.current}
+          customComponents={memoizedCustomComponents}
         />
       </div>
     </div>
