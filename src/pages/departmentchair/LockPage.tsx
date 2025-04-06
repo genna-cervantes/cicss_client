@@ -52,7 +52,7 @@ const LockPage = () => {
   }, [csReady, isReady, itReady]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center justify-center min-h-screen space-y-16">
       <div className="text-3xl font-extrabold text-primary text-center font-Helvetica-Neue-Heavy">
         {department} SCHEDULE <br /> Successfully Locked
       </div>

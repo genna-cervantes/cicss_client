@@ -26,9 +26,12 @@ const UnlockButton = () => {
   };
 
   return (
-    <div className="flex items-center justify-center">
-      <button onClick={() => handleClick()} className="">
-        <img src={cs_locked} alt="" className="w-full" />
+    <div className="w-full flex justify-center items-center">
+      <button
+        onClick={() => handleClick()}
+        className="flex justify-center items-center"
+      >
+        <img src={cs_locked} alt="Unlock schedule" className="w-[600px]" />
       </button>
     </div>
   );
