@@ -73,11 +73,11 @@ const Header = () => {
   };
 
   return (
-    <header className="mt-2 w-full">
+    <header className="w-full py-2">
       {/* Desktop View */}
       <div className="hidden md:flex justify-between items-center py-2 px-4 lg:px-16">
         <a href="/">
-          <img src={cicss_logo} alt="CICSS Logo" className="w-24 lg:w-36" />
+          <img src={cicss_logo} alt="CICSS Logo" className="w-36 lg:w-48" />
         </a>
 
         {/* User profile dropdown */}

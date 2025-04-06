@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import star_label from "../../assets/star_label.png";
 import thumbs_up from "../../assets/thumbs_up.png";
 import excellent from "../../assets/excellent.png";
 import StudentChart from "../../components/StudentChart";
+import { merge } from "lodash";
 
 interface StarRatingProps {
   rating: number;
@@ -177,12 +178,256 @@ const StarRating: React.FC<StarRatingProps> = ({
 };
 
 const Ratings = () => {
-  const [selectedCourse, setSelectedCourse] = useState<string>(
-    COURSE_OPTIONS[0].value
-  );
-  const [selectedProf, setSelectedProf] = useState<string>(
-    PROF_OPTIONS[0].value
-  );
+
+  const [currentSectionRatings, setCurrentSectionRatings] = useState(0);
+  const [currentSectionNumberOfRatings, setCurrentSectionNumberOfRatings] = useState(0);
+  const [currentSectionRatingsCount1, setCurrentSectionRatingsCount1] = useState(0);
+  const [currentSectionRatingsCount2, setCurrentSectionRatingsCount2] = useState(0);
+  const [currentSectionRatingsCount3, setCurrentSectionRatingsCount3] = useState(0);
+  const [currentSectionRatingsCount4, setCurrentSectionRatingsCount4] = useState(0);
+  const [currentSectionRatingsCount5, setCurrentSectionRatingsCount5] = useState(0);
+  
+  const [currentTASRatings, setCurrentTASRatings] = useState(0);
+  const [currentTASNumberOfRatings, setCurrentTASNumberOfRatings] = useState(0);
+  const [currentTASRatingsCount1, setCurrentTASRatingsCount1] = useState(0);
+  const [currentTASRatingsCount2, setCurrentTASRatingsCount2] = useState(0);
+  const [currentTASRatingsCount3, setCurrentTASRatingsCount3] = useState(0);
+  const [currentTASRatingsCount4, setCurrentTASRatingsCount4] = useState(0);
+  const [currentTASRatingsCount5, setCurrentTASRatingsCount5] = useState(0);
+
+  const [yearSections, setYearSections] = useState<{
+    [key: string]: { next: string; prev: string; specialization: string };
+  }>({});
+  const [profDetails, setProfDetails] = useState<{ [key: string]: string }>({});
+
+  const [currentSection, setCurrentSection] = useState<{
+    label: string;
+    specialization?: string;
+  }>({ label: "1CSA", specialization: "" });
+
+  const [currentTAS, setCurrentTAS] = useState<{
+    label: string;
+    name: string;
+  }>({ label: "", name: "" });
+
+  useEffect(() => {
+    const getCurrentSectionRatings = async () => {
+      const res = await fetch(`http://localhost:8080/ratings/section/${currentSection.label}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token") ?? ""}`
+        }
+      })
+
+      if (res.ok){
+        const data = await res.json();
+        setCurrentSectionRatings(data.averageRating ?? 0);
+        setCurrentSectionNumberOfRatings(data.numberOfRatings ?? 0);
+        setCurrentSectionRatingsCount1(data.count1)
+        setCurrentSectionRatingsCount2(data.count2)
+        setCurrentSectionRatingsCount3(data.count3)
+        setCurrentSectionRatingsCount4(data.count4)
+        setCurrentSectionRatingsCount5(data.count5)
+      }
+    }
+    getCurrentSectionRatings()
+  }, [currentSection])
+
+  useEffect(() => {
+    const getCurrentSectionRatings = async () => {
+      const res = await fetch(`http://localhost:8080/ratings/tas/${currentTAS.label}`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem("token") ?? ""}`
+        }
+      })
+
+      if (res.ok){
+        const data = await res.json();
+        setCurrentTASRatings(data.averageRating ?? 0);
+        setCurrentTASNumberOfRatings(data.numberOfRatings ?? 0);
+        setCurrentTASRatingsCount1(data.count1)
+        setCurrentTASRatingsCount2(data.count2)
+        setCurrentTASRatingsCount3(data.count3)
+        setCurrentTASRatingsCount4(data.count4)
+        setCurrentTASRatingsCount5(data.count5)
+      }
+    }
+    getCurrentSectionRatings()
+  }, [currentTAS])
+
+  useEffect(() => {
+    const fetchYearSectionsData = async () => {
+      let department = localStorage.getItem("department") ?? "CS";
+      if (department == "undefined") {
+        department = "CS";
+      }
+      const res = await fetch(
+        `http://localhost:8080/year_sections/${department}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          },
+        }
+      );
+      console.log(res);
+      const data = await res.json();
+
+      if (res.ok) {
+        let firstYearSections = data.firstYearSections.sort(
+          (a: any, b: any) => a.section - b.section
+        );
+        let transformedFirstYearSections = [];
+        let secondYearSections = data.secondYearSections.sort(
+          (a: any, b: any) => a.section - b.section
+        );
+        let transformedSecondYearSections = [];
+        let thirdYearSections = data.thirdYearSections.sort(
+          (a: any, b: any) => a.section - b.section
+        );
+        let transformedThirdYearSections = [];
+        let fourthYearSections = data.fourthYearSections.sort(
+          (a: any, b: any) => a.section - b.section
+        );
+        let transformedFourthYearSections = [];
+
+        for (let i = 0; i < firstYearSections.length; i++) {
+          let section = firstYearSections[i];
+          let nextSection =
+            i === firstYearSections.length - 1
+              ? `2${secondYearSections[0].section}`
+              : `1${firstYearSections[i + 1].section}`;
+          let prevSection =
+            i === 0
+              ? `4${fourthYearSections[fourthYearSections.length - 1].section}`
+              : `1${firstYearSections[i - 1].section}`;
+
+          let newSection = {
+            [`1${section.section}`]: {
+              next: nextSection,
+              prev: prevSection,
+              specialization: section.specialization as string,
+            },
+          };
+
+          transformedFirstYearSections.push(newSection);
+        }
+
+        for (let i = 0; i < secondYearSections.length; i++) {
+          let section = secondYearSections[i];
+          let nextSection =
+            i === secondYearSections.length - 1
+              ? `3${thirdYearSections[0].section}`
+              : `2${secondYearSections[i + 1].section}`;
+          let prevSection =
+            i === 0
+              ? `1${firstYearSections[firstYearSections.length - 1].section}`
+              : `2${secondYearSections[i - 1].section}`;
+
+          let newSection = {
+            [`2${section.section}`]: {
+              next: nextSection,
+              prev: prevSection,
+              specialization: section.specialization as string,
+            },
+          };
+
+          transformedSecondYearSections.push(newSection);
+        }
+
+        for (let i = 0; i < thirdYearSections.length; i++) {
+          let section = thirdYearSections[i];
+          let nextSection =
+            i === thirdYearSections.length - 1
+              ? `4${fourthYearSections[0].section}`
+              : `3${thirdYearSections[i + 1].section}`;
+          let prevSection =
+            i === 0
+              ? `2${secondYearSections[secondYearSections.length - 1].section}`
+              : `3${thirdYearSections[i - 1].section}`;
+
+          let newSection = {
+            [`3${section.section}`]: {
+              next: nextSection,
+              prev: prevSection,
+              specialization: section.specialization as string,
+            },
+          };
+
+          transformedThirdYearSections.push(newSection);
+        }
+
+        for (let i = 0; i < fourthYearSections.length; i++) {
+          let section = fourthYearSections[i];
+          let nextSection =
+            i === fourthYearSections.length - 1
+              ? `1${firstYearSections[0].section}`
+              : `4${fourthYearSections[i + 1].section}`;
+          let prevSection =
+            i === 0
+              ? `3${thirdYearSections[thirdYearSections.length - 1].section}`
+              : `4${fourthYearSections[i - 1].section}`;
+
+          let newSection = {
+            [`4${section.section}`]: {
+              next: nextSection,
+              prev: prevSection,
+              specialization: section.specialization as string,
+            },
+          };
+
+          transformedFourthYearSections.push(newSection);
+        }
+
+        const allSections = [
+          ...transformedFirstYearSections,
+          ...transformedSecondYearSections,
+          ...transformedThirdYearSections,
+          ...transformedFourthYearSections,
+        ];
+        const combinedSections = allSections.reduce(
+          (acc, obj) => merge(acc, obj),
+          {}
+        );
+        setYearSections(combinedSections);
+
+        // console.log("year sections", combinedSections);
+      } else {
+        console.log("error with fetching data", data);
+      }
+    };
+
+    fetchYearSectionsData();
+  }, []);
+
+  useEffect(() => {
+    const fetchTASData = async () => {
+      let department = localStorage.getItem("department") ?? "CS";
+      if (department == "undefined") {
+        department = "CS";
+      }
+      const res = await fetch(
+        `http://localhost:8080/tasconstraints/details/${department}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          },
+        }
+      );
+      const data = await res.json();
+
+      setProfDetails(
+        data.reduce((acc: any, prof: any) => ({ ...acc, ...prof }), {})
+      );
+
+      if (res.ok) {
+        setCurrentTAS({
+          label: Object.keys(data[0])[0],
+          name: data[0][Object.keys(data[0])[0]],
+        });
+      }
+    };
+
+    fetchTASData();
+  }, []);
 
   const formatProfName = (name: string) => {
     const parts = name.split(", ");
@@ -222,15 +467,26 @@ const Ratings = () => {
                 </span>
                 <div className="relative">
                   <select
-                    value={selectedCourse}
-                    onChange={(e) => setSelectedCourse(e.target.value)}
+                    value={currentSection.label}
+                    onChange={(e) =>
+                      setCurrentSection({
+                        label: e.target.value,
+                        specialization:
+                          yearSections[e.target.value].specialization,
+                      })
+                    }
                     className="font-Manrope font-bold appearance-none border border-primary rounded-md py-2 px-4 pr-8 w-48 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                   >
-                    {COURSE_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
+                    <option value="" disabled>
+                      Select a Section
+                    </option>
+                    {Object.keys(yearSections).map((section, index) => {
+                      return (
+                        <option key={index} value={section} className="py-2">
+                          {section}
+                        </option>
+                      );
+                    })}
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                     <svg
@@ -252,10 +508,13 @@ const Ratings = () => {
                 <div className="flex space-x-5">
                   <div className="space-y-1 flex flex-col items-center">
                     <div className="font-CyGrotesk text-primary text-2xl text-center">
-                      {selectedCourse}
+                      {currentSection.label}
                     </div>
                     <div className="font-Manrope font-extrabold bg-[#FFCC1D] px-3 py-1 rounded-full text-sm text-center">
-                      DATA SCIENCE {/* magcchange depende sa section*/}
+                      {currentSection.specialization === "none"
+                        ? ""
+                        : currentSection.specialization}{" "}
+                      {/* magcchange depende sa section*/}
                     </div>
                   </div>
 
@@ -271,18 +530,18 @@ const Ratings = () => {
 
                 {/* Left-lower */}
                 <div className="font-Helvetica-Neue-Heavy">
-                  <StarRating rating={0.7} totalRatings={142} size="small" />
+                  <StarRating rating={currentSectionRatings} totalRatings={currentSectionNumberOfRatings} size="small" />
                 </div>
               </div>
 
               {/* Right */}
               <div className="w-1/2">
                 <StudentChart
-                  five_count={10}
-                  four_count={4}
-                  three_count={5}
-                  two_count={3}
-                  one_count={6}
+                  five_count={currentSectionRatingsCount5}
+                  four_count={currentSectionRatingsCount4}
+                  three_count={currentSectionRatingsCount3}
+                  two_count={currentSectionRatingsCount2}
+                  one_count={currentSectionRatingsCount1}
                 />
               </div>
             </div>
@@ -304,15 +563,26 @@ const Ratings = () => {
                 </span>
                 <div className="relative">
                   <select
-                    value={selectedProf}
-                    onChange={(e) => setSelectedProf(e.target.value)}
+                    value={currentTAS.label}
+                    onChange={(e: any) =>
+                      setCurrentTAS({
+                        label: e.target.value,
+                        name: profDetails[e.target.value],
+                      })
+                    }
                     className="font-Manrope font-bold appearance-none border border-primary rounded-md py-2 px-4 pr-8 w-48 text-gray-700 leading-tight focus:outline-none focus:border-blue-500"
                   >
-                    {PROF_OPTIONS.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
+                    <option value="" disabled>
+                      Select a TAS
+                    </option>
+                    {Object.keys(profDetails).map((tasId, index) => {
+                      let tasName = profDetails[tasId];
+                      return (
+                        <option key={index} value={tasId} className="py-2">
+                          {tasName}
+                        </option>
+                      );
+                    })}
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                     <svg
@@ -332,7 +602,7 @@ const Ratings = () => {
               <div className="flex justify-center items-center space-x-5">
                 {/* Left */}
                 <div className="text-center font-Helvetica-Neue-Heavy text-primary">
-                  {formatProfName(selectedProf)}
+                  {formatProfName(currentTAS.name)}
                 </div>
 
                 {/* Divider */}
@@ -349,7 +619,7 @@ const Ratings = () => {
 
               {/* Lower */}
               <div className="flex justify-center items-center font-Helvetica-Neue-Heavy">
-                <StarRating rating={3.5} size="small" />
+                <StarRating rating={currentTASRatings} size="small" />
               </div>
             </div>
           </div>

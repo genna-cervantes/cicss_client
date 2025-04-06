@@ -1,6 +1,8 @@
 import React, { useEffect } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 const TASAuth = () => {
   const { role, setRole } = useAppContext();
@@ -54,18 +56,24 @@ const TASAuth = () => {
     verifyToken();
   }, []);
 
-  if (role !== "tas") {
-    if (role == "student") {
+  if (role !== "TAS") {
+    if (role == "Student") {
       return <Navigate to="/student" replace />;
     }
-    if (role == "department-chair") {
+    if (role == "Department Chair") {
       return <Navigate to="/departmentchair" replace />;
     }
 
     return <Navigate to="/login" replace />;
   }
 
-  return <Outlet />;
+  return (
+    <div className="bg-cover bg-no-repeat bg-gradient-to-b from-[#F1FAFF] via-[#BFDDF6] to-[#9FCEF5] min-h-screen">
+      <Header />
+      <Outlet />
+      <Footer />
+    </div>
+  );
 };
 
 export default TASAuth;
