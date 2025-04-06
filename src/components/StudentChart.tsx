@@ -19,35 +19,42 @@ const StudentChart: React.FC<StudentChartProps> = ({
   two_count,
   one_count,
 }) => {
+  // Check if all counts are 0
+  const allZero = five_count === 0 && four_count === 0 && three_count === 0 && two_count === 0 && one_count === 0;
+
   const data = {
-    labels: [],
+    labels: allZero ? ["No Ratings"] : [],
     datasets: [
       {
         label: "Ratings",
-        data: [
-          0.5,
-          five_count,
-          0.5,
-          four_count,
-          0.5,
-          three_count,
-          0.5,
-          two_count,
-          0.5,
-          one_count,
-        ],
-        backgroundColor: [
-          "transparent",
-          "#FFBA21",
-          "transparent",
-          "#0350D3",
-          "transparent",
-          "#1972E4",
-          "transparent",
-          "#3C96F1",
-          "transparent",
-          "#77B9F4",
-        ],
+        data: allZero
+          ? [1] // Only show "No Ratings" if all counts are zero
+          : [
+              0.5,
+              five_count,
+              0.5,
+              four_count,
+              0.5,
+              three_count,
+              0.5,
+              two_count,
+              0.5,
+              one_count,
+            ],
+        backgroundColor: allZero
+          ? ["#E0E0E0"] // Grey for "No Ratings"
+          : [
+              "transparent",
+              "#FFBA21",
+              "transparent",
+              "#0350D3",
+              "transparent",
+              "#1972E4",
+              "transparent",
+              "#3C96F1",
+              "transparent",
+              "#77B9F4",
+            ],
         borderColor: "transparent",
         borderWidth: 6,
         borderRadius: 15,
