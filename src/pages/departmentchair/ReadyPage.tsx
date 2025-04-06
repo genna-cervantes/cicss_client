@@ -45,7 +45,7 @@ const ReadyPage = () => {
 
   return (
     <div>
-      <div className="flex flex-col items-center justify-center mb-32 mt-10">
+      <div className="flex flex-col items-center justify-center mb-52 mt-10">
         <div className="font-Helvetica-Neue-Heavy text-4xl text-primary mb-16">
           {readyCount}/3 departments are ready
         </div>
