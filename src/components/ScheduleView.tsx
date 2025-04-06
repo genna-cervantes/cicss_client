@@ -42,13 +42,6 @@ export const getViolations = (rawSchedule: any) => {
     for (let j = 0; j < daySched.length; j++) {
       let schedBlock = daySched[j];
 
-      // console.log('schedBlock')
-      // console.log(schedBlock)
-      // console.log(filter)
-      // console.log(value)
-
-      // nag eerror pag walang schedule ung prof na un -- gawing empty
-
       violations.push(...(schedBlock.violations ?? []));
     }
   }

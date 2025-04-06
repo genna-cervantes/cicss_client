@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import timeGridEvent from "./TimeGridEvent";
 import { constants } from "node:http2";
 import TimeGridEvent from "./TimeGridEvent";
+import { transformToOriginalEvents } from "../../utils/utils";
 
 const ManualEdit = ({
   filter = "Section",
@@ -47,7 +48,10 @@ const ManualEdit = ({
   const [scheduleEvents, setScheduleEvents] = useState<any>();
   const [transformedScheduleEvents, setTransformedScheduleEvents] =
     useState<any>();
-  const [error, setError] = useState("");
+
+  const [changedScheduleBlocks, setChangedSchedBlocks] = useState<any>([]);
+
+    const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
@@ -237,6 +241,14 @@ const ManualEdit = ({
     window.location.reload();
   };
 
+  const handleChangeSchedBlock = (newEvent: any) => {
+    setChangedSchedBlocks((prev: any) => {
+      const newSchedBlocks = prev.filter((sb: any) => sb.id !== newEvent.id)
+      newSchedBlocks.push(newEvent)
+      return newSchedBlocks;
+    })
+  }
+
   // if (transformedScheduleEvents) {
   // let calendar: CalendarApp =
   if (!calendarRef.current) {
@@ -293,6 +305,7 @@ const ManualEdit = ({
 
             console.log(reqObj);
             schedBlockRef.current = reqObj;
+            handleChangeSchedBlock(newEvent)
 
             const fetchViolations = async () => {
               const res = await fetch(
@@ -329,15 +342,45 @@ const ManualEdit = ({
     if (transformedScheduleEvents && calendarRef.current) {
       calendarRef.current.events.set(transformedScheduleEvents);
     }
+    // setChangedSchedBlocks(transformedScheduleEvents)
   }, [transformedScheduleEvents]);
 
-  //   // console.log(transformedScheduleEvents)
-  // } else {
-  //   return <>waiting...</>;
-  // }
 
-  // violations original sa terminal
-  // if new popup tapos accept
+  const handleSave = async () => {
+    // console.log('saved events')
+    // console.log(transformedScheduleEvents) 
+    const originalEvents = transformToOriginalEvents(transformedScheduleEvents, changedScheduleBlocks, value)
+
+    const res = await fetch('http://localhost:3000/schedule/manual-edit/save', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({transformedSchedBlocks: originalEvents})
+    })
+
+    if (res.ok){
+      const data = await res.json()
+      if (data.success){
+        console.log('yeyy')
+      }else{
+        console.log('error', data)
+      }
+    }
+  }
+  
+  const handleDeploy = async () => {
+    const res = await fetch('http://localhost:3000/schedule/manual-edit/deploy')
+  
+    if (res.ok){
+      const data = await res.json()
+      if (data.success){
+        console.log('yeyy')
+      }else{
+        console.log('error', data)
+      }
+    }
+  }
 
   const memoizedCustomComponents = useMemo(() => ({
     timeGridEvent: TimeGridEvent, // Your custom component for the time grid
@@ -572,6 +615,8 @@ const ManualEdit = ({
         customComponents={memoizedCustomComponents}
         // timeGridEvent={TimeGridEvent}
       />
+      <button onClick={handleSave}>Save</button>
+      <button onClick={handleDeploy}>Deploy</button>
     </>
   );
 };
