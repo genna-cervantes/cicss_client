@@ -9,7 +9,7 @@ const StudentDashboard = () => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate("/departmentchair/view");
+    navigate("/student/view");
   };
 
   return (
