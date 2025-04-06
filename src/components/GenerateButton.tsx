@@ -71,10 +71,11 @@ function GenerateButton({
       <div>
         <button onClick={handleClick} className={getButtonClassName()}>
           {regenerate ? (
-            <div className="flex items-center justify-center">
-              <span>Regenerate Schedule</span>
-            </div>
-          ) : scheduleExists && !regenerate && !newSemester && !hasChanges ? (
+            "Regenerate Schedule"
+          ) : scheduleExists &&
+            scheduleExists &&
+            !newSemester &&
+            !hasChanges ? (
             <div className="flex items-center">
               <div
                 className="relative"
