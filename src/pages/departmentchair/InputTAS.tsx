@@ -1288,7 +1288,7 @@ const InputTAS: React.FC = () => {
                 onChange={(e) => setSearchValue(e.target.value)}
                 type="text"
                 className="rounded-md text-sm py-1 px-4 w-[18rem]"
-                placeholder="Search by Course Code or Course Name"
+                placeholder="Search by Name or Email"
               />
               <button
                 className="text-sm bg-primary rounded-md text-white px-4 font-semibold"
@@ -1332,7 +1332,7 @@ const InputTAS: React.FC = () => {
             <form onSubmit={handleSave}>
               {searchResults.map((tas, tasIndex) => (
                 <div key={tasIndex} className="mb-7 flex gap-3">
-                  <div className="gap-5 bg-[#F1FAFF] px-5 py-5 rounded-xl shadow-md border w-full">
+                  <div className="gap-5 bg-[#F1FAFF] px-5 py-5 rounded-xl shadow-sm border w-full">
                     <div className="flex text-primary font-bold mb-2">
                       <div className="ml-20">Name</div>
                       <div className="ml-24">Units</div>
@@ -1689,13 +1689,14 @@ const InputTAS: React.FC = () => {
           <div className="flex mx-auto gap-5 font-Manrope font-semibold mt-5">
             <form onSubmit={handleSave}>
               {tasList.map((tas, tasIndex) => {
-              if (tas.email === 'acgernale@ust.edu.ph'){
-                console.log(tas)
-                console.log(courseOptions)
-              }
+              // if (tas.email === 'acgernale@ust.edu.ph'){
+              //   console.log(tas)
+              //   console.log(courseOptions)
+              // }
               return(
                 <div key={tasIndex} className="mb-7 flex gap-3">
-                  <div className="gap-5 bg-[#F1FAFF] px-5 py-5 rounded-xl shadow-md border w-full">
+                  {/* <div className="gap-5 bg-[#F1FAFF] px-5 py-5 rounded-xl shadow-sm border w-full"> */}
+                  <div className="gap-5 bg-[#F1FAFF]/60 px-5 py-5 rounded-xl shadow-sm border w-full">
                     <div className="flex text-primary font-bold mb-2">
                       <div className="ml-20">Name</div>
                       <div className="ml-24">Units</div>
@@ -1793,7 +1794,8 @@ const InputTAS: React.FC = () => {
                           tas.restrictions.map((request, reqIndex) => (
                             <div
                               key={reqIndex}
-                              className="bg-[#BFDDF6] p-3 rounded-md mb-5"
+                              // className="bg-[#BFDDF6] p-3 rounded-md mb-5"
+                              className="bg-primary/15 p-3 rounded-md mb-5"
                             >
                               <div className="flex flex-col gap-2">
                                 <div className="flex gap-3">

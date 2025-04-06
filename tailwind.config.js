@@ -14,7 +14,7 @@ export default {
         CyGrotesk: ["CyGrotesk", "sans-serif"]
       },
       colors: {
-        primary: "#02296D",
+        primary: "#022666",
         secondary: "#0350D3",
         custom_yellow: "#FFCC1D",
         custom_black: "#1E1E1E",

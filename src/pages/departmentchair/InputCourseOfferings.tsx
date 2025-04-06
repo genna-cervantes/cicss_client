@@ -850,7 +850,7 @@ const InputCourseOfferings = () => {
                 id="yearFilter"
                 value={yearFilter}
                 onChange={(e) => setYearFilter(parseInt(e.target.value))}
-                className="rounded-md px-2 text-sm py-1 w-[5rem]"
+                className="rounded-md px-2 text-sm py-1 w-[6rem]"
               >
                 <option value="0">No Filter</option>
                 <option value="1">1</option>

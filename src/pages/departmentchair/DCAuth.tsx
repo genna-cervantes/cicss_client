@@ -71,6 +71,7 @@ const DCAuth = () => {
 
   return (
     <div className="bg-cover bg-no-repeat bg-gradient-to-b from-[#F1FAFF] via-[#BFDDF6] to-[#9FCEF5] min-h-screen">
+    {/* // <div className="bg-slate-200 min-h-screen"> */}
       <Header />
       <Outlet />
       <Footer />

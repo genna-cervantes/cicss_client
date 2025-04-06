@@ -47,6 +47,8 @@ export const getViolations = (rawSchedule: any) => {
     }
   }
 
+  // console.log(violations)
+
   return violations;
 };
 

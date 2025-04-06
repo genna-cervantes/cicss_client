@@ -5,6 +5,16 @@ export function cn(...inputs: any[]) {
   return clsx(...inputs);
 }
 
+export const uniqueByKey = <T>(arr: T[], key: keyof T): T[] => {
+    const seen = new Set();
+    return arr.filter((item) => {
+      const val = item[key];
+      if (seen.has(val)) return false;
+      seen.add(val);
+      return true;
+    });
+  };
+
 export const fuzzyMatch = (input: string, target: string) => {
   let t = 0;
   input = input.toLowerCase();
