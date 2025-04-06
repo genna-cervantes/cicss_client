@@ -4,21 +4,65 @@ import { useAppContext } from "../../context/AppContext";
 
 type Props = { calendarEvent: CalendarEvent };
 
-// Create a regular component function first
 const TimeGridEvent = ({ calendarEvent }: Props) => {
-  const {role} = useAppContext()
-  let desc = JSON.parse(calendarEvent?.description ?? "");
+  const { role } = useAppContext();
+  let desc = JSON.parse(calendarEvent?.description ?? "{}");
 
   let startTime = calendarEvent.start.split(" ")[1];
   let endTime = calendarEvent.end.split(" ")[1];
 
   let violations = desc.violations ?? [];
 
+  // Determine block color based on event title or other properties
+  const getBlockColor = () => {
+    let baseColor = "bg-blue-500";
+
+    const title = calendarEvent.title?.toLowerCase() || "";
+
+    if (title.includes("cs")) {
+      baseColor = "bg-blue-500";
+    } else if (
+      title.includes("purpcom") ||
+      title.includes("pathfit") ||
+      title.includes("thy") ||
+      title.includes("ele") ||
+      title.includes("sts") ||
+      title.includes("read") ||
+      title.includes("fil")
+    ) {
+      baseColor = "bg-teal-400";
+    }
+
+    if (title.includes("lb")) {
+      baseColor = "bg-orange-400";
+    }
+
+    if (title.includes("lc")) {
+      baseColor = "bg-purple-400";
+    }
+
+    return baseColor;
+  };
+
   return (
     <div
-      className={`group ${(violations.length > 0 && role === 'Department Chair') ? `hover:bg-red-600` : ''} bg-yellow-400 font-Manrope font-semibold px-8 py-6 flex flex-col justify-between h-full ${(violations.length > 0 && role === 'Department Chair') ? "border-2 border-red-600" : ""}`}
+      className={`group ${
+        violations.length > 0 && role === "Department Chair"
+          ? `hover:bg-red-600`
+          : ""
+      } ${getBlockColor()} font-Manrope font-semibold px-8 py-6 flex flex-col justify-between h-full ${
+        violations.length > 0 && role === "Department Chair"
+          ? "border-2 border-red-600"
+          : ""
+      } m-0.5 rounded-xl shadow-lg`}
     >
-      <div className={`${(violations.length > 0 && role === 'Department Chair') ? `block group-hover:hidden` : ''}`}>
+      <div
+        className={`${
+          violations.length > 0 && role === "Department Chair"
+            ? `block group-hover:hidden`
+            : ""
+        }`}
+      >
         <div>
           <h1 className="font-bold text-xl">{calendarEvent.title}</h1>
           <h2>{desc.type}</h2>
@@ -35,16 +79,18 @@ const TimeGridEvent = ({ calendarEvent }: Props) => {
           </h2>
         </div>
       </div>
-      {(violations.length > 0 && role === 'Department Chair') && <div className="group-hover:block hidden absolute bg-red-600 text-white" >
-        {violations.map((viol: any) => {
-          return (
-            <div className="flex flex-col gap-y-1" key={viol.id}>
-              <h1 className="font-black">{viol.type}</h1>
-              <h2>- {viol.description}</h2>
-            </div>
-          )
-        })}
-      </div>}
+      {violations.length > 0 && role === "Department Chair" && (
+        <div className="group-hover:block hidden absolute bg-red-600 text-white m-0.5 p-2">
+          {violations.map((viol: any) => {
+            return (
+              <div className="flex flex-col gap-y-1" key={viol.id}>
+                <h1 className="font-black">{viol.type}</h1>
+                <h2>- {viol.description}</h2>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
 import cs_locked from "../assets/cs_locked.png";
+import cs_unlocked from "../assets/cs_unlocked.png";
 
 const UnlockButton = () => {
   const { department, setIsLocked } = useAppContext();
   const navigate = useNavigate();
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleClick = async () => {
     const res = await fetch(
@@ -26,9 +28,18 @@ const UnlockButton = () => {
   };
 
   return (
-    <div className="flex items-center justify-center">
-      <button onClick={() => handleClick()} className="">
-        <img src={cs_locked} alt="" className="w-full" />
+    <div className="w-full flex justify-center items-center">
+      <button
+        onClick={() => handleClick()}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className="flex justify-center items-center transition-all duration-300"
+      >
+        <img
+          src={isHovered ? cs_unlocked : cs_locked}
+          alt={isHovered ? "Schedule will be unlocked" : "Unlock schedule"}
+          className="w-[600px]"
+        />
       </button>
     </div>
   );

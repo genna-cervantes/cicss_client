@@ -290,8 +290,12 @@ const ManualEdit = ({
 
           if (filter === "Section") {
             let date: string = newEvent.start.split(" ")[0];
-            let start: string = `${newEvent.start.split(" ")[1].slice(0, 2)}${newEvent.start.split(" ")[1].slice(3)}`;
-            let end: string = `${newEvent.end.split(" ")[1].slice(0, 2)}${newEvent.end.split(" ")[1].slice(3)}`;
+            let start: string = `${newEvent.start
+              .split(" ")[1]
+              .slice(0, 2)}${newEvent.start.split(" ")[1].slice(3)}`;
+            let end: string = `${newEvent.end
+              .split(" ")[1]
+              .slice(0, 2)}${newEvent.end.split(" ")[1].slice(3)}`;
 
             // "{"type":"lec","violations":[]}"
             let description = JSON.parse(newEvent?.description ?? "");
@@ -406,6 +410,7 @@ const ManualEdit = ({
         console.log("error", data);
       }
     }
+  };
   };
 
   const memoizedCustomComponents = useMemo(
@@ -647,13 +652,19 @@ const ManualEdit = ({
           <div className="flex gap-x-3">
             <button
               onClick={() => setViolationFilter("perSchedBlock")}
-              className={`${violationFitler === "perSchedBlock" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
+              className={`${
+                violationFitler === "perSchedBlock"
+                  ? "bg-primary"
+                  : "bg-primary/70"
+              } px-3 py-2 rounded-lg text-white text-sm font-bold`}
             >
               Per Schedule Block
             </button>
             <button
               onClick={() => setViolationFilter("perFilter")}
-              className={`${violationFitler === "perFilter" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
+              className={`${
+                violationFitler === "perFilter" ? "bg-primary" : "bg-primary/70"
+              } px-3 py-2 rounded-lg text-white text-sm font-bold`}
             >
               Per Section
             </button>
@@ -668,8 +679,21 @@ const ManualEdit = ({
         customComponents={memoizedCustomComponents}
         // timeGridEvent={TimeGridEvent}
       />
-      <button onClick={handleSave}>Save</button>
-      <button onClick={handleDeploy}>Deploy</button>
+
+      <div className="flex justify-center gap-x-6 mt-16 mb-16">
+        <button
+          onClick={handleSave}
+          className="bg-primary font-Manrope font-extrabold text-white px-7 py-1 rounded-md"
+        >
+          Save
+        </button>
+        <button
+          onClick={handleDeploy}
+          className="bg-[#FFBA21] font-Manrope font-extrabold text-gray-600 border border-gray-600 px-7 py-1 rounded-md"
+        >
+          Deploy
+        </button>
+      </div>
     </>
   );
 };
