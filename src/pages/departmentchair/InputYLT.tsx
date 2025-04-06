@@ -393,6 +393,7 @@ const InputYLT = () => {
 
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
+    localStorage.setItem('hasChanges', 'true')
 
     if (hasTimeValidationErrors()) {
       setStatusMessage({

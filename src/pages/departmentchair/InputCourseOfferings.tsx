@@ -359,6 +359,7 @@ const InputCourseOfferings = () => {
   // Save handler for demonstration: logs each course's details.
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
+    localStorage.setItem("hasChanges", "true")
 
     try {
       let isSuccess = false;

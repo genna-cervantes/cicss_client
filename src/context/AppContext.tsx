@@ -11,6 +11,10 @@ interface AppContextType {
   setIsLocked: (isLocked: boolean) => void,
   isReady: boolean
   setIsReady: (isReady: boolean) => void,
+  prevSemester: string,
+  setPrevSemester: (semester: string) => void,
+  isNewSemester: boolean,
+  setIsNewSemester: (isNew: boolean) => void
 }
 
 const getCurrentSemester = (): string => {
@@ -26,15 +30,24 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [role, setRole] = useState<string>(localStorage.getItem("role") ?? "");
   const [department, setDepartment] = useState<string>(localStorage.getItem("department") ?? "");
   const [semester, setSemester] = useState<string>(getCurrentSemester());
+  const [prevSemester, setPrevSemester] = useState<string>(localStorage.getItem("semester") ?? "");
+  const [isNewSemester, setIsNewSemester] = useState(false);
   const [isLocked, setIsLocked] = useState<boolean>(localStorage.getItem("isLocked") === "true" ? true : false)
   const [isReady, setIsReady] = useState<boolean>(localStorage.getItem("isReady") === "true" ? true : false)
 
   useEffect(() => {
     setSemester(getCurrentSemester());
+    // localStorage.setItem()
+
+    if (prevSemester !== semester){
+      setIsNewSemester(true)
+    }else{
+      setIsNewSemester(false)
+    }
   }, []);
 
   return (
-    <AppContext.Provider value={{ role, setRole, semester, department, setDepartment, isLocked, setIsLocked, isReady, setIsReady }}>
+    <AppContext.Provider value={{ role, setRole, semester, department, setDepartment, isLocked, setIsLocked, isReady, setIsReady, isNewSemester, setIsNewSemester, prevSemester, setPrevSemester }}>
       {children}
     </AppContext.Provider>
   );

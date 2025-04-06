@@ -26,6 +26,7 @@ interface TasInfo {
   units: number;
   courses: string[];
   restrictions: Request[];
+  email: string
 }
 
 interface Option {
@@ -64,6 +65,7 @@ const InputTAS: React.FC = () => {
     {
       tasId: "1",
       name: "",
+      email: "",
       units: 0,
       courses: [],
       restrictions: [{ day: "", startEndTimes: [{ start: "", end: "" }] }],
@@ -669,6 +671,7 @@ const InputTAS: React.FC = () => {
       {
         tasId: tempId, // temporary id
         name: "",
+        email: "",
         units: 0,
         courses: [],
         restrictions: [],
@@ -742,6 +745,7 @@ const InputTAS: React.FC = () => {
   // LOOP THRU HTE TRACKERS AND QUERY NECESSARY ENDPOINT
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
+    localStorage.setItem('hasChanges', 'true')
 
     // Clear any previous status messages
     setStatusMessage({ type: null, text: "" });
@@ -917,7 +921,7 @@ const InputTAS: React.FC = () => {
           ...rest,
           restrictions: restrictionsObj,
           mainDepartment: "CS", // HARD CODED FOR NOW
-          email: "sample@email.com", // WALA PANG EMAIL FORM DON SA ANO
+          // email: "sample@email.com", // WALA PANG EMAIL FORM DON SA ANO
         };
 
         const res = await fetch("http://localhost:8080/tasconstraints", {
@@ -1123,6 +1127,7 @@ const InputTAS: React.FC = () => {
                     <div className="ml-20">Name</div>
                     <div className="ml-24">Units</div>
                     <div className="ml-16">Specialization</div>
+                    <div className="ml-32">Email</div>
                   </div>
                   <div className="flex flex-col gap-5 lg:flex-row lg:gap-3">
                     {/* TAS name, units and specialization */}
@@ -1135,7 +1140,7 @@ const InputTAS: React.FC = () => {
                           value={tas.name}
                           onChange={(e) => handleTASFieldChange(tasIndex, e)}
                           placeholder="Enter full name"
-                          className={`h-[38px] border ${
+                          className={`py-1 border text-sm ${
                             nameErrors[tasIndex]
                               ? "border-red-500"
                               : "border-primary"
@@ -1161,7 +1166,7 @@ const InputTAS: React.FC = () => {
                             )
                           }
                           placeholder="Units"
-                          className="h-[38px] border border-primary rounded-[5px] px-2 w-[60px]"
+                          className="py-1 text-sm border border-primary rounded-[5px] px-2 w-[60px]"
                         />
                       </div>
 
@@ -1173,7 +1178,7 @@ const InputTAS: React.FC = () => {
                           isMulti
                           isClearable={false}
                           closeMenuOnSelect={false}
-                          className="w-[200px]"
+                          className="w-[200px] text-sm py-1"
                           value={courseOptions.filter((opt) =>
                             tas.courses.includes(opt.value)
                           )}
@@ -1186,7 +1191,30 @@ const InputTAS: React.FC = () => {
                           styles={customStyles}
                         />
                       </div>
+
+                    {/* email */}
+                    <div>
+                        <input
+                          type="text"
+                          name="email"
+                          value={tas.email}
+                          onChange={(e) => handleTASFieldChange(tasIndex, e)}
+                          placeholder="Enter full name"
+                          className={`py-1 border ${
+                            nameErrors[tasIndex]
+                              ? "border-red-500"
+                              : "border-primary"
+                          } rounded-[5px] px-2 w-[200px] text-sm`}
+                        />
+                        {nameErrors[tasIndex] && (
+                          <div className="text-red-500 text-xs mt-1">
+                            {nameErrors[tasIndex]}
+                          </div>
+                        )}
+                      </div>
                     </div>
+
+
 
                     {/* Day and Time Restriction */}
                     <div className="w-full">
@@ -1203,6 +1231,7 @@ const InputTAS: React.FC = () => {
                                     Day
                                   </label>
                                   <Select
+                                    className="text-sm"
                                     options={getAvailableDayOptions(
                                       tasIndex,
                                       reqIndex
@@ -1248,7 +1277,7 @@ const InputTAS: React.FC = () => {
                                                   e
                                                 )
                                               }
-                                              className={`h-[38px] border w-[130px] ${
+                                              className={`text-sm border w-[130px] ${
                                                 timeErrors[tasIndex]?.[
                                                   reqIndex
                                                 ]?.[timeIndex]
@@ -1274,13 +1303,13 @@ const InputTAS: React.FC = () => {
                                                   e
                                                 )
                                               }
-                                              className={`h-[38px] border w-[130px] ${
+                                              className={`border w-[130px] ${
                                                 timeErrors[tasIndex]?.[
                                                   reqIndex
                                                 ]?.[timeIndex]
                                                   ? "border-red-500"
                                                   : "border-primary"
-                                              } rounded-[5px] py-1 px-2`}
+                                              } rounded-[5px] text-sm py-1 px-2`}
                                             />
                                           </div>
 
@@ -1385,7 +1414,7 @@ const InputTAS: React.FC = () => {
                                   )}
                                 </div>
                               </div>
-                              <div className="flex justify-center gap-3 mt-3">
+                              <div className="flex justify-center gap-3 mt-1">
                                 <button
                                   type="button"
                                   onClick={() =>

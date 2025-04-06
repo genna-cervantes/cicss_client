@@ -33,7 +33,7 @@ const StudentChartCard = () => {
 
         <button
           onClick={() => navigate("/departmentchair/ratings")}
-          className="border-2 border-primary py-1 px-1 w-36 lg:w-40 xl:w-44 font-semibold text-primary text-sm lg:text-base xl:text-lg mt-6 lg:mt-8 hover:bg-primary hover:text-white transition duration-300"
+          className="border-2 border-primary py-1 px-1 w-36 lg:w-40 xl:w-44 font-semibold text-primary text-sm lg:text-base mt-6 lg:mt-8 hover:bg-primary hover:text-white transition duration-300 rounded-lg"
         >
           See More
         </button>

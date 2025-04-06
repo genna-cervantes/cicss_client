@@ -1,21 +1,33 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import cs_thumbnail from "../assets/cs_schedule_card.png";
+import { cn } from "../utils/utils";
 
-function GenerateButton({ regenerate = false }: { regenerate?: boolean }) {
+function GenerateButton({
+  hasChanges = false,
+  newSemester = false,
+  regenerate = false,
+  className = "",
+}: {
+  hasChanges?: boolean;
+  newSemester?: boolean;
+  regenerate?: boolean;
+  className?: string;
+}) {
   const [scheduleExists, setScheduleExists] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [isHovered, setIsHovered] = useState(false);
 
   const handleClick = async () => {
-    if (scheduleExists) {
+    if (scheduleExists && !newSemester && !hasChanges) {
       console.log("schedule exists");
       navigate("/departmentchair/waiting?exists=true", {
         state: { fromButton: true, regenerate },
       });
     } else {
       console.log("schedule not exists");
+
       navigate("/departmentchair/waiting", {
         state: { fromButton: true, regenerate },
       });

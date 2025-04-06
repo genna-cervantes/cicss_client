@@ -122,6 +122,7 @@ const InputSectionCounts: React.FC = () => {
 
   const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    localStorage.setItem("hasChanges", "true")
 
     setStatusMessage({ type: null, text: "" });
 

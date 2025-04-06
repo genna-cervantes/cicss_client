@@ -158,6 +158,7 @@ const InputYLD: React.FC = () => {
   // Handle form submission
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
+    localStorage.setItem('hasChanges', 'true')
 
     const hasInvalidMaxDays = yearLevels.some(
       (level) =>
