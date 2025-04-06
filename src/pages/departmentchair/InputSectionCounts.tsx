@@ -676,7 +676,6 @@ const InputSectionCounts: React.FC = () => {
                                     });
                                   }}
                                 >
-                                  <option value="none">None</option>
                                   <option value="Data Science">
                                     Data Science
                                   </option>

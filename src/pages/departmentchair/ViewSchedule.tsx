@@ -21,7 +21,15 @@ const sections = [
   { code: "3CSF", label: "Data Science" },
 ];
 
-const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter: string, setFilter: React.Dispatch<React.SetStateAction<string>>, role?: string }) => {
+const ViewSchedule = ({
+  filter,
+  setFilter,
+  role = "Department Chair",
+}: {
+  filter: string;
+  setFilter: React.Dispatch<React.SetStateAction<string>>;
+  role?: string;
+}) => {
   const [currentFilter, setCurrentFilter] = useState("Section");
   // const [filter, setFilter] = useState("Section");
 
@@ -40,10 +48,10 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
     currentFilter === "Section"
       ? { label: "1CSA", specialization: "" }
       : currentFilter === "TAS"
-        ? { label: "", name: "" }
-        : currentFilter === "Room"
-          ? { label: "RM1901" }
-          : { label: "" }
+      ? { label: "", name: "" }
+      : currentFilter === "Room"
+      ? { label: "RM1901" }
+      : { label: "" }
   );
 
   const navigate = useNavigate();
@@ -135,8 +143,8 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
     if (filter === "Professor") {
       const fetchTASData = async () => {
         let department = localStorage.getItem("department") ?? "CS";
-        if (department == 'undefined') {
-          department = "CS"
+        if (department == "undefined") {
+          department = "CS";
         }
         const res = await fetch(
           `http://localhost:8080/tasconstraints/details/${department}`,
@@ -174,8 +182,8 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
     if (filter === "Room") {
       const fetchRoomData = async () => {
         let department = localStorage.getItem("department") ?? "CS";
-        if (department == 'undefined') {
-          department = "CS"
+        if (department == "undefined") {
+          department = "CS";
         }
         const res = await fetch(`http://localhost:8080/rooms/${department}`, {
           headers: {
@@ -211,8 +219,8 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
   useEffect(() => {
     const fetchYearSectionsData = async () => {
       let department = localStorage.getItem("department") ?? "CS";
-      if (department == 'undefined') {
-        department = "CS"
+      if (department == "undefined") {
+        department = "CS";
       }
       const res = await fetch(
         `http://localhost:8080/year_sections/${department}`,
@@ -222,7 +230,7 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
           },
         }
       );
-      console.log(res)
+      console.log(res);
       const data = await res.json();
 
       if (res.ok) {
