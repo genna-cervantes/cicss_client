@@ -96,7 +96,7 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
       const keys = Object.keys(profDetails);
       const index = keys.findIndex((tasId) => tasId === currentValue.label);
 
-      let nextIndex: number = index === keys.length ? 0 : index + 1;
+      let nextIndex: number = index === (keys.length - 1) ? 0 : index + 1;
 
       setCurrentValue({
         label: keys[nextIndex],
@@ -106,7 +106,7 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
       const keys = Object.keys(roomDetails);
       const index = keys.findIndex((roomId) => roomId === currentValue.label);
 
-      let nextIndex: number = index === keys.length ? 0 : index + 1;
+      let nextIndex: number = index === (keys.length - 1) ? 0 : index + 1;
 
       setCurrentValue({
         label: keys[nextIndex],
@@ -130,6 +130,11 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
 
   // Get the current section data
   // const currentSection = sections[currentIndex];
+
+  useEffect(() => {
+    console.log('prof details')
+    console.log(profDetails)
+  }, [profDetails])
 
   useEffect(() => {
     if (filter === "Professor") {
@@ -475,7 +480,7 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
                 }
               >
                 <option value="" disabled>
-                  Select a Section
+                  Select a TAS
                 </option>
                 {Object.keys(profDetails).map((tasId, index) => {
                   let tasName = profDetails[tasId];

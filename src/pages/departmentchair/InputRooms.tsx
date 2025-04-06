@@ -176,6 +176,7 @@ const InputRooms = () => {
   // Save handler for demonstration (logs the rooms array).
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
+    localStorage.setItem("hasChanges", "true")
 
     try {
       let isSuccess = false;

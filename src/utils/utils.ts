@@ -1,4 +1,9 @@
 import { dateToDay } from "./constants";
+import { clsx } from "clsx";
+
+export function cn(...inputs: any[]) {
+  return clsx(...inputs);
+}
 
 export const fetchUserInfo = async (accessToken: string) => {
   try {
