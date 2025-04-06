@@ -21,9 +21,9 @@ const sections = [
   { code: "3CSF", label: "Data Science" },
 ];
 
-const ViewSchedule = ({ role = "Department Chair" }: { role?: string }) => {
+const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter: string, setFilter: React.Dispatch<React.SetStateAction<string>>, role?: string }) => {
   const [currentFilter, setCurrentFilter] = useState("Section");
-  const [filter, setFilter] = useState("Section");
+  // const [filter, setFilter] = useState("Section");
 
   const [yearSections, setYearSections] = useState<{
     [key: string]: { next: string; prev: string; specialization: string };

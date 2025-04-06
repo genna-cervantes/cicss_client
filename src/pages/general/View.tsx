@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ViewSchedule from "../departmentchair/ViewSchedule";
 import { generateRandomString } from "../../utils/utils";
 
-const View = ({role}: {role: string}) => {
+const View = ({ filter, setFilter, role }: { filter: string, setFilter: React.Dispatch<React.SetStateAction<string>>, role: string }) => {
   const [isFirstModalOpen, setIsFirstModalOpen] = useState(false);
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
@@ -133,9 +133,9 @@ const View = ({role}: {role: string}) => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4 py-6">
       {/*Put the schedule and the filter component here */}
-      <ViewSchedule role={role} />
+      <ViewSchedule role={role} filter={filter} setFilter={setFilter} />
 
-      <button
+      {role === 'Student' && filter === 'Section' && <button
         type="button"
         onClick={handleButtonClick}
         onMouseDown={handleButtonMouseDown}
@@ -152,7 +152,26 @@ const View = ({role}: {role: string}) => {
                    }`}
       >
         Rate
-      </button>
+      </button>}
+
+      {role === 'TAS' && filter === 'Professor' && <button
+        type="button"
+        onClick={handleButtonClick}
+        onMouseDown={handleButtonMouseDown}
+        onMouseUp={handleButtonMouseUp}
+        onMouseLeave={() => setIsButtonPressed(false)}
+        className={`bg-yellow-400 border-2 border-gray-700 text-gray-700 px-5 py-1 text-lg font-bold rounded-sm
+                   transition-all duration-200 ease-in-out
+                   hover:bg-yellow-500 hover:shadow-lg hover:scale-105
+                   active:scale-95 active:shadow-inner
+                   ${
+                     isButtonPressed
+                       ? "transform scale-95 shadow-inner"
+                       : "transform scale-100"
+                   }`}
+      >
+        Rate
+      </button>}
 
       {/* First Modal */}
       {isFirstModalOpen && (
