@@ -20,7 +20,7 @@ const LockPage = () => {
       if (res.ok) {
         const data = await res.json();
 
-        console.log(data);
+        console.log("Ready departments data:", data);
 
         setCSReady(data.csReady);
         setISReady(data.isReady);
@@ -31,25 +31,26 @@ const LockPage = () => {
   }, []);
 
   useEffect(() => {
-    console.log(department);
+    console.log("Current department:", department);
+    console.log("Department ready states:", { csReady, isReady, itReady });
+
     if (department === "CS" && csReady) {
-      console.log(department);
-      console.log(csReady);
+      console.log("CS department is ready");
       // navigate("/departmentchair/ready-schedule")
       return;
     }
 
     if (department === "IT" && itReady) {
-      console.log("hitting");
+      console.log("IT department is ready");
       // navigate("/departmentchair/ready-schedule")
       return;
     }
     if (department === "IS" && isReady) {
-      console.log("hitting 2");
+      console.log("IS department is ready");
       // navigate("/departmentchair/ready-schedule")
       return;
     }
-  }, [csReady, isReady, itReady]);
+  }, [csReady, isReady, itReady, department]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen space-y-16">
@@ -58,7 +59,7 @@ const LockPage = () => {
       </div>
 
       {department === "CS" && !csReady && <UnlockButton />}
-      {department === "IT" && !isReady && <UnlockButton />}
+      {department === "IT" && !itReady && <UnlockButton />}
       {department === "IS" && !isReady && <UnlockButton />}
 
       <ReadyButton />
