@@ -411,7 +411,6 @@ const ManualEdit = ({
       }
     }
   };
-  };
 
   const memoizedCustomComponents = useMemo(
     () => ({

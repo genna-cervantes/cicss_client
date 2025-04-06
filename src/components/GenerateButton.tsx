@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import cs_thumbnail from "../assets/cs_schedule_card.png";
+import { cn } from "../utils/utils";
 
 function GenerateButton({
   hasChanges = false,
@@ -13,6 +14,7 @@ function GenerateButton({
   regenerate?: boolean;
   className?: string;
 }) {
+
   const [scheduleExists, setScheduleExists] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -69,7 +71,7 @@ function GenerateButton({
   return (
     <div>
       <div>
-        <button onClick={handleClick} className={getButtonClassName()}>
+        <button onClick={handleClick} className={cn(className, getButtonClassName())}>
           {regenerate ? (
             "Regenerate Schedule"
           ) : scheduleExists &&
