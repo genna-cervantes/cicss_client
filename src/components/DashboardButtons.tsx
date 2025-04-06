@@ -15,7 +15,7 @@ const DashboardButtons: React.FC<DashboardButtonsProps> = ({ Label, Path }) => {
       <div
         className="flex font-Manrope font-bold 
                    bg-custom_lightblue items-center justify-between 
-                   py-5 px-3 md:px-5 rounded-xl shadow-lg"
+                   py-7 px-4 md:px-5 rounded-xl shadow-lg"
       >
         <div className="truncate mr-2">{Label}</div>
         <button

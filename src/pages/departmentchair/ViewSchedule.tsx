@@ -537,11 +537,16 @@ const ViewSchedule = ({
         <ScheduleView value={currentValue.label} filter={currentFilter} />
       </div>
       {role === "Department Chair" && (
-        <>
+        <div className="flex gap-6 items-center justify-center mt-6">
           <GenerateButton regenerate={true} />
-          <button onClick={() => navigate("/")}>Save as Draft</button>
+          <button
+            onClick={() => navigate("/")}
+            className="bg-primary text-white font-Manrope font-extrabold px-4 py-2 rounded-md"
+          >
+            Save as Draft
+          </button>
           <LockButton />
-        </>
+        </div>
       )}
     </div>
   );

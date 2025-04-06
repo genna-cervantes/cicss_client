@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import cs_thumbnail from "../assets/cs_schedule_card.png";
 
-function GenerateViewButton({ regenerate = false }: { regenerate?: boolean }) {
+function GenerateButton({ regenerate = false }: { regenerate?: boolean }) {
   const [scheduleExists, setScheduleExists] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -46,7 +46,9 @@ function GenerateViewButton({ regenerate = false }: { regenerate?: boolean }) {
   }, [error]);
 
   const getButtonClassName = () => {
-    if (scheduleExists) {
+    if (regenerate) {
+      return "bg-primary text-white font-Manrope font-extrabold px-4 py-2 rounded-md";
+    } else if (scheduleExists && !regenerate) {
       return "w-full px-8 py-2.5 rounded-md font-Manrope font-bold flex items-center justify-center";
     } else {
       return "w-full px-56 py-2.5 bg-secondary rounded-md font-Manrope font-bold text-[30px] text-white shadow-md hover:bg-primary";
@@ -58,7 +60,9 @@ function GenerateViewButton({ regenerate = false }: { regenerate?: boolean }) {
       <div>
         <button onClick={handleClick} className={getButtonClassName()}>
           {regenerate ? (
-            "Regenerate Schedule"
+            <div className="flex items-center justify-center">
+              <span>Regenerate Schedule</span>
+            </div>
           ) : scheduleExists ? (
             <div className="flex items-center">
               <div
@@ -69,7 +73,7 @@ function GenerateViewButton({ regenerate = false }: { regenerate?: boolean }) {
                 <img
                   src={cs_thumbnail}
                   alt="CS Schedule"
-                  className={`h-96 w-[1000px] transition duration-300 ${
+                  className={`h-72 w-[1000px] transition duration-300 ${
                     isHovered ? "opacity-75" : ""
                   }`}
                 />
@@ -92,4 +96,4 @@ function GenerateViewButton({ regenerate = false }: { regenerate?: boolean }) {
   );
 }
 
-export default GenerateViewButton;
+export default GenerateButton;

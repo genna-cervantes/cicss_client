@@ -15,7 +15,7 @@ const DashboardButtonsSC: React.FC<DashboardButtonsSCProps> = ({
 
   return (
     <div>
-      <div className="flex font-Manrope font-bold bg-custom_lightblue items-center justify-between py-5 px-5 rounded-xl shadow-lg hover:shadow-xl">
+      <div className="flex font-Manrope font-bold bg-custom_lightblue items-center justify-between py-7 px-4 rounded-xl shadow-lg hover:shadow-xl">
         <div>{Label}</div>
         <button
           className="flex border border-primary rounded-md px-6 py-[5px] items-center justify-between gap-3 hover:shadow-lg"
