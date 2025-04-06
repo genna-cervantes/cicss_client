@@ -1,10 +1,10 @@
 import { CalendarEvent } from "@schedule-x/calendar";
+import React from "react";
 
-type props = { calendarEvent: CalendarEvent };
+type Props = { calendarEvent: CalendarEvent };
 
-const timeGridEvent = ({ calendarEvent }: props) => {
-  // console.log(calendarEvent);
-
+// Create a regular component function first
+const TimeGridEvent = ({ calendarEvent }: Props) => {
   let desc = JSON.parse(calendarEvent?.description ?? "");
 
   let startTime = calendarEvent.start.split(" ")[1];
@@ -12,12 +12,7 @@ const timeGridEvent = ({ calendarEvent }: props) => {
 
   let violations = desc.violations ?? [];
 
-  // 1hr is 115px -> such a random number lol 7.188rem
-
-  // console.log(eventHeight);
-
   return (
-    // <div className="group">
     <div
       className={`group ${violations.length > 0 ? `hover:bg-red-600` : ''} bg-yellow-400 font-Manrope font-semibold px-8 py-6 flex flex-col justify-between h-full ${violations.length === 0 ? "" : "border-2 border-red-600"}`}
     >
@@ -49,8 +44,8 @@ const timeGridEvent = ({ calendarEvent }: props) => {
         })}
       </div>}
     </div>
-    // </ div>
   );
 };
 
-export default timeGridEvent;
+// Export the component as React.memo to prevent unnecessary re-renders
+export default React.memo(TimeGridEvent);

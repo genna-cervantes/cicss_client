@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useAppContext } from "../../context/AppContext";
 
 const WaitingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [scheduleExists, setScheduleExists] = useState<boolean>(searchParams.get("exists") === "true");
+
+  const {setIsLocked, setIsReady} = useAppContext()
 
   const [runningGenerator, setRunningGenerator] = useState(false);
   const [error, setError] = useState<string>();
@@ -119,6 +122,7 @@ const WaitingPage = () => {
   useEffect(() => {
     if (CSSections && ITSections && ISSections && !runningGenerator) {
       console.log('running gen')
+      
       const generateSchedule = async () => {
         try {
           // if (firstYearSections.length === 0 || secondYearSections.length === 0 || thirdYearSections.length === 0 || fourthYearSections.length === 0){
@@ -131,7 +135,7 @@ const WaitingPage = () => {
             ISSections,
             semester: 2,
           };
-
+          
           console.log("req");
           console.log(reqBody);
 
@@ -163,6 +167,11 @@ const WaitingPage = () => {
 
       console.log("running generate sched");
       setRunningGenerator(true);
+      setIsLocked(false)
+      setIsReady(false)
+      localStorage.setItem('isReady', 'false')
+      localStorage.setItem('isLocked', 'false')
+
       generateSchedule();
 
       console.log("done");
