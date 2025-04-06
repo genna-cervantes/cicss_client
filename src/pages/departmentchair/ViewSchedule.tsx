@@ -21,7 +21,15 @@ const sections = [
   { code: "3CSF", label: "Data Science" },
 ];
 
-const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter: string, setFilter: React.Dispatch<React.SetStateAction<string>>, role?: string }) => {
+const ViewSchedule = ({
+  filter,
+  setFilter,
+  role = "Department Chair",
+}: {
+  filter: string;
+  setFilter: React.Dispatch<React.SetStateAction<string>>;
+  role?: string;
+}) => {
   const [currentFilter, setCurrentFilter] = useState("Section");
   // const [filter, setFilter] = useState("Section");
 
@@ -40,10 +48,10 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
     currentFilter === "Section"
       ? { label: "1CSA", specialization: "" }
       : currentFilter === "TAS"
-        ? { label: "", name: "" }
-        : currentFilter === "Room"
-          ? { label: "RM1901" }
-          : { label: "" }
+      ? { label: "", name: "" }
+      : currentFilter === "Room"
+      ? { label: "RM1901" }
+      : { label: "" }
   );
 
   const navigate = useNavigate();
@@ -96,7 +104,7 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
       const keys = Object.keys(profDetails);
       const index = keys.findIndex((tasId) => tasId === currentValue.label);
 
-      let nextIndex: number = index === keys.length ? 0 : index + 1;
+      let nextIndex: number = index === (keys.length - 1) ? 0 : index + 1;
 
       setCurrentValue({
         label: keys[nextIndex],
@@ -106,7 +114,7 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
       const keys = Object.keys(roomDetails);
       const index = keys.findIndex((roomId) => roomId === currentValue.label);
 
-      let nextIndex: number = index === keys.length ? 0 : index + 1;
+      let nextIndex: number = index === (keys.length - 1) ? 0 : index + 1;
 
       setCurrentValue({
         label: keys[nextIndex],
@@ -132,11 +140,16 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
   // const currentSection = sections[currentIndex];
 
   useEffect(() => {
+    console.log('prof details')
+    console.log(profDetails)
+  }, [profDetails])
+
+  useEffect(() => {
     if (filter === "Professor") {
       const fetchTASData = async () => {
         let department = localStorage.getItem("department") ?? "CS";
-        if (department == 'undefined') {
-          department = "CS"
+        if (department == "undefined") {
+          department = "CS";
         }
         const res = await fetch(
           `http://localhost:8080/tasconstraints/details/${department}`,
@@ -174,8 +187,8 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
     if (filter === "Room") {
       const fetchRoomData = async () => {
         let department = localStorage.getItem("department") ?? "CS";
-        if (department == 'undefined') {
-          department = "CS"
+        if (department == "undefined") {
+          department = "CS";
         }
         const res = await fetch(`http://localhost:8080/rooms/${department}`, {
           headers: {
@@ -211,8 +224,8 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
   useEffect(() => {
     const fetchYearSectionsData = async () => {
       let department = localStorage.getItem("department") ?? "CS";
-      if (department == 'undefined') {
-        department = "CS"
+      if (department == "undefined") {
+        department = "CS";
       }
       const res = await fetch(
         `http://localhost:8080/year_sections/${department}`,
@@ -222,7 +235,7 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
           },
         }
       );
-      console.log(res)
+      console.log(res);
       const data = await res.json();
 
       if (res.ok) {
@@ -475,7 +488,7 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
                 }
               >
                 <option value="" disabled>
-                  Select a Section
+                  Select a TAS
                 </option>
                 {Object.keys(profDetails).map((tasId, index) => {
                   let tasName = profDetails[tasId];
@@ -529,11 +542,16 @@ const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter
         <ScheduleView value={currentValue.label} filter={currentFilter} />
       </div>
       {role === "Department Chair" && (
-        <>
+        <div className="flex gap-6 items-center justify-center mt-6">
           <GenerateButton regenerate={true} />
-          <button onClick={() => navigate("/")}>Save as Draft</button>
+          <button
+            onClick={() => navigate("/")}
+            className="bg-primary text-white font-Manrope font-extrabold px-4 py-2 rounded-md"
+          >
+            Save as Draft
+          </button>
           <LockButton />
-        </>
+        </div>
       )}
     </div>
   );

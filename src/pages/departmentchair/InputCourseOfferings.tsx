@@ -359,6 +359,7 @@ const InputCourseOfferings = () => {
   // Save handler for demonstration: logs each course's details.
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
+    localStorage.setItem("hasChanges", "true")
 
     try {
       let isSuccess = false;
@@ -637,7 +638,7 @@ const InputCourseOfferings = () => {
 
   const MemoizedThirdYearCourseList = useMemo(
     () =>
-      secondYearCourses.map((course, index) => (
+      thirdYearCourses.map((course, index) => (
         <CourseOffering
           yearLevel={3}
           course={course}
@@ -656,7 +657,7 @@ const InputCourseOfferings = () => {
 
   const MemoizedFourthYearCourseList = useMemo(
     () =>
-      secondYearCourses.map((course, index) => (
+      fourthYearCourses.map((course, index) => (
         <CourseOffering
           yearLevel={4}
           course={course}
@@ -711,15 +712,19 @@ const InputCourseOfferings = () => {
 
         <form className="flex flex-col">
           {/* FIRST YEAR COURSES */}
+          {/* <h1>First Year Courses</h1> */}
           {MemoizedFirstYearCourseList}
 
           {/* SECOND YEAR COURSES */}
+          {/* <h1>Second Year Courses</h1> */}
           {MemoizedSecondYearCourseList}
 
           {/* THIRD YEAR COURSES */}
+          {/* <h1>Third Year Courses</h1> */}
           {MemoizedThirdYearCourseList}
 
           {/* FOURTH YEAR COURSES */}
+          {/* <h1>Fourth Year Courses</h1> */}
           {MemoizedFourthYearCourseList}
 
           {addedCourses.map((course, index) => (

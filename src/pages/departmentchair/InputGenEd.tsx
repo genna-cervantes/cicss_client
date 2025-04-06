@@ -601,6 +601,7 @@ const InputGenEd = () => {
 
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
+    localStorage.setItem("hasChanges", "true")
 
     // Validate before saving
     if (!validateBeforeSave()) {

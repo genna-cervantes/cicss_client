@@ -25,13 +25,16 @@ const LockButton = () => {
   };
 
   useEffect(() => {
-    if (isLocked){
-        navigate("/departmentchair/lock-schedule");
+    if (isLocked) {
+      navigate("/departmentchair/lock-schedule");
     }
   }, [isLocked]);
 
   return (
-    <button onClick={() => handleClick()} className="">
+    <button
+      onClick={() => handleClick()}
+      className="bg-[#FFBA21] font-Manrope font-extrabold text-gray-700 border border-gray-700 px-4 py-2 rounded-md"
+    >
       Lock Schedule
     </button>
   );

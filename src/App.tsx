@@ -63,7 +63,10 @@ const App: React.FC = () => {
             <Route path="input-yld" element={<InputYLD />} />
             <Route path="input-ylt" element={<InputYLT />} />
 
-            <Route path="view-schedule" element={<ViewSchedule filter={filter} setFilter={setFilter} />} />
+            <Route
+              path="view-schedule"
+              element={<ViewSchedule filter={filter} setFilter={setFilter} />}
+            />
             <Route path="manual-edit" element={<ManualEditViewSchedule />} />
             <Route path="lock-schedule" element={<LockPage />} />
             <Route path="ready-schedule" element={<ReadyPage />} />
@@ -86,7 +89,14 @@ const App: React.FC = () => {
             <Route index element={<TASDashboard />} />
 
             {/* add routes for tas here */}
-            <Route path="view" element={<View role="TAS" filter={filter} setFilter={setFilter} />} />
+            <Route
+              path="view"
+              element={
+                <View role="TAS" filter={filter} setFilter={setFilter} />
+              }
+            />
+            <Route path="terms-conditions" element={<TermsAndConditions />} />
+            <Route path="help" element={<Help />} />
 
             <Route path="*" element={<Navigate to="/tas" replace />} />
           </Route>
@@ -95,8 +105,15 @@ const App: React.FC = () => {
             <Route index element={<StudentDashboard />} />
 
             {/* add routes for student here */}
-            <Route path="view" element={<View role="Student" filter={filter} setFilter={setFilter} />} />
+            <Route
+              path="view"
+              element={
+                <View role="Student" filter={filter} setFilter={setFilter} />
+              }
+            />
             {/* <Route path="schedule" element={<div>student schedule</div>} /> */}
+            <Route path="terms-conditions" element={<TermsAndConditions />} />
+            <Route path="help" element={<Help />} />
 
             <Route path="*" element={<Navigate to="/student" replace />} />
           </Route>

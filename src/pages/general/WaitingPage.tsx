@@ -6,7 +6,7 @@ const WaitingPage = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [scheduleExists, setScheduleExists] = useState<boolean>(searchParams.get("exists") === "true");
 
-  const {setIsLocked, setIsReady} = useAppContext()
+  const {setIsLocked, setIsReady, prevSemester} = useAppContext()
 
   const [runningGenerator, setRunningGenerator] = useState(false);
   const [error, setError] = useState<string>();
@@ -133,7 +133,7 @@ const WaitingPage = () => {
             CSSections,
             ITSections,
             ISSections,
-            semester: 2,
+            semester: prevSemester === 'First Semester' ? 1 : 2,
           };
           
           console.log("req");
@@ -171,6 +171,9 @@ const WaitingPage = () => {
       setIsReady(false)
       localStorage.setItem('isReady', 'false')
       localStorage.setItem('isLocked', 'false')
+      
+      // pagkadito nagenerate na ulit so change na ulit toh to wala na
+      localStorage.setItem('hasChanges', 'false')
 
       generateSchedule();
 

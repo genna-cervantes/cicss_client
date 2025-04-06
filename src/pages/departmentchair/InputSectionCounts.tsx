@@ -122,6 +122,7 @@ const InputSectionCounts: React.FC = () => {
 
   const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    localStorage.setItem("hasChanges", "true")
 
     setStatusMessage({ type: null, text: "" });
 
@@ -676,7 +677,6 @@ const InputSectionCounts: React.FC = () => {
                                     });
                                   }}
                                 >
-                                  <option value="none">None</option>
                                   <option value="Data Science">
                                     Data Science
                                   </option>

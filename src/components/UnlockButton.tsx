@@ -1,6 +1,7 @@
 import React from "react";
 import { useAppContext } from "../context/AppContext";
 import { useNavigate } from "react-router-dom";
+import cs_locked from "../assets/cs_locked.png";
 
 const UnlockButton = () => {
   const { department, setIsLocked } = useAppContext();
@@ -25,9 +26,11 @@ const UnlockButton = () => {
   };
 
   return (
-    <button onClick={() => handleClick()} className="">
-      Unock Schedule
-    </button>
+    <div className="flex items-center justify-center">
+      <button onClick={() => handleClick()} className="">
+        <img src={cs_locked} alt="" className="w-full" />
+      </button>
+    </div>
   );
 };
 
