@@ -17,7 +17,7 @@ const ReadyButton = () => {
       const data = await res.json();
       if (data.success) {
         setIsReady(true);
-        localStorage.setItem("isReady", "true")
+        localStorage.setItem("isReady", "true");
       } else {
         console.log("error with readying schedule");
       }
@@ -26,12 +26,19 @@ const ReadyButton = () => {
     console.log("error with readying schedule");
   };
   useEffect(() => {
-      if (isReady){
-        navigate("/departmentchair/ready-schedule");
-      } 
+    if (isReady) {
+      navigate("/departmentchair/ready-schedule");
+    }
   }, [isReady]);
 
-  return <button onClick={handleClick}>Ready</button>;
+  return (
+    <button
+      onClick={handleClick}
+      className="bg-primary text-white font-Manrope font-extrabold px-10 py-3 rounded-md"
+    >
+      Ready
+    </button>
+  );
 };
 
 export default ReadyButton;
