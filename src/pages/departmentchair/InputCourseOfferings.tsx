@@ -357,110 +357,156 @@ const InputCourseOfferings = () => {
   };
 
   // Save handler for demonstration: logs each course's details.
-  const handleSave = (e: FormEvent) => {
-    // save added courses
+  const handleSave = async (e: FormEvent) => {
     e.preventDefault();
 
-    const addCourseData = async () => {
-      for (let i = 0; i < addedCourses.length; i++) {
-        let course = addedCourses[i];
-        let reqObj = {
-          subjectCode: course.code,
-          name: course.title,
-          courseType: course.type,
-          category: course.category,
-          totalUnits: course.unit,
-        };
+    try {
+      let isSuccess = false;
+      let apiErrors: string[] = [];
 
+      // save added courses
+      if (addedCourses.length > 0) {
+        for (let i = 0; i < addedCourses.length; i++) {
+          let course = addedCourses[i];
+          let reqObj = {
+            subjectCode: course.code,
+            name: course.title,
+            courseType: course.type,
+            category: course.category,
+            totalUnits: course.unit,
+          };
+
+          const department = localStorage.getItem("department") ?? "CS";
+          const res = await fetch(
+            `http://localhost:8080/courseofferings/${course.yearLevel}/2/${department}`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify(reqObj),
+            }
+          );
+
+          if (res.ok) {
+            isSuccess = true;
+          } else {
+            const data = await res.json();
+            apiErrors.push(
+              `Failed to add course ${course.code}: ${
+                data.message || "Unknown error"
+              }`
+            );
+          }
+        }
+      }
+
+      // save updated courses
+      if (updatedCourses.length > 0) {
+        for (let i = 0; i < updatedCourses.length; i++) {
+          let reqObj = {
+            courseCodeKey: updatedCourses[i].courseCodeKey,
+            ...(updatedCourses[i]?.title && { name: updatedCourses[i].title }),
+            ...(updatedCourses[i]?.code && {
+              courseCode: updatedCourses[i].code,
+            }),
+            ...(updatedCourses[i]?.unit && {
+              totalUnits: updatedCourses[i].unit,
+            }),
+            ...(updatedCourses[i]?.type && {
+              courseType: updatedCourses[i].type,
+            }),
+            ...(updatedCourses[i]?.category && {
+              courseCategory: updatedCourses[i].category,
+            }),
+          };
+
+          const department = localStorage.getItem("department") ?? "CS";
+          const res = await fetch(
+            `http://localhost:8080/courseofferings/${updatedCourses[i].yearLevel}/2/${department}`,
+            {
+              method: "PUT",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify(reqObj),
+            }
+          );
+
+          if (res.ok) {
+            isSuccess = true;
+          } else {
+            const data = await res.json();
+            apiErrors.push(
+              `Failed to update course ${updatedCourses[i].courseCodeKey}: ${
+                data.message || "Unknown error"
+              }`
+            );
+          }
+        }
+      }
+
+      // save deleted courses
+      if (deletedCourses.length > 0) {
         const department = localStorage.getItem("department") ?? "CS";
-        const res = await fetch(
-          `http://localhost:8080/courseofferings/${course.yearLevel}/2/${department}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-              "Content-type": "application/json",
-            },
-            body: JSON.stringify(reqObj),
-          }
-        );
+        for (let i = 0; i < deletedCourses.length; i++) {
+          let reqObj = deletedCourses[i];
+          const res = await fetch(
+            `http://localhost:8080/courseofferings/${deletedCourses[i].yearLevel}/2/${department}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify(reqObj),
+            }
+          );
 
-        if (res.ok) {
-          console.log("yey nasave");
-        } else {
-          console.log("shet errro");
+          if (res.ok) {
+            isSuccess = true;
+          } else {
+            const data = await res.json();
+            apiErrors.push(
+              `Failed to delete course ${deletedCourses[i].courseCode}: ${
+                data.message || "Unknown error"
+              }`
+            );
+          }
         }
       }
-    };
-    addCourseData();
 
-    // save updated courses
-    const updateCoursesData = async () => {
-      for (let i = 0; i < updatedCourses.length; i++) {
-        let reqObj = {
-          courseCodeKey: updatedCourses[i].courseCodeKey,
-          ...(updatedCourses[i]?.title && { name: updatedCourses[i].title }),
-          ...(updatedCourses[i]?.code && {
-            courseCode: updatedCourses[i].code,
-          }),
-          ...(updatedCourses[i]?.unit && {
-            totalUnits: updatedCourses[i].unit,
-          }),
-          ...(updatedCourses[i]?.type && {
-            courseType: updatedCourses[i].type,
-          }),
-          ...(updatedCourses[i]?.category && {
-            courseCategory: updatedCourses[i].category,
-          }),
-        };
-
-        const department = localStorage.getItem("department") ?? "CS";
-        const res = await fetch(
-          `http://localhost:8080/courseofferings/${updatedCourses[i].yearLevel}/2/${department}`,
-          {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-              "Content-type": "application/json",
-            },
-            body: JSON.stringify(reqObj),
-          }
-        );
-
-        if (res.ok) {
-          console.log("yey updated");
-        } else {
-          console.log("noo may error");
-        }
+      // Set final status message
+      if (apiErrors.length > 0) {
+        setStatusMessage({
+          type: "error",
+          text: apiErrors[0], // Show first error or join multiple errors
+        });
+      } else if (isSuccess) {
+        setStatusMessage({
+          type: "success",
+          text: "Course offerings successfully saved!",
+        });
+      } else if (
+        updatedCourses.length === 0 &&
+        addedCourses.length === 0 &&
+        deletedCourses.length === 0
+      ) {
+        // No operations were performed
+        setStatusMessage({
+          type: "error",
+          text: "No changes to save.",
+        });
       }
-    };
-    updateCoursesData();
-
-    // save deleted courses
-    const deleteCourseData = async () => {
-      const department = localStorage.getItem("department") ?? "CS";
-      for (let i = 0; i < deletedCourses.length; i++) {
-        let reqObj = deletedCourses[i];
-        const res = await fetch(
-          `http://localhost:8080/courseofferings/${deletedCourses[i].yearLevel}/2/${department}`,
-          {
-            method: "DELETE",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-              "Content-type": "application/json",
-            },
-            body: JSON.stringify(reqObj),
-          }
-        );
-
-        if (res.ok) {
-          console.log("yey delted");
-        } else {
-          console.log("may error sis");
-        }
-      }
-    };
-    deleteCourseData();
+    } catch (error) {
+      console.error("Error saving courses:", error);
+      setStatusMessage({
+        type: "error",
+        text: "An error occurred while saving. Please try again.",
+      });
+    }
   };
 
   // fetch data
@@ -627,6 +673,15 @@ const InputCourseOfferings = () => {
     [fourthYearCourses]
   );
 
+  const [statusMessage, setStatusMessage] = useState<{
+    type: "success" | "error" | null;
+    text: string;
+  }>({ type: null, text: "" });
+
+  const clearStatusMessage = () => {
+    setStatusMessage({ type: null, text: "" });
+  };
+
   return (
     <>
       {/* Mobile/Small screen warning */}
@@ -779,23 +834,57 @@ const InputCourseOfferings = () => {
               </button>
             </section>
           ))}
-          <div className="mx-auto flex gap-4">
-            <div>
-              <button
-                onClick={handleSave}
-                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+          <div className="flex flex-col">
+            {statusMessage.type && (
+              <div
+                className={`mx-auto mt-6 p-3 rounded-md text-center font-medium flex justify-between items-center ${
+                  statusMessage.type === "success"
+                    ? "bg-green-100 text-green-800 border border-green-300"
+                    : "bg-red-100 text-red-800 border border-red-300"
+                }`}
               >
-                Save
-              </button>
-            </div>
-            <div>
-              <button
-                onClick={handleAddCourse}
-                className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
-              >
-                Add
-                <img src={add_button_white} className="w-4" alt="Add" />
-              </button>
+                <span className="flex-grow">{statusMessage.text}</span>
+                <button
+                  onClick={clearStatusMessage}
+                  className="text-gray-600 hover:text-gray-900 ml-5 flex items-center"
+                  type="button"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            <div className="mx-auto flex gap-4">
+              <div>
+                <button
+                  onClick={handleSave}
+                  className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+                >
+                  Save
+                </button>
+              </div>
+              <div>
+                <button
+                  onClick={handleAddCourse}
+                  className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+                >
+                  Add
+                  <img src={add_button_white} className="w-4" alt="Add" />
+                </button>
+              </div>
             </div>
           </div>
         </form>

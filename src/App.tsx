@@ -30,6 +30,7 @@ import Help from "./pages/general/Help";
 import LockPage from "./pages/departmentchair/LockPage";
 import ReadyPage from "./pages/departmentchair/ReadyPage";
 import ManualEditViewSchedule from "./components/ManualEditViewSchedule";
+import View from "./pages/general/View";
 
 const App: React.FC = () => {
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
@@ -72,7 +73,6 @@ const App: React.FC = () => {
             <Route path="terms-conditions" element={<TermsAndConditions />} />
             <Route path="help" element={<Help />} />
 
-
             {/* catch all */}
             <Route
               path="*"
@@ -84,7 +84,7 @@ const App: React.FC = () => {
             <Route index element={<TASDashboard />} />
 
             {/* add routes for tas here */}
-            <Route path="schedule" element={<div>tas schedule</div>} />
+            <Route path="view" element={<View />} />
 
             <Route path="*" element={<Navigate to="/tas" replace />} />
           </Route>
@@ -93,6 +93,7 @@ const App: React.FC = () => {
             <Route index element={<StudentDashboard />} />
 
             {/* add routes for student here */}
+            <Route path="view" element={<View />} />
             <Route path="schedule" element={<div>student schedule</div>} />
 
             <Route path="*" element={<Navigate to="/student" replace />} />

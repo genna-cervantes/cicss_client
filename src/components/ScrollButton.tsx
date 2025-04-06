@@ -6,22 +6,18 @@ const ScrollButton = () => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
-
       const viewportHeight = window.innerHeight;
-
       const documentHeight = document.documentElement.scrollHeight;
 
-      const halfwayPoint = documentHeight / 2;
+      const thresholdPoint = documentHeight * 0.8;
 
       const currentViewPosition = scrollPosition + viewportHeight / 2;
 
-      setIsInUpperHalf(currentViewPosition < halfwayPoint);
+      setIsInUpperHalf(currentViewPosition < thresholdPoint);
     };
 
     window.addEventListener("scroll", handleScroll);
-
     window.addEventListener("resize", handleScroll);
-
     handleScroll();
 
     return () => {
@@ -39,7 +35,6 @@ const ScrollButton = () => {
         behavior: "smooth",
       });
     } else {
-      // In lower half, scroll up to the top
       window.scrollTo({
         top: 0,
         behavior: "smooth",
