@@ -26,6 +26,7 @@ interface TasInfo {
   units: number;
   courses: string[];
   restrictions: Request[];
+  email: string
 }
 
 interface Option {
@@ -64,6 +65,7 @@ const InputTAS: React.FC = () => {
     {
       tasId: "1",
       name: "",
+      email: "",
       units: 0,
       courses: [],
       restrictions: [{ day: "", startEndTimes: [{ start: "", end: "" }] }],
@@ -669,6 +671,7 @@ const InputTAS: React.FC = () => {
       {
         tasId: tempId, // temporary id
         name: "",
+        email: "",
         units: 0,
         courses: [],
         restrictions: [],
@@ -917,7 +920,7 @@ const InputTAS: React.FC = () => {
           ...rest,
           restrictions: restrictionsObj,
           mainDepartment: "CS", // HARD CODED FOR NOW
-          email: "sample@email.com", // WALA PANG EMAIL FORM DON SA ANO
+          // email: "sample@email.com", // WALA PANG EMAIL FORM DON SA ANO
         };
 
         const res = await fetch("http://localhost:8080/tasconstraints", {
@@ -1186,7 +1189,30 @@ const InputTAS: React.FC = () => {
                           styles={customStyles}
                         />
                       </div>
+
+                    {/* email */}
+                    <div>
+                        <input
+                          type="text"
+                          name="name"
+                          value={tas.email}
+                          onChange={(e) => handleTASFieldChange(tasIndex, e)}
+                          placeholder="Enter full name"
+                          className={`h-[38px] border ${
+                            nameErrors[tasIndex]
+                              ? "border-red-500"
+                              : "border-primary"
+                          } rounded-[5px] px-2 w-[200px]`}
+                        />
+                        {nameErrors[tasIndex] && (
+                          <div className="text-red-500 text-xs mt-1">
+                            {nameErrors[tasIndex]}
+                          </div>
+                        )}
+                      </div>
                     </div>
+
+
 
                     {/* Day and Time Restriction */}
                     <div className="w-full">
