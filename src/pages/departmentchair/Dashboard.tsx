@@ -5,7 +5,6 @@ import DashboardButtons from "../../components/DashboardButtons";
 import DashboardButtonsSC from "../../components/DashboardButtonsSC";
 import StudentChartCard from "../../components/StudentChartCard";
 import TeacherChartCard from "../../components/TeacherChartCard";
-import { NavLink } from "react-router-dom";
 import GenerateButton from "../../components/GenerateButton";
 import { useAppContext } from "../../context/AppContext";
 
@@ -27,7 +26,7 @@ const Dashboard = () => {
 
   return (
     <div className="w-full">
-      {/* Mobile/Small screen warning - only shows on screens smaller than sm breakpoint */}
+      {/* Mobile/Small screen warning */}
       <div className="lg:hidden flex flex-col items-center justify-center h-screen">
         <div className="text-center p-8 bg-white rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-blue-800 mb-4">
@@ -43,7 +42,7 @@ const Dashboard = () => {
 
       <main className="hidden lg:block justify-between max-w-full min-h-screen">
         <section className="flex items-center justify-between py-7 px-2 lg:px-12 xl:px-16 2xl:px-24">
-          <Greeting userName="CS Chair" />
+          <Greeting userName={(department ?? "") + (role ? ` ${role}` : "")} />
           <Semester />
         </section>
 

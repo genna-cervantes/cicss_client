@@ -25,8 +25,8 @@ const LockButton = () => {
   };
 
   useEffect(() => {
-    if (isLocked){
-        navigate("/departmentchair/lock-schedule");
+    if (isLocked) {
+      navigate("/departmentchair/lock-schedule");
     }
   }, [isLocked]);
 
