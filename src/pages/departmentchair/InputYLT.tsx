@@ -50,6 +50,11 @@ const InputYLT = () => {
     [key: string]: { [key: number]: { [key: number]: string } };
   }>({});
 
+  const [statusMessage, setStatusMessage] = useState<{
+    type: "success" | "error" | null;
+    text: string;
+  }>({ type: null, text: "" });
+
   useEffect(() => {
     console.log("updated");
     console.log(updatedYearLevels);
@@ -382,11 +387,18 @@ const InputYLT = () => {
     return Object.keys(timeErrors).length > 0;
   };
 
+  const clearStatusMessage = () => {
+    setStatusMessage({ type: null, text: "" });
+  };
+
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
 
     if (hasTimeValidationErrors()) {
-      alert("Please fix all time validation errors before saving");
+      setStatusMessage({
+        type: "error",
+        text: "Please fix all time validation errors before saving",
+      });
       return;
     }
 
@@ -408,58 +420,105 @@ const InputYLT = () => {
     }
 
     if (hasIncompleteTimeEntries) {
-      alert("Please complete all time entries with both start and end times");
+      setStatusMessage({
+        type: "error",
+        text: "Please complete all time entries with both start and end times",
+      });
       return;
     }
 
     console.log("saving");
     console.log(updatedYearLevels);
 
-    // Here you would typically send the data to your backend
-    for (let i = 0; i < updatedYearLevels.length; i++) {
-      let updatedYearLevel = updatedYearLevels[i];
-      let yearLevel = Object.keys(updatedYearLevel)[0];
-
-      let transformedRestrictions: any = {
-        M: [],
-        T: [],
-        W: [],
-        TH: [],
-        F: [],
-        S: [],
-      };
-
-      updatedYearLevel[yearLevel].forEach((res) => {
-        let transformedStartEndTimes = res.startEndTimes.map((set) => {
-          return {
-            start: `${set.startTime.slice(0, 2)}${set.startTime.slice(3)}`,
-            end: `${set.endTime.slice(0, 2)}${set.endTime.slice(3)}`,
-          };
-        });
-        transformedRestrictions[res.day] = [
-          ...transformedRestrictions[res.day],
-          ...transformedStartEndTimes,
-        ];
+    if (updatedYearLevels.length === 0) {
+      setStatusMessage({
+        type: "error",
+        text: "No changes to save.",
       });
+      return;
+    }
 
-      const department = localStorage.getItem("department") ?? "CS";
-      const res = await fetch(
-        `http://localhost:8080/yltconstraints/${department}/${yearLevel}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-            "Content-type": "application/json",
-          },
-          body: JSON.stringify({ restrictions: transformedRestrictions }),
+    try {
+      let isSuccess = false;
+      let apiErrors: string[] = [];
+
+      // Here you would typically send the data to your backend
+      for (let i = 0; i < updatedYearLevels.length; i++) {
+        let updatedYearLevel = updatedYearLevels[i];
+        let yearLevel = Object.keys(updatedYearLevel)[0];
+
+        let transformedRestrictions: any = {
+          M: [],
+          T: [],
+          W: [],
+          TH: [],
+          F: [],
+          S: [],
+        };
+
+        updatedYearLevel[yearLevel].forEach((res) => {
+          let transformedStartEndTimes = res.startEndTimes.map((set) => {
+            return {
+              start: `${set.startTime.slice(0, 2)}${set.startTime.slice(3)}`,
+              end: `${set.endTime.slice(0, 2)}${set.endTime.slice(3)}`,
+            };
+          });
+          transformedRestrictions[res.day] = [
+            ...transformedRestrictions[res.day],
+            ...transformedStartEndTimes,
+          ];
+        });
+
+        const department = localStorage.getItem("department") ?? "CS";
+        try {
+          const res = await fetch(
+            `http://localhost:8080/yltconstraints/${department}/${yearLevel}`,
+            {
+              method: "PUT",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify({ restrictions: transformedRestrictions }),
+            }
+          );
+
+          if (res.ok) {
+            isSuccess = true;
+            console.log("yeyy okay");
+          } else {
+            const data = await res.json();
+            console.log("error", data);
+            apiErrors.push(
+              `Failed to update Year ${yearLevel}: ${
+                data.message || "Unknown error"
+              }`
+            );
+          }
+        } catch (error) {
+          console.error("Update fetch error:", error);
+          apiErrors.push(`Network error updating Year ${yearLevel}`);
         }
-      );
-
-      if (res.ok) {
-        console.log("yeyy okay");
-      } else {
-        console.log("error");
       }
+
+      // Set final status message
+      if (apiErrors.length > 0) {
+        setStatusMessage({
+          type: "error",
+          text: apiErrors[0], // Show first error
+        });
+      } else if (isSuccess) {
+        setStatusMessage({
+          type: "success",
+          text: "Year Level Time constraints successfully saved!",
+        });
+      }
+    } catch (error) {
+      console.error("Error saving year level time constraints:", error);
+      setStatusMessage({
+        type: "error",
+        text: "An error occurred while saving. Please try again.",
+      });
     }
   };
 
@@ -773,6 +832,38 @@ const InputYLT = () => {
               }
             )}
           </section>
+
+          {statusMessage.type && (
+            <div
+              className={`mx-auto max-w-lg mt-6 p-3 rounded-md text-center font-medium flex justify-between items-center ${
+                statusMessage.type === "success"
+                  ? "bg-green-100 text-green-800 border border-green-300"
+                  : "bg-red-100 text-red-800 border border-red-300"
+              }`}
+            >
+              <span className="flex-grow">{statusMessage.text}</span>
+              <button
+                onClick={clearStatusMessage}
+                className="text-gray-600 hover:text-gray-900 ml-5 flex items-center"
+                type="button"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          )}
 
           <div className="flex justify-center">
             <button
