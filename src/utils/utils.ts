@@ -1,3 +1,5 @@
+import { dateToDay } from "./constants";
+
 export const fetchUserInfo = async (accessToken: string) => {
   try {
     const response = await fetch(
@@ -18,88 +20,118 @@ export const fetchUserInfo = async (accessToken: string) => {
 };
 
 export const checkIfCICSStudent = (email: string) => {
-    try{
+  try {
+    let prefix = email.split("@")[0];
+    let prefixSplit = prefix.split(".");
+    let college = prefixSplit[prefixSplit.length - 1];
 
-        let prefix = email.split('@')[0];
-        let prefixSplit = prefix.split('.');
-        let college = prefixSplit[prefixSplit.length - 1];
-
-        return college === 'cics';
-
-    }catch (error){
-        console.error("Error with checking email:", error);
-    }
-}
+    return college === "cics";
+  } catch (error) {
+    console.error("Error with checking email:", error);
+  }
+};
 
 export const checkIfCICSTAS = async (email: string) => {
-    try{
+  try {
+    // POST /api/tas/email
+    let rqBody = JSON.stringify({ email }); // {email: email}
 
-        // POST /api/tas/email 
-        let rqBody = JSON.stringify({email})// {email: email}
+    let response = await fetch(
+      "http://localhost:8080/departmentchair/authenticate",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: rqBody,
+      }
+    );
 
-        let response = await fetch("http://localhost:8080/departmentchair/authenticate", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: rqBody
-        })
+    let jsRes = await response.json();
 
-        let jsRes = await response.json();
+    return jsRes.auth;
+  } catch (error) {
+    console.error("Error with checking email: ", error);
+  }
+};
 
-        return jsRes.auth;
+export const getCourseCodesFromInternalRepresentation = (
+  internalRep: String[]
+) => {
+  // loop thru the string arr
+  // remove ung mga -LC -LB sa dulo tapos gawing set - para sa may mga lab
+  // remove ung mga W- sa unahan - para sa mga specialization - lagyan ng (Specialization) - dont kasi sa front end may difference din dapat
 
-    }catch (error){
-        console.error("Error with checking email: ", error);
+  // return the set
+  let removedLCandLb = internalRep.map((r) => {
+    if (r.endsWith("-LC") || r.endsWith("-LB")) {
+      return r.slice(0, r.length - 3);
     }
-}
+    return r;
+  });
 
-export const checkIfCICSDepartmentChair = async (email: string) => {
-    try{
+  return Array(...new Set(removedLCandLb));
+};
 
-        return true;
+export const transformToOriginalEvents = (
+  transformedEvents: any,
+  changedScheduleBlocks: any,
+  value: string
+) => {
+  let originalEvents = [];
 
-        // POST /api/department-chair/email 
-        // {email: email}
+  console.log(changedScheduleBlocks)
 
-        // return true if may return ung query false if wala
-        // SELECT id FROM department_chairs WHERE email = 'email'
+  let combinedEvents = transformedEvents.map((te: any) => {
+    const changedEvent = changedScheduleBlocks.find((ce: any) => ce.id === te.id);
+    
+    return changedEvent || te;
+  });
+  
+  for (let i = 0; i < combinedEvents.length; i++) {
+    let schedBlock = combinedEvents[i];
 
-        return true;
+    let date: string = schedBlock.start.split(" ")[0];
+    let start: string = `${schedBlock.start.split(" ")[1].slice(0, 2)}${schedBlock.start.split(" ")[1].slice(3)}`;
+    let end: string = `${schedBlock.end.split(" ")[1].slice(0, 2)}${schedBlock.end.split(" ")[1].slice(3)}`;
 
-        let rqBody = JSON.stringify({email})// {email: email}
+    // "{"type":"lec","violations":[]}"
+    let description = JSON.parse(schedBlock?.description ?? "");
 
-        let response = await fetch("http://localhost:8080/departmentchair/authenticate", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: rqBody
-        })
+    const reqObj = {
+      section: value.slice(1),
+      year: value.slice(0, 1),
+      department: value.slice(1, 3),
+      id: schedBlock.id,
+      room: {
+        roomId: schedBlock.location,
+      },
+      tas: schedBlock?.people?.[0] ?? "GENED_PROF",
+      day: dateToDay[date],
+      timeBlock: {
+        start,
+        end,
+      },
+      course: {
+        type: description?.type,
+        category: description?.category,
+        subjectCode: schedBlock.title,
+      },
+      violations: description?.violations,
+    };
 
-        let jsRes = await response.json();
+    originalEvents.push(reqObj);
+  }
 
-        return jsRes.auth;
+  return originalEvents;
+};
 
-    }catch (error){
-        console.error("Error with checking email: ", error);
+export const generateRandomString = (length: number) => {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters[randomIndex];
     }
-}
-
-export const getCourseCodesFromInternalRepresentation = (internalRep: String[]) => {
-
-    // loop thru the string arr
-    // remove ung mga -LC -LB sa dulo tapos gawing set - para sa may mga lab
-    // remove ung mga W- sa unahan - para sa mga specialization - lagyan ng (Specialization) - dont kasi sa front end may difference din dapat
-
-    // return the set
-    let removedLCandLb = internalRep.map((r) => {
-        if (r.endsWith('-LC') || r.endsWith('-LB')){
-            return r.slice(0, r.length - 3)
-        }
-        return r;
-    })
-
-    return Array(...new Set(removedLCandLb))
-
-}
+    return result;
+  }

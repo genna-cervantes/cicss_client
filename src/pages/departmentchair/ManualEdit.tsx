@@ -15,9 +15,11 @@ import {
   getViolations,
   transformToScheduleEvents,
 } from "../../components/ScheduleView";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import timeGridEvent from "./TimeGridEvent";
 import { constants } from "node:http2";
+import TimeGridEvent from "./TimeGridEvent";
+import { transformToOriginalEvents } from "../../utils/utils";
 
 const ManualEdit = ({
   filter = "Section",
@@ -26,10 +28,12 @@ const ManualEdit = ({
   filter: string;
   value: string;
 }) => {
-
   const schedBlockRef = useRef<any>(null);
+  const violationsRef = useRef<any>(null);
+  const calendarRef = useRef<any>(null);
 
-  const [violations, setViolations] = useState<any>();  
+  const [violations, setViolations] = useState<any>();
+
   const [
     perSchedBlockScheduleViolations,
     setPerScheduleBlockScheduleViolations,
@@ -44,7 +48,10 @@ const ManualEdit = ({
   const [scheduleEvents, setScheduleEvents] = useState<any>();
   const [transformedScheduleEvents, setTransformedScheduleEvents] =
     useState<any>();
-  const [error, setError] = useState("");
+
+  const [changedScheduleBlocks, setChangedSchedBlocks] = useState<any>([]);
+
+    const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
@@ -212,30 +219,40 @@ const ManualEdit = ({
 
   const handleAcceptViolations = async () => {
     console.log("accept violations");
-    console.log(schedBlockRef.current)
-    const res = await fetch('http://localhost:3000/schedule/accept/violations', {
-      method: 'POST',
-      headers: {
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify(schedBlockRef.current)
-    })
+    console.log(schedBlockRef.current);
+    const res = await fetch(
+      "http://localhost:3000/schedule/accept/violations",
+      {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(schedBlockRef.current),
+      }
+    );
 
-    if (res.ok){
-      const data = await res.json()
-      if (data.success){
-        console.log('yeyy')
-      }else[
-        console.log('nooo')
-      ]
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        console.log("yeyy");
+      } else [console.log("nooo")];
     }
-    setAcceptViolationsModal(false)
+    setAcceptViolationsModal(false);
     window.location.reload();
   };
 
-  let calendar: CalendarApp;
-  if (transformedScheduleEvents) {
-    calendar = createCalendar({
+  const handleChangeSchedBlock = (newEvent: any) => {
+    setChangedSchedBlocks((prev: any) => {
+      const newSchedBlocks = prev.filter((sb: any) => sb.id !== newEvent.id)
+      newSchedBlocks.push(newEvent)
+      return newSchedBlocks;
+    })
+  }
+
+  // if (transformedScheduleEvents) {
+  // let calendar: CalendarApp =
+  if (!calendarRef.current) {
+    calendarRef.current = createCalendar({
       views: [createViewWeek()],
       events: transformedScheduleEvents,
       selectedDate: "2025-02-03",
@@ -288,6 +305,7 @@ const ManualEdit = ({
 
             console.log(reqObj);
             schedBlockRef.current = reqObj;
+            handleChangeSchedBlock(newEvent)
 
             const fetchViolations = async () => {
               const res = await fetch(
@@ -304,7 +322,7 @@ const ManualEdit = ({
               if (res.ok) {
                 const data = await res.json();
                 if (!data.success) {
-                  setViolations(data);
+                  violationsRef.current = data;
                   setAcceptViolationsModal(true);
                 }
                 console.log(data);
@@ -314,33 +332,60 @@ const ManualEdit = ({
             };
             fetchViolations();
           }
-
-          // const events = $app.calendarEvents.list.value;
-
-          // for (const evt of events) {
-          //   // Skip the event that is being updated.
-          //   if (evt.id === oldEvent.id) continue;
-
-          //   const evtStart = parseDateTime(evt.start);
-          //   const evtEnd = parseDateTime(evt.end);
-
-          //   // Check for overlapping time intervals.
-          //   console.log('ns', newStart)
-          //   console.log('es', evtStart)
-          //   // check
-          // }
           return true;
         },
       },
     });
-
-    // console.log(transformedScheduleEvents)
-  } else {
-    return <>waiting...</>;
   }
 
-  // violations original sa terminal
-  // if new popup tapos accept
+  useEffect(() => {
+    if (transformedScheduleEvents && calendarRef.current) {
+      calendarRef.current.events.set(transformedScheduleEvents);
+    }
+    // setChangedSchedBlocks(transformedScheduleEvents)
+  }, [transformedScheduleEvents]);
+
+
+  const handleSave = async () => {
+    // console.log('saved events')
+    // console.log(transformedScheduleEvents) 
+    const originalEvents = transformToOriginalEvents(transformedScheduleEvents, changedScheduleBlocks, value)
+
+    const res = await fetch('http://localhost:3000/schedule/manual-edit/save', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({transformedSchedBlocks: originalEvents})
+    })
+
+    if (res.ok){
+      const data = await res.json()
+      if (data.success){
+        console.log('yeyy')
+      }else{
+        console.log('error', data)
+      }
+    }
+  }
+  
+  const handleDeploy = async () => {
+    const res = await fetch('http://localhost:3000/schedule/manual-edit/deploy')
+  
+    if (res.ok){
+      const data = await res.json()
+      if (data.success){
+        console.log('yeyy')
+      }else{
+        console.log('error', data)
+      }
+    }
+  }
+
+  const memoizedCustomComponents = useMemo(() => ({
+    timeGridEvent: TimeGridEvent, // Your custom component for the time grid
+  }), []);
+  
 
   return (
     <>
@@ -348,50 +393,103 @@ const ManualEdit = ({
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg w-[60%] text-center">
             <h2 className="text-2xl font-semibold mb-4">
-              New Violations Found ({violations.type})
+              New Violations Found ({violationsRef.current.type})
             </h2>
-            <p className="text-lg mb-4">
-              Your adjustment will lead to these new violations
-            </p>
             <div className="flex flex-col items-center w-full">
-              {violations.violations.map((viol: any) => {
-                console.log(viol);
-                return violations.type === "soft" ? (
-                  <div key={viol.id} className="flex py-2 items-center gap-x-2">
-                    <h1 className="bg-red-300 px-3 py-1 rounded-lg">
-                      {viol.type}
-                    </h1>
-                    <h1>{viol?.time?.day}</h1>
-                    <h1>
-                      {viol?.time?.time?.start} {viol?.time?.time && 'to'} {viol?.time?.time?.end}
-                    </h1>
-                    <h1>{viol?.course}</h1>
-                    <h1>{viol.description}</h1>
-                  </div>
-                ) : (
-                  <div
-                    key={viol.id}
-                    className="flex flex-col py-2 items-center gap-x-2"
-                  >
-                    <h1 className="bg-red-300 px-3 py-1 rounded-lg">
-                      {viol.type}
-                    </h1>
-                    <span className="flex">
-                      <h1>{viol.section.current} ({viol.course.current})</h1>
-                      <h1>conflict against</h1>
-                      <h1>{viol.section.against} ({viol.course.against})</h1>
-                    </span>
-                    <h1>on</h1>
-                    <span className="flex">
-                      <h1>{viol.time.day}</h1>
-                      <h1>
-                        {viol.time.time.start} to {viol.time.time.end}
-                      </h1>
-                    </span>
-                  </div>
-                );
-              })}
-              {violations.type === "hard" ? (
+              {violationsRef.current.type === "hard" ? (
+                <div>
+                  <p className="text-lg mb-4">
+                    Your adjustment will lead to these new violations
+                  </p>
+                  {violationsRef.current.violations.map((viol: any) => {
+                    console.log(viol);
+                    return (
+                      <div
+                        key={viol.id}
+                        className="flex flex-col py-2 items-center gap-x-2"
+                      >
+                        <h1 className="bg-red-300 px-3 py-1 rounded-lg">
+                          {viol.type}
+                        </h1>
+                        <span className="flex">
+                          <h1>
+                            {viol.section.current} ({viol.course.current})
+                          </h1>
+                          <h1>conflict against</h1>
+                          <h1>
+                            {viol.section.against} ({viol.course.against})
+                          </h1>
+                        </span>
+                        <h1>on</h1>
+                        <span className="flex">
+                          <h1>{viol.time.day}</h1>
+                          <h1>
+                            {viol.time?.time?.start} to {viol.time?.time?.end}
+                          </h1>
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div>
+                  {violationsRef.current.violations.addedViolations.length > 0 && <h1>Your adjustment will lead to these new violations</h1>}
+                  {violationsRef.current.violations.addedViolations.map(
+                    (addedViol: any) => {
+                      return (
+                        <div
+                          key={addedViol.id}
+                          className="flex flex-col py-2 items-center gap-x-2"
+                        >
+                          <h1 className="bg-red-300 px-3 py-1 rounded-lg">
+                            {addedViol.type}
+                          </h1>
+                          <h1>
+                            {addedViol.section.current} (
+                            {addedViol.course.current})
+                          </h1>
+                          <h1>on</h1>
+                          <span className="flex">
+                            <h1>{addedViol.time.day}</h1>
+                            <h1>
+                              {addedViol.time?.time?.start} to{" "}
+                              {addedViol.time?.time?.end}
+                            </h1>
+                          </span>
+                        </div>
+                      );
+                    }
+                  )}
+                  {violationsRef.current.violations.removedViolations.length > 0 && <h1>Your adjustment will lead to removing these violations</h1>}
+                  {violationsRef.current.violations.removedViolations.map(
+                    (addedViol: any) => {
+                      return (
+                        <div
+                          key={addedViol.id}
+                          className="flex flex-col py-2 items-center gap-x-2"
+                        >
+                          <h1 className="bg-red-300 px-3 py-1 rounded-lg">
+                            {addedViol.type}
+                          </h1>
+                          <h1>
+                            {addedViol.section.current} (
+                            {addedViol.course.current})
+                          </h1>
+                          <h1>on</h1>
+                          <span className="flex">
+                            <h1>{addedViol.time.day}</h1>
+                            <h1>
+                              {addedViol.time?.time?.start} to{" "}
+                              {addedViol.time?.time?.end}
+                            </h1>
+                          </span>
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
+              )}
+              {violationsRef.current.type === "hard" ? (
                 <p>
                   The violations listed contains a HARD constraint, you are not
                   allowed to make this change
@@ -404,9 +502,9 @@ const ManualEdit = ({
               onClick={() => setAcceptViolationsModal(false)}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
             >
-              {violations.type === "hard" ? "Close" : "Cancel"}
+              {violationsRef.current.type === "hard" ? "Close" : "Cancel"}
             </button>
-            {violations.type !== "hard" ? (
+            {violationsRef.current.type !== "hard" ? (
               <button
                 onClick={() => handleAcceptViolations()}
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
@@ -513,9 +611,12 @@ const ManualEdit = ({
         </div>
       )}
       <ScheduleXCalendar
-        calendarApp={calendar}
-        customComponents={{ timeGridEvent: timeGridEvent }}
+        calendarApp={calendarRef.current}
+        customComponents={memoizedCustomComponents}
+        // timeGridEvent={TimeGridEvent}
       />
+      <button onClick={handleSave}>Save</button>
+      <button onClick={handleDeploy}>Deploy</button>
     </>
   );
 };

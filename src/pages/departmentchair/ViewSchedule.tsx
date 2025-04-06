@@ -21,9 +21,9 @@ const sections = [
   { code: "3CSF", label: "Data Science" },
 ];
 
-const ViewSchedule = () => {
+const ViewSchedule = ({ filter, setFilter, role = "Department Chair" }: { filter: string, setFilter: React.Dispatch<React.SetStateAction<string>>, role?: string }) => {
   const [currentFilter, setCurrentFilter] = useState("Section");
-  const [filter, setFilter] = useState("Section");
+  // const [filter, setFilter] = useState("Section");
 
   const [yearSections, setYearSections] = useState<{
     [key: string]: { next: string; prev: string; specialization: string };
@@ -134,13 +134,17 @@ const ViewSchedule = () => {
   useEffect(() => {
     if (filter === "Professor") {
       const fetchTASData = async () => {
-        const department = localStorage.getItem('department') ?? 'CS'
+        let department = localStorage.getItem("department") ?? "CS";
+        if (department == 'undefined') {
+          department = "CS"
+        }
         const res = await fetch(
-          `http://localhost:8080/tasconstraints/details/${department}`, {
+          `http://localhost:8080/tasconstraints/details/${department}`,
+          {
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem(('token')) ?? ''}`
-            }
-            }
+              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            },
+          }
         );
         const data = await res.json();
 
@@ -169,11 +173,14 @@ const ViewSchedule = () => {
     }
     if (filter === "Room") {
       const fetchRoomData = async () => {
-        const department = localStorage.getItem('department') ?? 'CS'
-        const res = await fetch(`http://localhost:8080/rooms/${department}`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem(('token')) ?? ''}`
+        let department = localStorage.getItem("department") ?? "CS";
+        if (department == 'undefined') {
+          department = "CS"
         }
+        const res = await fetch(`http://localhost:8080/rooms/${department}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          },
         });
         const data = await res.json();
 
@@ -203,7 +210,10 @@ const ViewSchedule = () => {
   // fetch values for the sections - nakabase don sa year sections
   useEffect(() => {
     const fetchYearSectionsData = async () => {
-      const department = localStorage.getItem("department") ?? "CS";
+      let department = localStorage.getItem("department") ?? "CS";
+      if (department == 'undefined') {
+        department = "CS"
+      }
       const res = await fetch(
         `http://localhost:8080/year_sections/${department}`,
         {
@@ -212,6 +222,7 @@ const ViewSchedule = () => {
           },
         }
       );
+      console.log(res)
       const data = await res.json();
 
       if (res.ok) {
@@ -517,11 +528,13 @@ const ViewSchedule = () => {
       <div>
         <ScheduleView value={currentValue.label} filter={currentFilter} />
       </div>
-      <GenerateButton regenerate={true} />
-      <button onClick={() => navigate("/")}>
-        Save as Draft
-      </button>
-      <LockButton />
+      {role === "Department Chair" && (
+        <>
+          <GenerateButton regenerate={true} />
+          <button onClick={() => navigate("/")}>Save as Draft</button>
+          <LockButton />
+        </>
+      )}
     </div>
   );
 };

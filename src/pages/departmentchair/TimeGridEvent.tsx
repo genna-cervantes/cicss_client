@@ -1,10 +1,12 @@
 import { CalendarEvent } from "@schedule-x/calendar";
+import React from "react";
+import { useAppContext } from "../../context/AppContext";
 
-type props = { calendarEvent: CalendarEvent };
+type Props = { calendarEvent: CalendarEvent };
 
-const timeGridEvent = ({ calendarEvent }: props) => {
-  // console.log(calendarEvent);
-
+// Create a regular component function first
+const TimeGridEvent = ({ calendarEvent }: Props) => {
+  const {role} = useAppContext()
   let desc = JSON.parse(calendarEvent?.description ?? "");
 
   let startTime = calendarEvent.start.split(" ")[1];
@@ -12,16 +14,11 @@ const timeGridEvent = ({ calendarEvent }: props) => {
 
   let violations = desc.violations ?? [];
 
-  // 1hr is 115px -> such a random number lol 7.188rem
-
-  // console.log(eventHeight);
-
   return (
-    // <div className="group">
     <div
-      className={`group ${violations.length > 0 ? `hover:bg-red-600` : ''} bg-yellow-400 font-Manrope font-semibold px-8 py-6 flex flex-col justify-between h-full ${violations.length === 0 ? "" : "border-2 border-red-600"}`}
+      className={`group ${(violations.length > 0 && role === 'Department Chair') ? `hover:bg-red-600` : ''} bg-yellow-400 font-Manrope font-semibold px-8 py-6 flex flex-col justify-between h-full ${(violations.length > 0 && role === 'Department Chair') ? "border-2 border-red-600" : ""}`}
     >
-      <div className={`${violations.length > 0 ? `block group-hover:hidden` : ''}`}>
+      <div className={`${(violations.length > 0 && role === 'Department Chair') ? `block group-hover:hidden` : ''}`}>
         <div>
           <h1 className="font-bold text-xl">{calendarEvent.title}</h1>
           <h2>{desc.type}</h2>
@@ -38,7 +35,7 @@ const timeGridEvent = ({ calendarEvent }: props) => {
           </h2>
         </div>
       </div>
-      {violations.length > 0 && <div className="group-hover:block hidden absolute bg-red-600 text-white" >
+      {(violations.length > 0 && role === 'Department Chair') && <div className="group-hover:block hidden absolute bg-red-600 text-white" >
         {violations.map((viol: any) => {
           return (
             <div className="flex flex-col gap-y-1" key={viol.id}>
@@ -49,8 +46,8 @@ const timeGridEvent = ({ calendarEvent }: props) => {
         })}
       </div>}
     </div>
-    // </ div>
   );
 };
 
-export default timeGridEvent;
+// Export the component as React.memo to prevent unnecessary re-renders
+export default React.memo(TimeGridEvent);

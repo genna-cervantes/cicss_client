@@ -1,6 +1,5 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import {
-  checkIfCICSDepartmentChair,
   checkIfCICSStudent,
   checkIfCICSTAS,
   fetchUserInfo,

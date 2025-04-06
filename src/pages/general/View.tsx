@@ -1,6 +1,8 @@
 import React, { useState } from "react";
+import ViewSchedule from "../departmentchair/ViewSchedule";
+import { generateRandomString } from "../../utils/utils";
 
-const View = () => {
+const View = ({ filter, setFilter, role }: { filter: string, setFilter: React.Dispatch<React.SetStateAction<string>>, role: string }) => {
   const [isFirstModalOpen, setIsFirstModalOpen] = useState(false);
   const [isSecondModalOpen, setIsSecondModalOpen] = useState(false);
   const [isRatingModalOpen, setIsRatingModalOpen] = useState(false);
@@ -72,10 +74,35 @@ const View = () => {
     setHoveredRating(0);
   };
 
-  const handleSubmitRating = () => {
+  const handleSubmitRating = async () => {
     // get the data here
-    closeRatingModal();
-    openSuccessModal();
+
+    console.log(rating)
+    const reqObj = 
+      {
+        ratingId: generateRandomString(10),
+        rating: rating,
+        raterName: localStorage.getItem("email") ?? "No Name",
+        raterSection: selectedSection,
+        raterType: role
+    }
+    
+    const res = await fetch('http://localhost:8080/ratings', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem("token") ?? ""}`,
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(reqObj)
+    })
+
+    if (res.ok){
+      openSuccessModal();
+      closeRatingModal();
+    }else{
+      console.log('error')
+    }
+
   };
 
   const handleButtonMouseDown = () => {
@@ -88,17 +115,28 @@ const View = () => {
 
   const handleButtonClick = () => {
     setIsButtonPressed(true);
-
-    setTimeout(() => {
-      setIsButtonPressed(false);
-      openFirstModal();
-    }, 150);
+    if (role === "Student"){
+  
+      setTimeout(() => {
+        setIsButtonPressed(false);
+        openFirstModal();
+      }, 150);
+    }else{
+      
+      setTimeout(() => {
+        setIsButtonPressed(false);
+        setIsRatingModalOpen(true);
+      }, 150);
+    }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen px-4 py-6">
+    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-6">
       {/*Put the schedule and the filter component here */}
-      <button
+      <ViewSchedule role={role} filter={filter} setFilter={setFilter} />
+
+      {role === 'Student' && filter === 'Section' && <button
+        type="button"
         onClick={handleButtonClick}
         onMouseDown={handleButtonMouseDown}
         onMouseUp={handleButtonMouseUp}
@@ -114,7 +152,26 @@ const View = () => {
                    }`}
       >
         Rate
-      </button>
+      </button>}
+
+      {role === 'TAS' && filter === 'Professor' && <button
+        type="button"
+        onClick={handleButtonClick}
+        onMouseDown={handleButtonMouseDown}
+        onMouseUp={handleButtonMouseUp}
+        onMouseLeave={() => setIsButtonPressed(false)}
+        className={`bg-yellow-400 border-2 border-gray-700 text-gray-700 px-5 py-1 text-lg font-bold rounded-sm
+                   transition-all duration-200 ease-in-out
+                   hover:bg-yellow-500 hover:shadow-lg hover:scale-105
+                   active:scale-95 active:shadow-inner
+                   ${
+                     isButtonPressed
+                       ? "transform scale-95 shadow-inner"
+                       : "transform scale-100"
+                   }`}
+      >
+        Rate
+      </button>}
 
       {/* First Modal */}
       {isFirstModalOpen && (

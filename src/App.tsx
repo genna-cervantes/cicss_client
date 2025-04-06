@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -35,6 +35,8 @@ import View from "./pages/general/View";
 const App: React.FC = () => {
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
 
+  const [filter, setFilter] = useState("Section");
+
   return (
     <GoogleOAuthProvider clientId={clientId ?? ""}>
       <Router>
@@ -61,7 +63,7 @@ const App: React.FC = () => {
             <Route path="input-yld" element={<InputYLD />} />
             <Route path="input-ylt" element={<InputYLT />} />
 
-            <Route path="view-schedule" element={<ViewSchedule />} />
+            <Route path="view-schedule" element={<ViewSchedule filter={filter} setFilter={setFilter} />} />
             <Route path="manual-edit" element={<ManualEditViewSchedule />} />
             <Route path="lock-schedule" element={<LockPage />} />
             <Route path="ready-schedule" element={<ReadyPage />} />
@@ -84,7 +86,7 @@ const App: React.FC = () => {
             <Route index element={<TASDashboard />} />
 
             {/* add routes for tas here */}
-            <Route path="view" element={<View />} />
+            <Route path="view" element={<View role="TAS" filter={filter} setFilter={setFilter} />} />
 
             <Route path="*" element={<Navigate to="/tas" replace />} />
           </Route>
@@ -93,8 +95,8 @@ const App: React.FC = () => {
             <Route index element={<StudentDashboard />} />
 
             {/* add routes for student here */}
-            <Route path="view" element={<View />} />
-            <Route path="schedule" element={<div>student schedule</div>} />
+            <Route path="view" element={<View role="Student" filter={filter} setFilter={setFilter} />} />
+            {/* <Route path="schedule" element={<div>student schedule</div>} /> */}
 
             <Route path="*" element={<Navigate to="/student" replace />} />
           </Route>

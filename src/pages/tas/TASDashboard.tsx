@@ -4,7 +4,7 @@ import cs_schedule_card from "../../assets/cs_schedule_card.png";
 import wave from "../../assets/wave.png";
 
 const TASDashboard = () => {
-  const userName = "Chappel Roan";
+  const userName = localStorage.getItem("email") ?? "Teaching Academic Staff";
 
   const navigate = useNavigate();
 
