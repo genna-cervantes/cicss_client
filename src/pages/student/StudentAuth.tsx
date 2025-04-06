@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
+import Footer from "../../components/Footer";
 
 const StudentAuth = () => {
   const { role, setRole } = useAppContext();
@@ -65,7 +67,15 @@ const StudentAuth = () => {
     verifyToken();
   }, []);
 
-  return <Outlet />;
+  return (
+    <>
+      <div className="bg-cover bg-no-repeat bg-gradient-to-b from-[#F1FAFF] via-[#BFDDF6] to-[#9FCEF5] min-h-screen">
+        <Header />
+        <Outlet />
+        <Footer />
+      </div>
+    </>
+  );
 };
 
 export default StudentAuth;

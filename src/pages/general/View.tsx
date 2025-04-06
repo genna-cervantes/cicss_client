@@ -115,11 +115,19 @@ const View = ({role}: {role: string}) => {
 
   const handleButtonClick = () => {
     setIsButtonPressed(true);
-
-    setTimeout(() => {
-      setIsButtonPressed(false);
-      openFirstModal();
-    }, 150);
+    if (role === "Student"){
+  
+      setTimeout(() => {
+        setIsButtonPressed(false);
+        openFirstModal();
+      }, 150);
+    }else{
+      
+      setTimeout(() => {
+        setIsButtonPressed(false);
+        setIsRatingModalOpen(true);
+      }, 150);
+    }
   };
 
   return (
