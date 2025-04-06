@@ -10,6 +10,8 @@ import { useAppContext } from "../../context/AppContext";
 
 const Dashboard = () => {
 
+  const [role, setRole] = useState<string | null>(null);
+  const [department, setDepartment] = useState<string | null>(null);
   const [hasChanges, setHasChanges] = useState(localStorage.getItem("hasChanges") ?? "");
   const [semester, setSemester] = useState("")
   const {isNewSemester, setPrevSemester, isReady} = useAppContext()
@@ -17,6 +19,14 @@ const Dashboard = () => {
   useEffect(() => {
     setSemester(localStorage.getItem('semester') ?? "")
   }, [])
+
+  useEffect(() => {
+    const storedRole = localStorage.getItem("role");
+    setRole(storedRole);
+
+    const storedDepartment = localStorage.getItem("department");
+    setDepartment(storedDepartment);
+  }, []);
 
   const handleChooseSemester = (semester: string) => {
     localStorage.setItem("semester", semester)

@@ -61,7 +61,7 @@ function GenerateViewButton({ hasChanges = false, newSemester = false, regenerat
         <button onClick={handleClick} className={getButtonClassName()}>
           {regenerate ? (
             "Regenerate Schedule"
-          ) : scheduleExists ? (
+          ) : scheduleExists && scheduleExists && !newSemester && !hasChanges ? (
             <div className="flex items-center">
               <div
                 className="relative"
