@@ -6,14 +6,18 @@ import {
 } from "@schedule-x/calendar";
 import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Select from "react-select";
 import "../../components/custom-calendar.css";
 import "../../components/custom-event.css";
 import { dateToDay, weekDates } from "../../utils/constants";
-import { transformToScheduleEvents } from "../../components/ScheduleView";
-import { useEffect, useState } from "react";
+import {
+  getViolations,
+  transformToScheduleEvents,
+} from "../../components/ScheduleView";
+import { useEffect, useRef, useState } from "react";
 import timeGridEvent from "./TimeGridEvent";
+import { constants } from "node:http2";
 
 const ManualEdit = ({
   filter = "Section",
@@ -22,10 +26,42 @@ const ManualEdit = ({
   filter: string;
   value: string;
 }) => {
+
+  const schedBlockRef = useRef<any>(null);
+
+  const [violations, setViolations] = useState<any>();  
+  const [
+    perSchedBlockScheduleViolations,
+    setPerScheduleBlockScheduleViolations,
+  ] = useState<any>([]);
+  const [perFilterScheduleViolations, setPerFilterScheduleViolations] =
+    useState<any>([]);
+  const [violationFitler, setViolationFilter] = useState("perSchedBlock");
+  const [terminalVisible, setTerminalVisible] = useState(true);
+
+  const [acceptViolationsModal, setAcceptViolationsModal] = useState(false);
+
   const [scheduleEvents, setScheduleEvents] = useState<any>();
   const [transformedScheduleEvents, setTransformedScheduleEvents] =
     useState<any>();
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchReadyDepartments = async () => {
+      const res = await fetch(
+        "http://localhost:3000/schedule/ready/departments"
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (!data.csReady || !data.isReady || !data.itReady) {
+          navigate("/departmentchair/ready-schedule");
+        }
+      }
+    };
+    fetchReadyDepartments();
+  }, []);
 
   // default schedule to show
   useEffect(() => {
@@ -64,9 +100,30 @@ const ManualEdit = ({
         filter,
         value
       );
+      let violations = getViolations(scheduleEvents);
+
+      let perSchedBlockViolations = [];
+      let perFilterViolations = [];
+      for (let i = 0; i < violations.length; i++) {
+        let specViol = violations[i];
+
+        if (specViol?.time) {
+          perSchedBlockViolations.push(specViol);
+        } else {
+          perFilterViolations.push(specViol);
+        }
+      }
+      setPerFilterScheduleViolations(perFilterViolations);
+      setPerScheduleBlockScheduleViolations(perSchedBlockViolations);
+
       setTransformedScheduleEvents(transformedEvents);
     }
   }, [scheduleEvents]);
+
+  useEffect(() => {
+    console.log("transform", perFilterScheduleViolations);
+    console.log("transform 2", perSchedBlockScheduleViolations);
+  }, [perFilterScheduleViolations, perSchedBlockScheduleViolations]);
 
   // update schedule when go to next or previous
   useEffect(() => {
@@ -153,6 +210,29 @@ const ManualEdit = ({
     }
   }, [filter, value]);
 
+  const handleAcceptViolations = async () => {
+    console.log("accept violations");
+    console.log(schedBlockRef.current)
+    const res = await fetch('http://localhost:3000/schedule/accept/violations', {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(schedBlockRef.current)
+    })
+
+    if (res.ok){
+      const data = await res.json()
+      if (data.success){
+        console.log('yeyy')
+      }else[
+        console.log('nooo')
+      ]
+    }
+    setAcceptViolationsModal(false)
+    window.location.reload();
+  };
+
   let calendar: CalendarApp;
   if (transformedScheduleEvents) {
     calendar = createCalendar({
@@ -176,16 +256,6 @@ const ManualEdit = ({
           const newStart = parseDateTime(newEvent.start);
           const newEnd = parseDateTime(newEvent.end);
 
-          //  id: schedBlock.id,
-          //         title: filter !== 'Section' ? schedBlock.course : schedBlock.course.subjectCode,
-          //         start: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.start)}`,
-          //         end: `${weekDates[schoolDay]} ${transformMilitaryTimeRawToTime(schedBlock.timeBlock.end)}`,
-          //         location: filter !== 'Room' ? schedBlock.room.roomId : '',
-          //         people: [filter === 'Section' ? schedBlock.tas.tas_name : `${schedBlock.year}${schedBlock.section}`], // magkaiba pa ung convnetiona mp
-          //         description: JSON.s
-
-          // use new start and new end to check with backend
-          console.log(newEvent);
           if (filter === "Section") {
             let date: string = newEvent.start.split(" ")[0];
             let start: string = `${newEvent.start.split(" ")[1].slice(0, 2)}${newEvent.start.split(" ")[1].slice(3)}`;
@@ -211,12 +281,38 @@ const ManualEdit = ({
               course: {
                 type: description?.type,
                 category: description?.category,
-                subjectCode: newEvent.title
+                subjectCode: newEvent.title,
               },
               violations: description?.violations,
             };
 
             console.log(reqObj);
+            schedBlockRef.current = reqObj;
+
+            const fetchViolations = async () => {
+              const res = await fetch(
+                "http://localhost:3000/schedule/check/violations",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-type": "application/json",
+                  },
+                  body: JSON.stringify(reqObj),
+                }
+              );
+
+              if (res.ok) {
+                const data = await res.json();
+                if (!data.success) {
+                  setViolations(data);
+                  setAcceptViolationsModal(true);
+                }
+                console.log(data);
+              } else {
+                console.log("error");
+              }
+            };
+            fetchViolations();
           }
 
           // const events = $app.calendarEvents.list.value;
@@ -243,12 +339,191 @@ const ManualEdit = ({
     return <>waiting...</>;
   }
 
+  // violations original sa terminal
+  // if new popup tapos accept
+
   return (
-    <ScheduleXCalendar
-      calendarApp={calendar}
-      customComponents={{ timeGridEvent: timeGridEvent }}
-    />
+    <>
+      {acceptViolationsModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg w-[60%] text-center">
+            <h2 className="text-2xl font-semibold mb-4">
+              New Violations Found ({violations.type})
+            </h2>
+            <p className="text-lg mb-4">
+              Your adjustment will lead to these new violations
+            </p>
+            <div className="flex flex-col items-center w-full">
+              {violations.violations.map((viol: any) => {
+                console.log(viol);
+                return violations.type === "soft" ? (
+                  <div key={viol.id} className="flex py-2 items-center gap-x-2">
+                    <h1 className="bg-red-300 px-3 py-1 rounded-lg">
+                      {viol.type}
+                    </h1>
+                    <h1>{viol?.time?.day}</h1>
+                    <h1>
+                      {viol?.time?.time?.start} {viol?.time?.time && 'to'} {viol?.time?.time?.end}
+                    </h1>
+                    <h1>{viol?.course}</h1>
+                    <h1>{viol.description}</h1>
+                  </div>
+                ) : (
+                  <div
+                    key={viol.id}
+                    className="flex flex-col py-2 items-center gap-x-2"
+                  >
+                    <h1 className="bg-red-300 px-3 py-1 rounded-lg">
+                      {viol.type}
+                    </h1>
+                    <span className="flex">
+                      <h1>{viol.section.current} ({viol.course.current})</h1>
+                      <h1>conflict against</h1>
+                      <h1>{viol.section.against} ({viol.course.against})</h1>
+                    </span>
+                    <h1>on</h1>
+                    <span className="flex">
+                      <h1>{viol.time.day}</h1>
+                      <h1>
+                        {viol.time.time.start} to {viol.time.time.end}
+                      </h1>
+                    </span>
+                  </div>
+                );
+              })}
+              {violations.type === "hard" ? (
+                <p>
+                  The violations listed contains a HARD constraint, you are not
+                  allowed to make this change
+                </p>
+              ) : (
+                <></>
+              )}
+            </div>
+            <button
+              onClick={() => setAcceptViolationsModal(false)}
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
+            >
+              {violations.type === "hard" ? "Close" : "Cancel"}
+            </button>
+            {violations.type !== "hard" ? (
+              <button
+                onClick={() => handleAcceptViolations()}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none"
+              >
+                Accept
+              </button>
+            ) : (
+              <></>
+            )}
+          </div>
+        </div>
+      )}
+      {terminalVisible ? (
+        <div className="bg-slate-300">
+          <div className="flex w-full justify-between items-center px-2 py-3">
+            <h1 className="font-bold">Constraints Violations</h1>
+            <div className="flex gap-x-3">
+              <button
+                onClick={() => setViolationFilter("perSchedBlock")}
+                className={`${violationFitler === "perSchedBlock" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
+              >
+                Per Schedule Block
+              </button>
+              <button
+                onClick={() => setViolationFilter("perFilter")}
+                className={`${violationFitler === "perFilter" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
+              >
+                Per Section
+              </button>
+              <button onClick={() => setTerminalVisible(!terminalVisible)}>
+                Hide
+              </button>
+            </div>
+          </div>
+          <div className="bg-slate-400 px-2">
+            {violationFitler === "perSchedBlock" ? (
+              perSchedBlockScheduleViolations &&
+              perSchedBlockScheduleViolations.length > 0 ? (
+                perSchedBlockScheduleViolations.map((viol: any) => {
+                  // console.log(viol);
+                  return (
+                    <div
+                      key={viol.id}
+                      className="flex py-2 items-center gap-x-2"
+                    >
+                      <h1 className="bg-red-300 px-3 py-1 rounded-lg">
+                        {viol.type}
+                      </h1>
+                      <h1>{viol.time.day}</h1>
+                      <h1>
+                        {viol.time.time.start} to {viol.time.time.end}
+                      </h1>
+                      <h1>{viol.description}</h1>
+                    </div>
+                  );
+                })
+              ) : (
+                <h1>No constraints</h1>
+              )
+            ) : perFilterScheduleViolations ? (
+              perFilterScheduleViolations.length > 0 ? (
+                perFilterScheduleViolations.map((viol: any) => {
+                  console.log(viol);
+                  return (
+                    <div
+                      key={viol.id}
+                      className="flex py-2 items-center gap-x-2"
+                    >
+                      <h1 className="bg-red-300 px-3 py-1 rounded-lg">
+                        {viol.type}
+                      </h1>
+                      <h1>{viol.description}</h1>
+                    </div>
+                  );
+                })
+              ) : (
+                <h1>No Constraints</h1>
+              )
+            ) : (
+              <h1>Loading...</h1>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="flex w-full justify-between items-center px-2 py-3 bg-slate-300">
+          <h1 className="font-bold">Constraints Violations</h1>
+          <div className="flex gap-x-3">
+            <button
+              onClick={() => setViolationFilter("perSchedBlock")}
+              className={`${violationFitler === "perSchedBlock" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
+            >
+              Per Schedule Block
+            </button>
+            <button
+              onClick={() => setViolationFilter("perFilter")}
+              className={`${violationFitler === "perFilter" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
+            >
+              Per Section
+            </button>
+            <button onClick={() => setTerminalVisible(!terminalVisible)}>
+              {terminalVisible ? "Hide" : "Unhide"}
+            </button>
+          </div>
+        </div>
+      )}
+      <ScheduleXCalendar
+        calendarApp={calendar}
+        customComponents={{ timeGridEvent: timeGridEvent }}
+      />
+    </>
   );
 };
 
 export default ManualEdit;
+
+// kapag mawawala ung violation pano un kasi pag dagdag lng ung inaano
+// every change ng position dapat uupdate -- consequence of above
+// save changes sa baba incase walang nabawas and walang naadd
+
+// deploy function
