@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";
+import cicss_gear_icon from "../../assets/cicss_gear_icon.png";
 
 const WaitingPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [scheduleExists, setScheduleExists] = useState<boolean>(searchParams.get("exists") === "true");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [scheduleExists, setScheduleExists] = useState<boolean>(
+    searchParams.get("exists") === "true"
+  );
 
-  const {setIsLocked, setIsReady, prevSemester} = useAppContext()
+  const { setIsLocked, setIsReady, prevSemester } = useAppContext();
 
   const [runningGenerator, setRunningGenerator] = useState(false);
   const [error, setError] = useState<string>();
@@ -40,12 +48,12 @@ const WaitingPage = () => {
       return;
     }
 
-    console.log('reg', location.state?.regenerate)
-    if (scheduleExists && !location.state?.regenerate){
+    console.log("reg", location.state?.regenerate);
+    if (scheduleExists && !location.state?.regenerate) {
       navigate("/departmentchair/view-schedule");
     }
 
-    console.log('new sched')
+    console.log("new sched");
 
     // generate / regenerate
     const fetchSections = async () => {
@@ -93,10 +101,10 @@ const WaitingPage = () => {
 
         const resIS = await fetch("http://localhost:8080/year_sections/IS", {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem(('token')) ?? ''}`
-          }
-          });
-          
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          },
+        });
+
         const dataIS = await resIS.json();
         console.log("ung response", dataIS);
 
@@ -121,8 +129,8 @@ const WaitingPage = () => {
 
   useEffect(() => {
     if (CSSections && ITSections && ISSections && !runningGenerator) {
-      console.log('running gen')
-      
+      console.log("running gen");
+
       const generateSchedule = async () => {
         try {
           // if (firstYearSections.length === 0 || secondYearSections.length === 0 || thirdYearSections.length === 0 || fourthYearSections.length === 0){
@@ -133,9 +141,9 @@ const WaitingPage = () => {
             CSSections,
             ITSections,
             ISSections,
-            semester: prevSemester === 'First Semester' ? 1 : 2,
+            semester: prevSemester === "First Semester" ? 1 : 2,
           };
-          
+
           console.log("req");
           console.log(reqBody);
 
@@ -167,13 +175,13 @@ const WaitingPage = () => {
 
       console.log("running generate sched");
       setRunningGenerator(true);
-      setIsLocked(false)
-      setIsReady(false)
-      localStorage.setItem('isReady', 'false')
-      localStorage.setItem('isLocked', 'false')
-      
+      setIsLocked(false);
+      setIsReady(false);
+      localStorage.setItem("isReady", "false");
+      localStorage.setItem("isLocked", "false");
+
       // pagkadito nagenerate na ulit so change na ulit toh to wala na
-      localStorage.setItem('hasChanges', 'false')
+      localStorage.setItem("hasChanges", "false");
 
       generateSchedule();
 
@@ -186,9 +194,31 @@ const WaitingPage = () => {
   }, [CSSections, ITSections, ISSections]);
 
   return (
-    <div>
-      <h1>Waiting</h1>
-      {error ? <h1>{error}</h1> : <></>}
+    <div className="flex flex-col items-center justify-center min-h-screen ">
+      <div className="flex flex-col items-center justify-center p-8 max-w-md w-full">
+        <div className="relative w-60 h-60 mb-6">
+          {/* Animated Loading Spinner */}
+          <div className="absolute inset-0 border-8 border-blue-400 border-opacity-50 rounded-full"></div>
+          <div className="absolute inset-0 border-t-8 border-l-8 border-primary rounded-full animate-spin"></div>
+
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <div className="w-52">
+              <img src={cicss_gear_icon} alt="" />
+            </div>
+          </div>
+        </div>
+
+        <h1 className="text-2xl font-bold text-primary mb-20 text-center">
+          Almost there! CICS schedule <br />
+          is on the way...
+        </h1>
+
+        {error && (
+          <div className="mt-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-md">
+            {error}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
