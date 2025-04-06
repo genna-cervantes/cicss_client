@@ -24,6 +24,12 @@ const ReadyPage = () => {
     fetchReadyDepartments()
   }, [])
 
+  useEffect(() => {
+    if (csReady && isReady && itReady){
+      navigate("/departmentchair/manual-edit")
+    }
+  }, [csReady, isReady, itReady])
+
   const handleClick = () => {
     navigate("/departmentchair/manual-edit")   
   }

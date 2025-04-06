@@ -92,6 +92,15 @@ const InputGenEd = () => {
     [key: number]: { [key: number]: { [key: number]: string } };
   }>({});
 
+  const [statusMessage, setStatusMessage] = useState<{
+    type: "success" | "error" | null;
+    text: string;
+  }>({ type: null, text: "" });
+
+  const clearStatusMessage = () => {
+    setStatusMessage({ type: null, text: "" });
+  };
+
   const convertTimeToMinutes = (timeStr: string): number => {
     if (!timeStr) return 0;
     const [hours, minutes] = timeStr.split(":").map(Number);
@@ -600,52 +609,93 @@ const InputGenEd = () => {
 
     // handle update
     const updateGenedConstraintData = async () => {
-      for (let i = 0; i < updatedGenedConstraints.length; i++) {
-        let genedcon = updatedGenedConstraints[i];
+      try {
+        let isSuccess = false;
+        let apiErrors: string[] = [];
 
-        let transformedRestrictions: any = {
-          M: [],
-          T: [],
-          W: [],
-          TH: [],
-          F: [],
-          S: [],
-        };
-        genedcon.courseRestriction.forEach((res) => {
-          if (!res.day) return; // Skip entries with empty days
+        for (let i = 0; i < updatedGenedConstraints.length; i++) {
+          let genedcon = updatedGenedConstraints[i];
 
-          let transformedStartEndTimes = res.startEndTimes
-            .filter(
-              // Filter out incomplete time entries
-              (set) => set.start && set.end
-            )
-            .map((set) => {
-              return {
-                start: `${set.start.slice(0, 2)}${set.start.slice(3)}`,
-                end: `${set.end.slice(0, 2)}${set.end.slice(3)}`,
-              };
-            });
+          let transformedRestrictions: any = {
+            M: [],
+            T: [],
+            W: [],
+            TH: [],
+            F: [],
+            S: [],
+          };
+          genedcon.courseRestriction.forEach((res) => {
+            if (!res.day) return; // Skip entries with empty days
 
-          transformedRestrictions[res.day] = transformedStartEndTimes;
-        });
+            let transformedStartEndTimes = res.startEndTimes
+              .filter(
+                // Filter out incomplete time entries
+                (set) => set.start && set.end
+              )
+              .map((set) => {
+                return {
+                  start: `${set.start.slice(0, 2)}${set.start.slice(3)}`,
+                  end: `${set.end.slice(0, 2)}${set.end.slice(3)}`,
+                };
+              });
 
-        const res = await fetch(
-          `http://localhost:8080/genedconstraint/${genedcon.courseCode}`,
-          {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-              "Content-type": "application/json",
-            },
-            body: JSON.stringify(transformedRestrictions),
+            transformedRestrictions[res.day] = transformedStartEndTimes;
+          });
+
+          try {
+            const res = await fetch(
+              `http://localhost:8080/genedconstraint/${genedcon.courseCode}`,
+              {
+                method: "PUT",
+                headers: {
+                  Authorization: `Bearer ${
+                    localStorage.getItem("token") ?? ""
+                  }`,
+                  "Content-type": "application/json",
+                },
+                body: JSON.stringify(transformedRestrictions),
+              }
+            );
+
+            if (res.ok) {
+              isSuccess = true;
+            } else {
+              const data = await res.json();
+              apiErrors.push(
+                `Failed to update ${genedcon.courseCode}: ${
+                  data.message || "Unknown error"
+                }`
+              );
+            }
+          } catch (error) {
+            console.error("Update fetch error:", error);
+            apiErrors.push(`Network error updating ${genedcon.courseCode}`);
           }
-        );
-
-        if (res.ok) {
-          console.log("yey updated");
-        } else {
-          console.log("may error sis");
         }
+
+        // Set final status message
+        if (apiErrors.length > 0) {
+          setStatusMessage({
+            type: "error",
+            text: apiErrors[0], // Show first error
+          });
+        } else if (isSuccess) {
+          setStatusMessage({
+            type: "success",
+            text: "Gen Ed constraints successfully saved!",
+          });
+        } else if (updatedGenedConstraints.length === 0) {
+          setStatusMessage({
+            type: "error",
+            text: "No changes to save.",
+          });
+        }
+      } catch (error) {
+        console.error("Error saving gen ed constraints:", error);
+        setStatusMessage({
+          type: "error",
+          text: "An error occurred while saving. Please try again.",
+        });
       }
     };
     updateGenedConstraintData();
@@ -833,7 +883,7 @@ const InputGenEd = () => {
                                   }
                                   className="bg-primary text-white py-2 px-5 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
                                 >
-                                  Add Day and Time Constraint
+                                  Add
                                 </button>
                               )}
                             </div>
@@ -850,7 +900,7 @@ const InputGenEd = () => {
                                 }
                                 className="bg-primary text-white py-2 px-5 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
                               >
-                                Add Day and Time Constraint
+                                Add
                               </button>
                             )}
                           </div>
@@ -861,14 +911,49 @@ const InputGenEd = () => {
                 </div>
               );
             })}
-            <div className="justify-center flex gap-4 font-Manrope font-semibold">
-              <button
-                type="submit"
-                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
-              >
-                Save
-              </button>
-              {/* walang add dito kasi lahat ng gened course nakalagay na here */}
+
+            <div className="flex flex-col">
+              {statusMessage.type && (
+                <div
+                  className={`mx-auto mt-6 p-3 rounded-md text-center font-medium flex justify-between items-center ${
+                    statusMessage.type === "success"
+                      ? "bg-green-100 text-green-800 border border-green-300"
+                      : "bg-red-100 text-red-800 border border-red-300"
+                  }`}
+                >
+                  <span className="flex-grow">{statusMessage.text}</span>
+                  <button
+                    onClick={clearStatusMessage}
+                    className="text-gray-600 hover:text-gray-900 ml-5 flex items-center"
+                    type="button"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              )}
+
+              <div className="justify-center flex gap-4 font-Manrope font-semibold">
+                <button
+                  type="submit"
+                  className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+                >
+                  Save
+                </button>
+                {/* walang add dito kasi lahat ng gened course nakalagay na here */}
+              </div>
             </div>
           </form>
         </div>
@@ -947,46 +1032,129 @@ const DayRestriction = React.memo(
 
     return (
       <div className="bg-[#BFDDF6] p-5 rounded-md mb-5">
-        <div className="flex gap-3 justify-center">
-          <div className="flex flex-col mb-3">
-            <label className="text-left mb-1">Day</label>
-            <MemoizedSelect
-              selectedValue={selectedValue}
-              onChangeHandler={onChangeHandler}
-              customStylesMemoized={customStylesMemoized}
-              dayOptionsMemoized={dayOptionsMemoized}
-            />
+        <div>
+          <div className="text-center mb-3 font-Manrope font-extrabold text-primary">
+            Day and Time Restriction
           </div>
+          <div className="flex gap-3 justify-center">
+            <div className="flex flex-col mb-3">
+              <label className="text-left mb-1">Day</label>
+              <MemoizedSelect
+                selectedValue={selectedValue}
+                onChangeHandler={onChangeHandler}
+                customStylesMemoized={customStylesMemoized}
+                dayOptionsMemoized={dayOptionsMemoized}
+              />
+            </div>
 
-          <div className="flex flex-col">
-            {restriction.startEndTimes.length > 0 ? (
-              restriction.startEndTimes.map((time, timeIndex) => {
-                return (
-                  <div
-                    key={timeIndex}
-                    className="mb-3 flex gap-3 justify-center"
-                  >
+            <div className="flex flex-col">
+              {restriction.startEndTimes.length > 0 ? (
+                restriction.startEndTimes.map((time, timeIndex) => {
+                  return (
+                    <div
+                      key={timeIndex}
+                      className="mb-3 flex gap-3 justify-center"
+                    >
+                      <div className="flex flex-col">
+                        <label className="text-left mb-1">Start</label>
+                        <input
+                          type="time"
+                          name="start"
+                          value={time.start}
+                          onChange={(e) =>
+                            handleGenEdTimeRestrictionChange(
+                              genEdIndex,
+                              restrictionIndex,
+                              timeIndex,
+                              e
+                            )
+                          }
+                          className={`h-[38px] border w-[130px] ${
+                            timeErrors[genEdIndex]?.[restrictionIndex]?.[
+                              timeIndex
+                            ]
+                              ? "border-red-500"
+                              : "border-primary"
+                          } rounded-[5px] py-1 px-2`}
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <label className="text-left mb-1">End</label>
+                        <input
+                          type="time"
+                          name="end"
+                          value={time.end}
+                          onChange={(e) =>
+                            handleGenEdTimeRestrictionChange(
+                              genEdIndex,
+                              restrictionIndex,
+                              timeIndex,
+                              e
+                            )
+                          }
+                          className={`h-[38px] border w-[130px] ${
+                            timeErrors[genEdIndex]?.[restrictionIndex]?.[
+                              timeIndex
+                            ]
+                              ? "border-red-500"
+                              : "border-primary"
+                          } rounded-[5px] py-1 px-2`}
+                        />
+                      </div>
+                      <div className="flex items-end gap-1">
+                        {restriction.startEndTimes.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleDeleteTimeRestriction(
+                                genEdIndex,
+                                restrictionIndex,
+                                timeIndex
+                              )
+                            }
+                            className="mb-[6px]"
+                          >
+                            <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                          </button>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleAddTimeRestriction(
+                              genEdIndex,
+                              restrictionIndex
+                            )
+                          }
+                          className="w-7 mb-[6px]"
+                        >
+                          <img src={add_button} />
+                        </button>
+                      </div>
+
+                      {timeErrors[genEdIndex]?.[restrictionIndex]?.[
+                        timeIndex
+                      ] && (
+                        <div className="text-red-500 text-xs absolute mt-[70px] ml-1">
+                          {timeErrors[genEdIndex][restrictionIndex][timeIndex]}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="flex flex-col">
+                  <div className="mb-3 flex gap-3 justify-center">
                     <div className="flex flex-col">
                       <label className="text-left mb-1">Start</label>
                       <input
                         type="time"
                         name="start"
-                        value={time.start}
+                        value=""
                         onChange={(e) =>
-                          handleGenEdTimeRestrictionChange(
-                            genEdIndex,
-                            restrictionIndex,
-                            timeIndex,
-                            e
-                          )
+                          handleGenEdTimeRestrictionChange(genEdIndex, 0, 0, e)
                         }
-                        className={`h-[38px] border w-[130px] ${
-                          timeErrors[genEdIndex]?.[restrictionIndex]?.[
-                            timeIndex
-                          ]
-                            ? "border-red-500"
-                            : "border-primary"
-                        } rounded-[5px] py-1 px-2`}
+                        className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
                       />
                     </div>
                     <div className="flex flex-col">
@@ -994,114 +1162,39 @@ const DayRestriction = React.memo(
                       <input
                         type="time"
                         name="end"
-                        value={time.end}
-                        onChange={(e) =>
-                          handleGenEdTimeRestrictionChange(
-                            genEdIndex,
-                            restrictionIndex,
-                            timeIndex,
-                            e
-                          )
+                        value={
+                          genEdCourse?.courseRestriction[0]?.startEndTimes[0]
+                            ?.end || ""
                         }
-                        className={`h-[38px] border w-[130px] ${
-                          timeErrors[genEdIndex]?.[restrictionIndex]?.[
-                            timeIndex
-                          ]
-                            ? "border-red-500"
-                            : "border-primary"
-                        } rounded-[5px] py-1 px-2`}
+                        onChange={(e) =>
+                          handleGenEdTimeRestrictionChange(genEdIndex, 0, 0, e)
+                        }
+                        className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
                       />
                     </div>
-                    <div className="flex items-end gap-1">
-                      {restriction.startEndTimes.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleDeleteTimeRestriction(
-                              genEdIndex,
-                              restrictionIndex,
-                              timeIndex
-                            )
-                          }
-                          className="mb-[6px]"
-                        >
-                          <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
-                        </button>
-                      )}
-
+                    <div className="flex items-center justify-center gap-1">
                       <button
                         type="button"
                         onClick={() =>
-                          handleAddTimeRestriction(genEdIndex, restrictionIndex)
+                          handleDeleteTimeRestriction(genEdIndex, 0, 0)
                         }
+                        className="mb-[6px]"
+                      >
+                        <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleAddTimeRestriction(genEdIndex, 0)}
                         className="w-7 mb-[6px]"
                       >
                         <img src={add_button} />
                       </button>
                     </div>
-
-                    {timeErrors[genEdIndex]?.[restrictionIndex]?.[
-                      timeIndex
-                    ] && (
-                      <div className="text-red-500 text-xs absolute mt-[70px] ml-1">
-                        {timeErrors[genEdIndex][restrictionIndex][timeIndex]}
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            ) : (
-              <div className="flex flex-col">
-                <div className="mb-3 flex gap-3 justify-center">
-                  <div className="flex flex-col">
-                    <label className="text-left mb-1">Start</label>
-                    <input
-                      type="time"
-                      name="start"
-                      value=""
-                      onChange={(e) =>
-                        handleGenEdTimeRestrictionChange(genEdIndex, 0, 0, e)
-                      }
-                      className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                    />
-                  </div>
-                  <div className="flex flex-col">
-                    <label className="text-left mb-1">End</label>
-                    <input
-                      type="time"
-                      name="end"
-                      value={
-                        genEdCourse?.courseRestriction[0]?.startEndTimes[0]
-                          ?.end || ""
-                      }
-                      onChange={(e) =>
-                        handleGenEdTimeRestrictionChange(genEdIndex, 0, 0, e)
-                      }
-                      className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                    />
-                  </div>
-                  <div className="flex items-center justify-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        handleDeleteTimeRestriction(genEdIndex, 0, 0)
-                      }
-                      className="mb-[6px]"
-                    >
-                      <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleAddTimeRestriction(genEdIndex, 0)}
-                      className="w-7 mb-[6px]"
-                    >
-                      <img src={add_button} />
-                    </button>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
         <div className="flex justify-center gap-3 mt-5">

@@ -334,9 +334,9 @@ const InputTAS: React.FC = () => {
       } else if (endMinutes - startMinutes < 30) {
         //change depende sa ano dapat
         error = "Time slot must be at least 30 minutes";
-      } else if (endMinutes - startMinutes > 300) {
+      } else if (endMinutes - startMinutes > 840) {
         //change depende sa ano dapat
-        error = "Time slot cannot exceed 5 hours";
+        error = "Time slot cannot exceed 14 hours";
       }
       if (!error) {
         for (
@@ -743,6 +743,9 @@ const InputTAS: React.FC = () => {
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
 
+    // Clear any previous status messages
+    setStatusMessage({ type: null, text: "" });
+
     // Check if any TAS has an invalid name (empty or single word)
     const hasInvalidName = tasList.some((tas) => {
       const trimmedName = tas.name.trim();
@@ -750,20 +753,26 @@ const InputTAS: React.FC = () => {
     });
 
     if (hasInvalidName) {
-      alert("All TAS entries must have a full name (first and last name)");
+      setStatusMessage({
+        type: "error",
+        text: "All TAS entries must have a full name (first and last name)",
+      });
       return;
     }
 
     // Check if there are any time validation errors
     if (hasTimeValidationErrors()) {
-      alert("Please fix all time validation errors before saving");
+      setStatusMessage({
+        type: "error",
+        text: "Please fix all time validation errors before saving",
+      });
       return;
     }
 
     // Manual validation check for invalid time entries
-    const hasInvalidTimeEntries = tasList.some((tas, tasIndex) =>
-      tas.restrictions.some((restriction, reqIndex) =>
-        restriction.startEndTimes.some((time, timeIndex) => {
+    const hasInvalidTimeEntries = tasList.some((tas) =>
+      tas.restrictions.some((restriction) =>
+        restriction.startEndTimes.some((time) => {
           if (time.start && time.end) {
             const startMinutes = convertTimeToMinutes(time.start);
             const endMinutes = convertTimeToMinutes(time.end);
@@ -775,7 +784,10 @@ const InputTAS: React.FC = () => {
     );
 
     if (hasInvalidTimeEntries) {
-      alert("End time must be after start time in all time entries");
+      setStatusMessage({
+        type: "error",
+        text: "End time must be after start time in all time entries",
+      });
       return;
     }
 
@@ -788,7 +800,10 @@ const InputTAS: React.FC = () => {
     );
 
     if (hasEmptyDays) {
-      alert("Please select a day for all time restrictions");
+      setStatusMessage({
+        type: "error",
+        text: "Please select a day for all time restrictions",
+      });
       return;
     }
 
@@ -801,141 +816,164 @@ const InputTAS: React.FC = () => {
     );
 
     if (hasEmptyTimes) {
-      alert(
-        "Please fill in both start and end times for all time restrictions"
-      );
+      setStatusMessage({
+        type: "error",
+        text: "Please fill in both start and end times for all time restrictions",
+      });
       return;
     }
 
     // UPDATES
     // check if may nagbago b talaga
     console.log("UPDATING");
-    for (let i = 0; i < updatedTAS.length; i++) {
-      let upd = updatedTAS[i];
-      let tas: any = tasList.find((item) => item.tasId === upd.tasId);
+    try {
+      for (let i = 0; i < updatedTAS.length; i++) {
+        let upd = updatedTAS[i];
+        let tas: any = tasList.find((item) => item.tasId === upd.tasId);
 
-      let reqObj: any = { tasId: tas?.tasId };
-      for (let j = 0; j < upd.fields.length; j++) {
-        let field: any = upd.fields[j];
+        let reqObj: any = { tasId: tas?.tasId };
+        for (let j = 0; j < upd.fields.length; j++) {
+          let field: any = upd.fields[j];
 
-        if (field === "restrictions") {
-          let restrictionsObj: any = {
-            M: [],
-            T: [],
-            W: [],
-            TH: [],
-            F: [],
-            S: [],
-          };
+          if (field === "restrictions") {
+            let restrictionsObj: any = {
+              M: [],
+              T: [],
+              W: [],
+              TH: [],
+              F: [],
+              S: [],
+            };
 
-          tas?.["restrictions"].forEach((res: any) => {
-            console.log(res);
-            res.startEndTimes.forEach((set: any) => {
-              restrictionsObj[res.day].push({
-                start: `${set.start.slice(0, 2)}${set.start.slice(3)}`,
-                end: `${set.end.slice(0, 2)}${set.end.slice(3)}`,
+            tas?.["restrictions"].forEach((res: any) => {
+              console.log(res);
+              res.startEndTimes.forEach((set: any) => {
+                restrictionsObj[res.day].push({
+                  start: `${set.start.slice(0, 2)}${set.start.slice(3)}`,
+                  end: `${set.end.slice(0, 2)}${set.end.slice(3)}`,
+                });
               });
             });
-          });
 
-          reqObj["restrictions"] = restrictionsObj;
-        } else {
-          reqObj[field] = tas?.[field];
+            reqObj["restrictions"] = restrictionsObj;
+          } else {
+            reqObj[field] = tas?.[field];
+          }
         }
 
-        // console.log(resObj)
-      }
+        const res = await fetch("http://localhost:8080/tasconstraints", {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(reqObj),
+        });
 
-      const res = await fetch("http://localhost:8080/tasconstraints", {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(reqObj),
-      });
-
-      if (res.ok) {
-        console.log("yey ok"); // PLS CHANGE THIS TO MESSAGE KAHIT SA BABA NUNG BUTTONS LNG
-      } else {
-        console.log("nooo", res.body);
-      }
-    }
-
-    // INSERTS
-    console.log("INSERTING");
-    for (let i = 0; i < insertedTAS.length; i++) {
-      let tempId = insertedTAS[i];
-      let tas: TasInfo | undefined = tasList.find(
-        (item) => item.tasId === tempId
-      );
-      if (!tas) {
-        continue;
-      }
-      const { tasId, ...rest } = tas;
-
-      let restrictionsObj: any = {
-        M: [],
-        T: [],
-        W: [],
-        TH: [],
-        F: [],
-        S: [],
-      };
-
-      tas?.["restrictions"].forEach((res: any) => {
-        if (res.day === "") {
+        if (!res.ok) {
+          console.log("Error updating", res.body);
+          setStatusMessage({
+            type: "error",
+            text: "Failed to update TAS constraints. Please try again.",
+          });
           return;
         }
-        res.startEndTimes.forEach((set: any) => {
-          restrictionsObj[res.day].push({
-            start: `${set.start.slice(0, 2)}${set.start.slice(3)}`,
-            end: `${set.end.slice(0, 2)}${set.end.slice(3)}`,
+      }
+
+      // INSERTS
+      console.log("INSERTING");
+      for (let i = 0; i < insertedTAS.length; i++) {
+        let tempId = insertedTAS[i];
+        let tas: TasInfo | undefined = tasList.find(
+          (item) => item.tasId === tempId
+        );
+        if (!tas) {
+          continue;
+        }
+        const { tasId, ...rest } = tas;
+
+        let restrictionsObj: any = {
+          M: [],
+          T: [],
+          W: [],
+          TH: [],
+          F: [],
+          S: [],
+        };
+
+        tas?.["restrictions"].forEach((res: any) => {
+          if (res.day === "") {
+            return;
+          }
+          res.startEndTimes.forEach((set: any) => {
+            restrictionsObj[res.day].push({
+              start: `${set.start.slice(0, 2)}${set.start.slice(3)}`,
+              end: `${set.end.slice(0, 2)}${set.end.slice(3)}`,
+            });
           });
         });
-      });
 
-      const reqObj = {
-        ...rest,
-        restrictions: restrictionsObj,
-        mainDepartment: "CS", // HARD CODED FOR NOW
-        email: "sample@email.com", // WALA PANG EMAIL FORM DON SA ANO
-      };
+        const reqObj = {
+          ...rest,
+          restrictions: restrictionsObj,
+          mainDepartment: "CS", // HARD CODED FOR NOW
+          email: "sample@email.com", // WALA PANG EMAIL FORM DON SA ANO
+        };
 
-      const res = await fetch("http://localhost:8080/tasconstraints", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(reqObj),
-      });
+        const res = await fetch("http://localhost:8080/tasconstraints", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(reqObj),
+        });
 
-      if (res.ok) {
-        console.log("yey ok"); // PLS CHANGE THIS TO MESSAGE KAHIT SA BABA NUNG BUTTONS LNG
-      } else {
-        const data = await res.json();
-        console.log("nooo", data);
+        if (!res.ok) {
+          const data = await res.json();
+          console.log("Error inserting", data);
+          setStatusMessage({
+            type: "error",
+            text: "Failed to add new TAS. Please try again.",
+          });
+          return;
+        }
       }
-    }
 
-    console.log("DELETING");
-    for (let i = 0; i < deletedTAS.length; i++) {
-      const res = await fetch("http://localhost:8080/tasconstraints", {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ tasId: deletedTAS[i] }),
-      });
+      // DELETING
+      console.log("DELETING");
+      for (let i = 0; i < deletedTAS.length; i++) {
+        const res = await fetch("http://localhost:8080/tasconstraints", {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ tasId: deletedTAS[i] }),
+        });
 
-      if (res.ok) {
-        console.log("yey ok");
-      } else {
-        const data = await res.json();
-        console.log("nooo", data);
+        if (!res.ok) {
+          const data = await res.json();
+          console.log("Error deleting", data);
+          setStatusMessage({
+            type: "error",
+            text: "Failed to delete TAS. Please try again.",
+          });
+          return;
+        }
       }
+
+      // If all operations were successful
+      setStatusMessage({
+        type: "success",
+        text: "TAS constraints successfully saved!",
+      });
+    } catch (error) {
+      console.error("Error saving TAS constraints:", error);
+      setStatusMessage({
+        type: "error",
+        text: "An error occurred while saving. Please check your connection and try again.",
+      });
     }
   };
 
@@ -1035,6 +1073,15 @@ const InputTAS: React.FC = () => {
 
     getTASConstraints();
   }, []);
+
+  const [statusMessage, setStatusMessage] = useState<{
+    type: "success" | "error" | null;
+    text: string;
+  }>({ type: null, text: "" });
+
+  const clearStatusMessage = () => {
+    setStatusMessage({ type: null, text: "" });
+  };
 
   return (
     <>
@@ -1389,20 +1436,53 @@ const InputTAS: React.FC = () => {
                 </button>
               </div>
             ))}
-            <div className="justify-center flex gap-4 font-Manrope font-semibold">
-              <button
-                type="submit"
-                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg "
-              >
-                Save
-              </button>
-              <button
-                onClick={handleAddTAS}
-                className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
-              >
-                Add
-                <img src={add_button_white} className="w-4" />
-              </button>
+            <div className="flex flex-col items-center justify-center">
+              {statusMessage.type && (
+                <div
+                  className={`mx-auto mt-6 p-3 rounded-md text-center font-medium relative ${
+                    statusMessage.type === "success"
+                      ? "bg-green-100 text-green-800 border border-green-300"
+                      : "bg-red-100 text-red-800 border border-red-300"
+                  }`}
+                >
+                  {statusMessage.text}
+                  <button
+                    onClick={clearStatusMessage}
+                    className="text-gray-600 hover:text-gray-900 ml-5 items-center"
+                    type="button"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              )}
+              <div className="justify-center flex gap-4 font-Manrope font-semibold">
+                <button
+                  type="submit"
+                  className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg "
+                >
+                  Save
+                </button>
+                <button
+                  onClick={handleAddTAS}
+                  className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+                >
+                  Add
+                  <img src={add_button_white} className="w-4" />
+                </button>
+              </div>
             </div>
           </form>
         </div>

@@ -60,6 +60,11 @@ const InputRooms = () => {
   const [insertedRooms, setInsertedRooms] = useState<string[]>([]);
   const [deletedRooms, setDeletedRooms] = useState<string[]>([]);
 
+  const [statusMessage, setStatusMessage] = useState<{
+    type: "success" | "error" | null;
+    text: string;
+  }>({ type: null, text: "" });
+
   useEffect(() => {
     console.log("updated", updatedRooms);
   }, [updatedRooms]);
@@ -164,111 +169,189 @@ const InputRooms = () => {
     setDeletedRooms((prev) => [...prev, rooms[index].roomId]);
   };
 
+  const clearStatusMessage = () => {
+    setStatusMessage({ type: null, text: "" });
+  };
+
   // Save handler for demonstration (logs the rooms array).
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
-    // rooms.forEach((room, index) => {
-    //   console.log(`Room ${index + 1}`);
-    //   console.log(` Code: ${room.roomId}`);
-    //   console.log(` Department: ${room.department}`);
-    //   console.log(` Type: ${room.roomType}`);
-    // });
 
-    // UPDATES
-    for (let i = 0; i < updatedRooms.length; i++) {
-      let updatedRoom: any = rooms.find(
-        (r) => r.roomId === updatedRooms[i].roomId
-      );
+    try {
+      let isSuccess = false;
+      let apiErrors: string[] = [];
 
-      if (!updatedRoom) {
-        continue;
+      // UPDATES
+      if (updatedRooms.length > 0) {
+        for (let i = 0; i < updatedRooms.length; i++) {
+          let updatedRoom: any = rooms.find(
+            (r) => r.roomId === updatedRooms[i].roomId
+          );
+
+          if (!updatedRoom) {
+            continue;
+          }
+
+          const reqObj: any = {
+            roomId: updatedRoom.roomId,
+          };
+
+          for (let j = 0; j < updatedRooms[i].fields.length; j++) {
+            let field = updatedRooms[i].fields[j];
+            reqObj[field] = updatedRoom[field];
+          }
+
+          try {
+            console.log("Sending PUT request:", reqObj);
+            const res = await fetch("http://localhost:8080/rooms", {
+              method: "PUT",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(reqObj),
+            });
+
+            console.log("Update response status:", res.status);
+
+            if (res.ok) {
+              isSuccess = true;
+            } else {
+              const data = await res.json();
+              console.log("error", data);
+              apiErrors.push(
+                `Failed to update room ${updatedRoom.roomId}: ${
+                  data.message || "Unknown error"
+                }`
+              );
+            }
+          } catch (error) {
+            console.error("Update fetch error:", error);
+            apiErrors.push(`Network error updating room ${updatedRoom.roomId}`);
+          }
+        }
       }
 
-      const reqObj: any = {
-        roomId: updatedRoom.roomId,
-      };
+      // INSERTS
+      if (insertedRooms.length > 0) {
+        for (let i = 0; i < insertedRooms.length; i++) {
+          let insertedRoom = insertedRooms[i];
 
-      for (let j = 0; j < updatedRooms[i].fields.length; j++) {
-        let field = updatedRooms[i].fields[j];
-        reqObj[field] = updatedRoom[field];
+          if (!insertedRoom.startsWith("RM")) {
+            continue;
+          }
+
+          if (rooms.filter((r) => r.roomId === insertedRoom).length > 1) {
+            apiErrors.push(`Duplicate room ID: ${insertedRoom}`);
+            continue;
+            // set error dito na bawal mag dupli ng room
+          }
+
+          let room = rooms.find((r) => r.roomId === insertedRoom);
+
+          if (!room) {
+            continue;
+          }
+
+          let reqObj = {
+            roomId: insertedRoom,
+            department: room.department,
+            roomType: room.roomType,
+          };
+
+          try {
+            console.log("Sending POST request:", reqObj);
+            const res = await fetch("http://localhost:8080/rooms", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify(reqObj),
+            });
+
+            console.log("Insert response status:", res.status);
+
+            if (res.ok) {
+              isSuccess = true;
+            } else {
+              const data = await res.json();
+              console.log("error", data);
+              apiErrors.push(
+                `Failed to add room ${insertedRoom}: ${
+                  data.message || "Unknown error"
+                }`
+              );
+            }
+          } catch (error) {
+            console.error("Insert fetch error:", error);
+            apiErrors.push(`Network error adding room ${insertedRoom}`);
+          }
+        }
       }
 
-      const res = await fetch("http://localhost:8080/rooms", {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(reqObj),
+      // DELETES
+      if (deletedRooms.length > 0) {
+        for (let i = 0; i < deletedRooms.length; i++) {
+          try {
+            console.log("Sending DELETE request for:", deletedRooms[i]);
+            const res = await fetch("http://localhost:8080/rooms", {
+              method: "DELETE",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ roomId: deletedRooms[i] }),
+            });
+
+            console.log("Delete response status:", res.status);
+
+            if (res.ok) {
+              isSuccess = true;
+            } else {
+              const data = await res.json();
+              console.log("nooo", data);
+              apiErrors.push(
+                `Failed to delete room ${deletedRooms[i]}: ${
+                  data.message || "Unknown error"
+                }`
+              );
+            }
+          } catch (error) {
+            console.error("Delete fetch error:", error);
+            apiErrors.push(`Network error deleting room ${deletedRooms[i]}`);
+          }
+        }
+      }
+
+      // Set final status message
+      if (apiErrors.length > 0) {
+        setStatusMessage({
+          type: "error",
+          text: apiErrors[0], // Show first error or join multiple errors
+        });
+      } else if (isSuccess) {
+        setStatusMessage({
+          type: "success",
+          text: "Room data successfully saved!",
+        });
+      } else if (
+        updatedRooms.length === 0 &&
+        insertedRooms.length === 0 &&
+        deletedRooms.length === 0
+      ) {
+        // No operations were performed
+        setStatusMessage({
+          type: "error",
+          text: "No changes to save.",
+        });
+      }
+    } catch (error) {
+      console.error("Error saving rooms:", error);
+      setStatusMessage({
+        type: "error",
+        text: "An error occurred while saving. Please try again.",
       });
-
-      if (res.ok) {
-        console.log("yeey ok");
-      } else {
-        const data = await res.json();
-        console.log("error", data);
-      }
-    }
-
-    // INSERTS
-    for (let i = 0; i < insertedRooms.length; i++) {
-      let insertedRoom = insertedRooms[i];
-
-      if (!insertedRoom.startsWith("RM")) {
-        continue;
-      }
-
-      if (rooms.filter((r) => r.roomId === insertedRoom).length > 1) {
-        continue;
-        // set error dito na bawal mag dupli ng room
-      }
-
-      let room = rooms.find((r) => r.roomId === insertedRoom);
-
-      if (!room) {
-        continue;
-      }
-
-      let reqObj = {
-        roomId: insertedRoom,
-        department: room.department,
-        roomType: room.roomType,
-      };
-
-      const res = await fetch("http://localhost:8080/rooms", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(reqObj),
-      });
-
-      if (res.ok) {
-        console.log("yeyy");
-      } else {
-        const data = await res.json();
-        console.log("error", data);
-      }
-    }
-
-    // DELETES
-    for (let i = 0; i < deletedRooms.length; i++) {
-      const res = await fetch("http://localhost:8080/rooms", {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ roomId: deletedRooms[i] }),
-      });
-
-      if (res.ok) {
-        console.log("yey ok"); // PLS CHANGE THIS TO MESSAGE KAHIT SA BABA NUNG BUTTONS LNG
-      } else {
-        const data = await res.json();
-        console.log("nooo", data);
-      }
     }
   };
 
@@ -413,23 +496,59 @@ const InputRooms = () => {
             );
           })}
 
-          <div className="mx-auto flex gap-4">
-            <div>
-              <button
-                onClick={handleSave}
-                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+          <div className="flex flex-col">
+            {statusMessage.type && (
+              <div
+                className={`mx-auto  mt-6 p-3 rounded-md text-center font-medium flex justify-between items-center ${
+                  statusMessage.type === "success"
+                    ? "bg-green-100 text-green-800 border border-green-300"
+                    : "bg-red-100 text-red-800 border border-red-300"
+                }`}
               >
-                Save
-              </button>
-            </div>
-            <div>
-              <button
-                onClick={handleAddRoom}
-                className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
-              >
-                Add
-                <img src={add_button_white} className="w-4" alt="Add" />
-              </button>
+                <span className="flex-grow">{statusMessage.text}</span>
+                <button
+                  onClick={clearStatusMessage}
+                  className="text-gray-600 hover:text-gray-900 ml-5 flex items-center"
+                  type="button"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            <div className="mx-auto flex gap-4">
+              <div>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+                >
+                  Save
+                </button>
+              </div>
+              <div>
+                <button
+                  type="button"
+                  onClick={handleAddRoom}
+                  className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+                >
+                  Add
+                  <img src={add_button_white} className="w-4" alt="Add" />
+                </button>
+              </div>
             </div>
           </div>
         </form>

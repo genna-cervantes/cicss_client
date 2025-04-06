@@ -78,6 +78,10 @@ const InputYLD: React.FC = () => {
   const [updatedYearLevels, setUpdatedYearLevels] = useState<YearLevelData[]>(
     []
   );
+  const [statusMessage, setStatusMessage] = useState<{
+    type: "success" | "error" | null;
+    text: string;
+  }>({ type: null, text: "" });
 
   const handleUpdate = ({ updatedYld }: { updatedYld: YearLevelData }) => {
     setUpdatedYearLevels((prev) => {
@@ -147,6 +151,10 @@ const InputYLD: React.FC = () => {
     });
   };
 
+  const clearStatusMessage = () => {
+    setStatusMessage({ type: null, text: "" });
+  };
+
   // Handle form submission
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
@@ -160,14 +168,18 @@ const InputYLD: React.FC = () => {
     );
 
     if (hasInvalidMaxDays) {
-      alert(
-        "Please specify Maximum Days for all year levels. Values must be between 1 and 7."
-      );
+      setStatusMessage({
+        type: "error",
+        text: "Please specify Maximum Days for all year levels. Values must be between 1 and 7.",
+      });
       return;
     }
 
     // handle updates
     const updateYLDData = async () => {
+      let isSuccess = false;
+      let apiErrors: string[] = [];
+
       for (let i = 0; i < updatedYearLevels.length; i++) {
         let updYearLevel: any = updatedYearLevels[i];
 
@@ -185,23 +197,55 @@ const InputYLD: React.FC = () => {
         };
 
         const department = localStorage.getItem("department") ?? "CS";
-        const res = await fetch(
-          `http://localhost:8080/yldconstraint/${department}/${updYearLevel.year}`,
-          {
-            method: "PUT",
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-              "Content-type": "application/json",
-            },
-            body: JSON.stringify(transformedUpdYearLevel),
-          }
-        );
 
-        if (res.ok) {
-          console.log("yey updated");
-        } else {
-          console.log("may error sis");
+        try {
+          const res = await fetch(
+            `http://localhost:8080/yldconstraint/${department}/${updYearLevel.year}`,
+            {
+              method: "PUT",
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify(transformedUpdYearLevel),
+            }
+          );
+
+          if (res.ok) {
+            isSuccess = true;
+            console.log("yey updated");
+          } else {
+            const data = await res.json();
+            console.log("may error sis");
+            apiErrors.push(
+              `Failed to update Year Level ${updYearLevel.year}: ${
+                data.message || "Unknown error"
+              }`
+            );
+          }
+        } catch (error) {
+          console.error("Update fetch error:", error);
+          apiErrors.push(
+            `Network error updating Year Level ${updYearLevel.year}`
+          );
         }
+      }
+
+      if (apiErrors.length > 0) {
+        setStatusMessage({
+          type: "error",
+          text: apiErrors[0],
+        });
+      } else if (isSuccess) {
+        setStatusMessage({
+          type: "success",
+          text: "Year Level - Day constraints successfully saved!",
+        });
+      } else if (updatedYearLevels.length === 0) {
+        setStatusMessage({
+          type: "error",
+          text: "No changes to save.",
+        });
       }
     };
     updateYLDData();
@@ -341,13 +385,47 @@ const InputYLD: React.FC = () => {
             ))}
           </section>
 
-          <div className="flex mx-auto">
-            <button
-              type="submit"
-              className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-11 mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
-            >
-              Save
-            </button>
+          <div className="flex flex-col">
+            {statusMessage.type && (
+              <div
+                className={`mx-auto mt-6 p-3 rounded-md text-center font-medium flex justify-between items-center ${
+                  statusMessage.type === "success"
+                    ? "bg-green-100 text-green-800 border border-green-300"
+                    : "bg-red-100 text-red-800 border border-red-300"
+                }`}
+              >
+                <span className="flex-grow">{statusMessage.text}</span>
+                <button
+                  onClick={clearStatusMessage}
+                  className="text-gray-600 hover:text-gray-900 ml-5 flex items-center"
+                  type="button"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+            )}
+
+            <div className="flex mx-auto">
+              <button
+                type="submit"
+                className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-11 mb-24 rounded-sm hover:bg-primary hover:text-white hover:shadow-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+              >
+                Save
+              </button>
+            </div>
           </div>
         </form>
       </div>

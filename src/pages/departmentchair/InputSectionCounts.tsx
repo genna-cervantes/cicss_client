@@ -33,6 +33,12 @@ const InputSectionCounts: React.FC = () => {
     [key: string]: string;
   }>({});
 
+  // Add state for status message
+  const [statusMessage, setStatusMessage] = useState<{
+    type: "success" | "error" | null;
+    text: string;
+  }>({ type: null, text: "" });
+
   const handleSectionCountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const numValue = value ? parseInt(value, 10) : "";
@@ -80,6 +86,10 @@ const InputSectionCounts: React.FC = () => {
         setFourthYearSections(data.fourthYearSections);
       } else {
         console.log("error with fetching data", data);
+        setStatusMessage({
+          type: "error",
+          text: "Failed to load section data",
+        });
       }
     };
 
@@ -113,8 +123,13 @@ const InputSectionCounts: React.FC = () => {
   const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Validate before submitting
+    setStatusMessage({ type: null, text: "" });
+
     if (!validateForm()) {
+      setStatusMessage({
+        type: "error",
+        text: "Please fix validation errors before saving",
+      });
       return;
     }
 
@@ -132,22 +147,76 @@ const InputSectionCounts: React.FC = () => {
 
     console.log(reqBody);
 
-    const res = await fetch("http://localhost:8080/year_sections", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
-        "Content-type": "application/json",
-      },
-      body: JSON.stringify(reqBody),
-    });
+    try {
+      const res = await fetch("http://localhost:8080/year_sections", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(reqBody),
+      });
 
-    if (res.ok) {
-      console.log("yeeyyyy saved"); // gawan ng message pls thanks
-    } else {
-      console.log("may error UGH");
+      if (res.ok) {
+        console.log("Successfully Added");
+        setStatusMessage({
+          type: "success",
+          text: "Sections successfully saved!",
+        });
+      } else {
+        console.log("Unable to Add");
+        setStatusMessage({
+          type: "error",
+          text: "Failed to save sections. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error("Error saving sections:", error);
+      setStatusMessage({
+        type: "error",
+        text: "An error occurred while saving. Please check your connection and try again.",
+      });
     }
+  };
 
-    // updates
+  const clearStatusMessage = () => {
+    setStatusMessage({ type: null, text: "" });
+  };
+
+  const deleteFirstYearSection = (index: number) => {
+    setFirstYearSections((prev) => prev.filter((_, i) => i !== index));
+    setSectionCounts((prev) => ({
+      ...prev,
+      firstSC:
+        typeof prev.firstSC === "number" ? prev.firstSC - 1 : prev.firstSC,
+    }));
+  };
+
+  const deleteSecondYearSection = (index: number) => {
+    setSecondYearSections((prev) => prev.filter((_, i) => i !== index));
+    setSectionCounts((prev) => ({
+      ...prev,
+      secondSC:
+        typeof prev.secondSC === "number" ? prev.secondSC - 1 : prev.secondSC,
+    }));
+  };
+
+  const deleteThirdYearSection = (index: number) => {
+    setThirdYearSections((prev) => prev.filter((_, i) => i !== index));
+    setSectionCounts((prev) => ({
+      ...prev,
+      thirdSC:
+        typeof prev.thirdSC === "number" ? prev.thirdSC - 1 : prev.thirdSC,
+    }));
+  };
+
+  const deleteFourthYearSection = (index: number) => {
+    setFourthYearSections((prev) => prev.filter((_, i) => i !== index));
+    setSectionCounts((prev) => ({
+      ...prev,
+      fourthSC:
+        typeof prev.fourthSC === "number" ? prev.fourthSC - 1 : prev.fourthSC,
+    }));
   };
 
   return (
@@ -180,7 +249,7 @@ const InputSectionCounts: React.FC = () => {
           </div>
         </section>
 
-        <section className="flex justify-center font-Manrope font-semibold mt-6 w-full">
+        <section className="flex justify-center font-Manrope font-semibold mt-6 w-full mb-5">
           <div className="space-y-10">
             {/* Upper */}
             <div className="flex flex-col lg:flex-row lg:space-x-10 space-y-10 lg:space-y-0">
@@ -221,7 +290,7 @@ const InputSectionCounts: React.FC = () => {
 
                   <div className="flex flex-col gap-2 w-64">
                     <div className="flex">
-                      <div className="text-xs ml-4 mr-10">Section</div>
+                      <div className="text-xs ml-4 mr-6">Section</div>
                       <div className="text-xs ml-10">Specialization</div>
                     </div>
                     {typeof sectionCounts.firstSC == "number" &&
@@ -233,7 +302,10 @@ const InputSectionCounts: React.FC = () => {
                             specialization: "none",
                           };
                           return (
-                            <div key={i} className="flex space-x-5">
+                            <div
+                              key={i}
+                              className="flex space-x-5 items-center"
+                            >
                               <input
                                 type="text"
                                 className="border border-primary rounded-md w-20 p-2"
@@ -251,10 +323,30 @@ const InputSectionCounts: React.FC = () => {
                               />
                               <input
                                 type="text"
-                                className="border border-primary rounded-md w-40 p-2"
+                                className="border border-primary rounded-md w-32 p-2"
                                 placeholder="Not Applicable"
                                 disabled
                               />
+                              <button
+                                type="button"
+                                onClick={() => deleteFirstYearSection(i)}
+                                className="text-primary hover:text-red-700"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                              </button>
                             </div>
                           );
                         }
@@ -300,7 +392,7 @@ const InputSectionCounts: React.FC = () => {
 
                   <div className="flex flex-col gap-2 w-64">
                     <div className="flex">
-                      <div className="text-xs ml-4 mr-10">Section</div>
+                      <div className="text-xs ml-4 mr-6">Section</div>
                       <div className="text-xs ml-10">Specialization</div>
                     </div>
                     {typeof sectionCounts.secondSC == "number" &&
@@ -312,7 +404,10 @@ const InputSectionCounts: React.FC = () => {
                             specialization: "none",
                           };
                           return (
-                            <div key={i} className="flex space-x-5">
+                            <div
+                              key={i}
+                              className="flex space-x-5 items-center"
+                            >
                               <input
                                 type="text"
                                 className="border border-primary rounded-md w-20 p-2"
@@ -330,10 +425,30 @@ const InputSectionCounts: React.FC = () => {
                               />
                               <input
                                 type="text"
-                                className="border border-primary rounded-md w-40 p-2"
+                                className="border border-primary rounded-md w-32 p-2"
                                 placeholder="Not Applicable"
                                 disabled
                               />
+                              <button
+                                type="button"
+                                onClick={() => deleteSecondYearSection(i)}
+                                className="text-primary hover:text-red-700"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                              </button>
                             </div>
                           );
                         }
@@ -382,7 +497,7 @@ const InputSectionCounts: React.FC = () => {
 
                   <div className="flex flex-col gap-2 w-64">
                     <div className="flex">
-                      <div className="text-xs ml-4 mr-10">Section</div>
+                      <div className="text-xs ml-4 mr-5">Section</div>
                       <div className="text-xs ml-10">Specialization</div>
                     </div>
                     {typeof sectionCounts.thirdSC == "number" &&
@@ -390,7 +505,10 @@ const InputSectionCounts: React.FC = () => {
                       Array.from({ length: sectionCounts.thirdSC }).map(
                         (_, i) => {
                           return (
-                            <div key={i} className="flex space-x-5">
+                            <div
+                              key={i}
+                              className="flex space-x-5 items-center"
+                            >
                               <input
                                 type="text"
                                 className="border border-primary rounded-md w-20 p-2"
@@ -426,7 +544,6 @@ const InputSectionCounts: React.FC = () => {
                                     });
                                   }}
                                 >
-                                  <option value="none">None</option>
                                   <option value="Data Science">
                                     Data Science
                                   </option>
@@ -447,6 +564,26 @@ const InputSectionCounts: React.FC = () => {
                                   </svg>
                                 </div>
                               </div>
+                              <button
+                                type="button"
+                                onClick={() => deleteThirdYearSection(i)}
+                                className="text-primary hover:text-red-700"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                              </button>
                             </div>
                           );
                         }
@@ -492,7 +629,7 @@ const InputSectionCounts: React.FC = () => {
 
                   <div className="flex flex-col gap-2 w-64">
                     <div className="flex">
-                      <div className="text-xs ml-4 mr-10">Section</div>
+                      <div className="text-xs ml-4 mr-5">Section</div>
                       <div className="text-xs ml-10">Specialization</div>
                     </div>
                     {typeof sectionCounts.fourthSC == "number" &&
@@ -500,7 +637,10 @@ const InputSectionCounts: React.FC = () => {
                       Array.from({ length: sectionCounts.fourthSC }).map(
                         (_, i) => {
                           return (
-                            <div key={i} className="flex space-x-5">
+                            <div
+                              key={i}
+                              className="flex space-x-5 items-center"
+                            >
                               <input
                                 type="text"
                                 className="border border-primary rounded-md w-20 p-2"
@@ -557,6 +697,26 @@ const InputSectionCounts: React.FC = () => {
                                   </svg>
                                 </div>
                               </div>
+                              <button
+                                type="button"
+                                onClick={() => deleteFourthYearSection(i)}
+                                className="text-primary hover:text-red-700"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                              </button>
                             </div>
                           );
                         }
@@ -567,9 +727,43 @@ const InputSectionCounts: React.FC = () => {
             </div>
           </div>
         </section>
+
+        {/* Status Message Display */}
+        {statusMessage.type && (
+          <div
+            className={`mx-auto mt-6 p-3 rounded-md text-center font-medium relative ${
+              statusMessage.type === "success"
+                ? "bg-green-100 text-green-800 border border-green-300"
+                : "bg-red-100 text-red-800 border border-red-300"
+            }`}
+          >
+            {statusMessage.text}
+            <button
+              onClick={clearStatusMessage}
+              className="text-gray-600 hover:text-gray-900 ml-5 items-center"
+              type="button"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        )}
+
         <button
           type="submit"
-          className="border-2 border-primary py-1 px-1 w-36 text-primary mx-auto mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white font-Manrope font-semibold transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+          className="border-2 border-primary py-1 px-1 w-36 text-primary mx-auto mt-7 mb-24 rounded-sm hover:bg-primary hover:text-white font-Manrope font-semibold transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
         >
           Save
         </button>

@@ -9,7 +9,7 @@ const TASDashboard = () => {
   const navigate = useNavigate();
 
   const handleCardClick = () => {
-    navigate("/departmentchair/view");
+    navigate("/tas/view");
   };
 
   return (
