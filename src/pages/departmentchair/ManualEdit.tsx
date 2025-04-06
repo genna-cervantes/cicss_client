@@ -51,7 +51,7 @@ const ManualEdit = ({
 
   const [changedScheduleBlocks, setChangedSchedBlocks] = useState<any>([]);
 
-    const [error, setError] = useState("");
+  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
@@ -243,11 +243,11 @@ const ManualEdit = ({
 
   const handleChangeSchedBlock = (newEvent: any) => {
     setChangedSchedBlocks((prev: any) => {
-      const newSchedBlocks = prev.filter((sb: any) => sb.id !== newEvent.id)
-      newSchedBlocks.push(newEvent)
+      const newSchedBlocks = prev.filter((sb: any) => sb.id !== newEvent.id);
+      newSchedBlocks.push(newEvent);
       return newSchedBlocks;
-    })
-  }
+    });
+  };
 
   // if (transformedScheduleEvents) {
   // let calendar: CalendarApp =
@@ -275,8 +275,12 @@ const ManualEdit = ({
 
           if (filter === "Section") {
             let date: string = newEvent.start.split(" ")[0];
-            let start: string = `${newEvent.start.split(" ")[1].slice(0, 2)}${newEvent.start.split(" ")[1].slice(3)}`;
-            let end: string = `${newEvent.end.split(" ")[1].slice(0, 2)}${newEvent.end.split(" ")[1].slice(3)}`;
+            let start: string = `${newEvent.start
+              .split(" ")[1]
+              .slice(0, 2)}${newEvent.start.split(" ")[1].slice(3)}`;
+            let end: string = `${newEvent.end
+              .split(" ")[1]
+              .slice(0, 2)}${newEvent.end.split(" ")[1].slice(3)}`;
 
             // "{"type":"lec","violations":[]}"
             let description = JSON.parse(newEvent?.description ?? "");
@@ -305,7 +309,7 @@ const ManualEdit = ({
 
             console.log(reqObj);
             schedBlockRef.current = reqObj;
-            handleChangeSchedBlock(newEvent)
+            handleChangeSchedBlock(newEvent);
 
             const fetchViolations = async () => {
               const res = await fetch(
@@ -345,47 +349,54 @@ const ManualEdit = ({
     // setChangedSchedBlocks(transformedScheduleEvents)
   }, [transformedScheduleEvents]);
 
-
   const handleSave = async () => {
     // console.log('saved events')
-    // console.log(transformedScheduleEvents) 
-    const originalEvents = transformToOriginalEvents(transformedScheduleEvents, changedScheduleBlocks, value)
+    // console.log(transformedScheduleEvents)
+    const originalEvents = transformToOriginalEvents(
+      transformedScheduleEvents,
+      changedScheduleBlocks,
+      value
+    );
 
-    const res = await fetch('http://localhost:3000/schedule/manual-edit/save', {
-      method: 'POST',
+    const res = await fetch("http://localhost:3000/schedule/manual-edit/save", {
+      method: "POST",
       headers: {
-        'Content-type': 'application/json'
+        "Content-type": "application/json",
       },
-      body: JSON.stringify({transformedSchedBlocks: originalEvents})
-    })
+      body: JSON.stringify({ transformedSchedBlocks: originalEvents }),
+    });
 
-    if (res.ok){
-      const data = await res.json()
-      if (data.success){
-        console.log('yeyy')
-      }else{
-        console.log('error', data)
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        console.log("yeyy");
+      } else {
+        console.log("error", data);
       }
     }
-  }
-  
+  };
+
   const handleDeploy = async () => {
-    const res = await fetch('http://localhost:3000/schedule/manual-edit/deploy')
-  
-    if (res.ok){
-      const data = await res.json()
-      if (data.success){
-        console.log('yeyy')
-      }else{
-        console.log('error', data)
+    const res = await fetch(
+      "http://localhost:3000/schedule/manual-edit/deploy"
+    );
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        console.log("yeyy");
+      } else {
+        console.log("error", data);
       }
     }
-  }
+  };
 
-  const memoizedCustomComponents = useMemo(() => ({
-    timeGridEvent: TimeGridEvent, // Your custom component for the time grid
-  }), []);
-  
+  const memoizedCustomComponents = useMemo(
+    () => ({
+      timeGridEvent: TimeGridEvent, // Your custom component for the time grid
+    }),
+    []
+  );
 
   return (
     <>
@@ -433,7 +444,10 @@ const ManualEdit = ({
                 </div>
               ) : (
                 <div>
-                  {violationsRef.current.violations.addedViolations.length > 0 && <h1>Your adjustment will lead to these new violations</h1>}
+                  {violationsRef.current.violations.addedViolations.length >
+                    0 && (
+                    <h1>Your adjustment will lead to these new violations</h1>
+                  )}
                   {violationsRef.current.violations.addedViolations.map(
                     (addedViol: any) => {
                       return (
@@ -460,7 +474,12 @@ const ManualEdit = ({
                       );
                     }
                   )}
-                  {violationsRef.current.violations.removedViolations.length > 0 && <h1>Your adjustment will lead to removing these violations</h1>}
+                  {violationsRef.current.violations.removedViolations.length >
+                    0 && (
+                    <h1>
+                      Your adjustment will lead to removing these violations
+                    </h1>
+                  )}
                   {violationsRef.current.violations.removedViolations.map(
                     (addedViol: any) => {
                       return (
@@ -524,13 +543,21 @@ const ManualEdit = ({
             <div className="flex gap-x-3">
               <button
                 onClick={() => setViolationFilter("perSchedBlock")}
-                className={`${violationFitler === "perSchedBlock" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
+                className={`${
+                  violationFitler === "perSchedBlock"
+                    ? "bg-primary"
+                    : "bg-primary/70"
+                } px-3 py-2 rounded-lg text-white text-sm font-bold`}
               >
                 Per Schedule Block
               </button>
               <button
                 onClick={() => setViolationFilter("perFilter")}
-                className={`${violationFitler === "perFilter" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
+                className={`${
+                  violationFitler === "perFilter"
+                    ? "bg-primary"
+                    : "bg-primary/70"
+                } px-3 py-2 rounded-lg text-white text-sm font-bold`}
               >
                 Per Section
               </button>
@@ -594,13 +621,19 @@ const ManualEdit = ({
           <div className="flex gap-x-3">
             <button
               onClick={() => setViolationFilter("perSchedBlock")}
-              className={`${violationFitler === "perSchedBlock" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
+              className={`${
+                violationFitler === "perSchedBlock"
+                  ? "bg-primary"
+                  : "bg-primary/70"
+              } px-3 py-2 rounded-lg text-white text-sm font-bold`}
             >
               Per Schedule Block
             </button>
             <button
               onClick={() => setViolationFilter("perFilter")}
-              className={`${violationFitler === "perFilter" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
+              className={`${
+                violationFitler === "perFilter" ? "bg-primary" : "bg-primary/70"
+              } px-3 py-2 rounded-lg text-white text-sm font-bold`}
             >
               Per Section
             </button>
@@ -615,8 +648,21 @@ const ManualEdit = ({
         customComponents={memoizedCustomComponents}
         // timeGridEvent={TimeGridEvent}
       />
-      <button onClick={handleSave}>Save</button>
-      <button onClick={handleDeploy}>Deploy</button>
+
+      <div className="flex justify-center gap-x-6 mt-16 mb-16">
+        <button
+          onClick={handleSave}
+          className="bg-primary font-Manrope font-extrabold text-white px-7 py-1 rounded-md"
+        >
+          Save
+        </button>
+        <button
+          onClick={handleDeploy}
+          className="bg-[#FFBA21] font-Manrope font-extrabold text-gray-600 border border-gray-600 px-7 py-1 rounded-md"
+        >
+          Deploy
+        </button>
+      </div>
     </>
   );
 };

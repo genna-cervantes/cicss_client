@@ -376,7 +376,7 @@ const ViewSchedule = ({
   }, [yearSections]);
 
   return (
-    <div className="w-full bg-transparent pt-4 px-16">
+    <div className="w-full bg-transparent pt-4 px-16 mb-16">
       <div className="flex items-center justify-between">
         {/* Section Code and Label */}
         <div className="flex items-center gap-3">
@@ -542,7 +542,7 @@ const ViewSchedule = ({
         <ScheduleView value={currentValue.label} filter={currentFilter} />
       </div>
       {role === "Department Chair" && (
-        <div className="flex gap-6 items-center justify-center mt-6">
+        <div className="flex gap-6 items-center justify-center mt-16">
           <GenerateButton regenerate={true} />
           <button
             onClick={() => navigate("/")}
