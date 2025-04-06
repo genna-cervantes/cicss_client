@@ -242,7 +242,7 @@ const InputSectionCounts: React.FC = () => {
           <Navbar />
         </div>
         <section className="px-8 md:px-16 flex flex-col md:flex-row gap-4 md:gap-11 font-Helvetica-Neue-Heavy items-center justify-center text-center md:text-left">
-          <div className="text-primary text-[30px] md:text-[35px]">
+          <div className="text-primary mt-5 text-[30px] md:text-[35px]">
             Section Counts
           </div>
           <div className="bg-custom_yellow p-2 rounded-md">

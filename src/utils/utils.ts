@@ -5,6 +5,18 @@ export function cn(...inputs: any[]) {
   return clsx(...inputs);
 }
 
+export const fuzzyMatch = (input: string, target: string) => {
+  let t = 0;
+  input = input.toLowerCase();
+  target = target.toLowerCase();
+
+  for (let i = 0; i < target.length; i++) {
+    if (input[t] === target[i]) t++;
+  }
+
+  return t === input.length;
+};
+
 export const fetchUserInfo = async (accessToken: string) => {
   try {
     const response = await fetch(
@@ -85,14 +97,16 @@ export const transformToOriginalEvents = (
 ) => {
   let originalEvents = [];
 
-  console.log(changedScheduleBlocks)
+  console.log(changedScheduleBlocks);
 
   let combinedEvents = transformedEvents.map((te: any) => {
-    const changedEvent = changedScheduleBlocks.find((ce: any) => ce.id === te.id);
-    
+    const changedEvent = changedScheduleBlocks.find(
+      (ce: any) => ce.id === te.id
+    );
+
     return changedEvent || te;
   });
-  
+
   for (let i = 0; i < combinedEvents.length; i++) {
     let schedBlock = combinedEvents[i];
 
@@ -132,11 +146,12 @@ export const transformToOriginalEvents = (
 };
 
 export const generateRandomString = (length: number) => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      result += characters[randomIndex];
-    }
-    return result;
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters[randomIndex];
   }
+  return result;
+};

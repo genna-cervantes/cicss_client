@@ -790,7 +790,7 @@ const InputGenEd = () => {
           <Navbar />
         </div>
         <section className="px-4 md:px-16 flex flex-col md:flex-row gap-4 md:gap-11 font-Helvetica-Neue-Heavy items-center justify-center text-center md:text-left">
-          <div className="text-primary text-[28px] md:text-[35px]">
+          <div className="text-primary mt-5 text-[28px] md:text-[35px]">
             Gen Ed Constraints
           </div>
           <div className="bg-custom_yellow p-2 rounded-md">

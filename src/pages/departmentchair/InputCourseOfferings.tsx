@@ -12,8 +12,9 @@ import Navbar from "../../components/Navbar";
 import trash_button from "../../assets/trash_button.png";
 import add_button_white from "../../assets/add_button_white.png";
 import ScrollButton from "../../components/ScrollButton";
+import { fuzzyMatch } from "../../utils/utils";
 
-interface CourseInfo {
+export interface CourseInfo {
   title: string;
   code: string;
   unit: string;
@@ -47,6 +48,11 @@ const yearLevelOptions: Option[] = [
 
 const InputCourseOfferings = () => {
   // Array of Courses
+
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [yearFilter, setYearFilter] = useState<number>(0);
+  const [searchResults, setSearchResults] = useState<CourseInfo[]>([]);
+
   const [firstYearCourses, setFirstYearCourses] = useState<CourseInfo[]>([]);
   const [secondYearCourses, setSecondYearCourses] = useState<CourseInfo[]>([]);
   const [thirdYearCourses, setThirdYearCourses] = useState<CourseInfo[]>([]);
@@ -359,7 +365,7 @@ const InputCourseOfferings = () => {
   // Save handler for demonstration: logs each course's details.
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
-    localStorage.setItem("hasChanges", "true")
+    localStorage.setItem("hasChanges", "true");
 
     try {
       let isSuccess = false;
@@ -683,6 +689,114 @@ const InputCourseOfferings = () => {
     setStatusMessage({ type: null, text: "" });
   };
 
+  const handleFilter = () => {
+    if (yearFilter === 0) {
+      setSearchResults([]);
+      return;
+    }
+
+    if (yearFilter === 1) {
+      if (searchValue.length > 0) {
+        let fuzzyMatches = [];
+        fuzzyMatches.push(
+          ...firstYearCourses.filter(
+            (course) =>
+              fuzzyMatch(searchValue, course.title) ||
+              fuzzyMatch(searchValue, course.code)
+          )
+        );
+
+        setSearchResults(fuzzyMatches);
+        return;
+      }
+      setSearchResults(firstYearCourses);
+    } else if (yearFilter === 2) {
+      if (searchValue.length > 0) {
+        let fuzzyMatches = [];
+        fuzzyMatches.push(
+          ...secondYearCourses.filter(
+            (course) =>
+              fuzzyMatch(searchValue, course.title) ||
+              fuzzyMatch(searchValue, course.code)
+          )
+        );
+
+        setSearchResults(fuzzyMatches);
+        return;
+      }
+      setSearchResults(secondYearCourses);
+    } else if (yearFilter === 3) {
+      if (searchValue.length > 0) {
+        let fuzzyMatches = [];
+        fuzzyMatches.push(
+          ...thirdYearCourses.filter(
+            (course) =>
+              fuzzyMatch(searchValue, course.title) ||
+              fuzzyMatch(searchValue, course.code)
+          )
+        );
+
+        setSearchResults(fuzzyMatches);
+        return;
+      }
+      setSearchResults(thirdYearCourses);
+    } else if (yearFilter === 4) {
+      if (searchValue.length > 0) {
+        let fuzzyMatches = [];
+        fuzzyMatches.push(
+          ...fourthYearCourses.filter(
+            (course) =>
+              fuzzyMatch(searchValue, course.title) ||
+              fuzzyMatch(searchValue, course.code)
+          )
+        );
+
+        setSearchResults(fuzzyMatches);
+        return;
+      }
+      setSearchResults(fourthYearCourses);
+    }
+  };
+
+  const handleSearch = () => {
+    if (searchValue.length === 0) {
+      setSearchResults([]);
+      return;
+    }
+
+    let fuzzyMatches = [];
+    fuzzyMatches.push(
+      ...firstYearCourses.filter(
+        (course) =>
+          fuzzyMatch(searchValue, course.title) ||
+          fuzzyMatch(searchValue, course.code)
+      )
+    );
+    fuzzyMatches.push(
+      ...secondYearCourses.filter(
+        (course) =>
+          fuzzyMatch(searchValue, course.title) ||
+          fuzzyMatch(searchValue, course.code)
+      )
+    );
+    fuzzyMatches.push(
+      ...thirdYearCourses.filter(
+        (course) =>
+          fuzzyMatch(searchValue, course.title) ||
+          fuzzyMatch(searchValue, course.code)
+      )
+    );
+    fuzzyMatches.push(
+      ...fourthYearCourses.filter(
+        (course) =>
+          fuzzyMatch(searchValue, course.title) ||
+          fuzzyMatch(searchValue, course.code)
+      )
+    );
+
+    setSearchResults(fuzzyMatches);
+  };
+
   return (
     <>
       {/* Mobile/Small screen warning */}
@@ -703,196 +817,265 @@ const InputCourseOfferings = () => {
           <ScrollButton />
           <Navbar />
         </div>
-        <section className="px-16 flex gap-11 font-Helvetica-Neue-Heavy items-center justify-center">
+        <section className="px-16 mt-5 flex gap-11 font-Helvetica-Neue-Heavy items-center justify-center">
           <div className="text-primary text-[35px]">Course Offerings</div>
           <div className="bg-custom_yellow p-2 rounded-md">
             1st Semester A.Y 2025-2026
           </div>
         </section>
 
-        <form className="flex flex-col">
-          {/* FIRST YEAR COURSES */}
-          {/* <h1>First Year Courses</h1> */}
-          {MemoizedFirstYearCourseList}
-
-          {/* SECOND YEAR COURSES */}
-          {/* <h1>Second Year Courses</h1> */}
-          {MemoizedSecondYearCourseList}
-
-          {/* THIRD YEAR COURSES */}
-          {/* <h1>Third Year Courses</h1> */}
-          {MemoizedThirdYearCourseList}
-
-          {/* FOURTH YEAR COURSES */}
-          {/* <h1>Fourth Year Courses</h1> */}
-          {MemoizedFourthYearCourseList}
-
-          {addedCourses.map((course, index) => (
-            <section
-              key={index}
-              className="flex mx-auto gap-7 font-semibold mb-5"
-            >
-              <div className=" bg-[rgba(241,250,255,0.5)] p-6 shadow-md rounded-xl font-Manrope">
-                {/* <label>Course {firstYearCourses.length + index + 1}</label> */}
-                <div className="flex text-primary font-bold mb-2">
-                  <div className="ml-20 mr-2">Course Name</div>
-                  <div className="ml-32 mr-4">Code</div>
-                  <div className="ml-20 mr-2">Units</div>
-                  <div className="ml-16">Lab/Lec</div>
-                  <div className="ml-24">Type</div>
-                  <div className="ml-20">Yr. Level</div>
-                </div>
-                <div className="flex items-center gap-10  text-sm">
-                  <input
-                    type="text"
-                    className="border border-primary h-[39px] w-[250px] rounded-md pl-2"
-                    value={course.title}
-                    onChange={(e) => handleAddedCourseTitleChange(index, e)}
-                    placeholder="Enter"
-                  />
-
-                  <input
-                    type="text"
-                    className="border border-primary h-[39px] w-[110px] rounded-md pl-2"
-                    value={course.code}
-                    onChange={(e) => handleAddedCourseCodeChange(index, e)}
-                    placeholder="Enter"
-                  />
-                  <input
-                    type="number"
-                    className="border border-primary h-[39px] w-[80px] rounded-md p-3"
-                    value={course.unit}
-                    onChange={(e) => handleAddedCourseUnitChange(index, e)}
-                    placeholder="Enter"
-                    min="0"
-                    max="3"
-                    step="0.5"
-                  />
-                  <Select
-                    options={courseType}
-                    placeholder="Select"
-                    styles={{
-                      control: (provided: any) => ({
-                        ...provided,
-                        border: "1px solid #02296D",
-                        borderRadius: "6px",
-                      }),
-                    }}
-                    value={
-                      courseType.find(
-                        (option) => option.value === course.type
-                      ) || null
-                    }
-                    onChange={(option) =>
-                      handleAddedCourseTypeChange(index, option as Option)
-                    }
-                    className="w-[100px] rounded-[5px]"
-                  />
-                  <Select
-                    options={courseCategory}
-                    placeholder="Select"
-                    styles={{
-                      control: (provided: any) => ({
-                        ...provided,
-                        border: "1px solid #02296D",
-                        borderRadius: "6px",
-                      }),
-                    }}
-                    value={
-                      courseCategory.find(
-                        (option) => option.value === course.category
-                      ) || null
-                    }
-                    onChange={(option) =>
-                      handleAddedCourseCategoryChange(index, option as Option)
-                    }
-                    className="w-[110px] rounded-[5px]"
-                  />
-                  <Select
-                    options={yearLevelOptions}
-                    placeholder="Select"
-                    styles={{
-                      control: (provided: any) => ({
-                        ...provided,
-                        border: "1px solid #02296D",
-                        borderRadius: "6px",
-                      }),
-                    }}
-                    value={
-                      yearLevelOptions.find(
-                        (option) => option.value === course.yearLevel.toString()
-                      ) || null
-                    }
-                    onChange={(option) =>
-                      handleAddedCourseYearLevelChange(index, option as Option)
-                    }
-                    className="w-[70px] rounded-[5px]"
-                  />
-                </div>
-              </div>
+        {/* search */}
+        <div className="w-full flex justify-center my-4">
+          <div className="flex w-[60%] justify-between bg-primary/15 px-4 py-3 rounded-xl items-center">
+            <div className="flex gap-x-2">
+              <input
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                type="text"
+                className="rounded-md text-sm py-1 px-4 w-[18rem]"
+                placeholder="Search by Course Code or Course Name"
+              />
               <button
-                type="button"
-                onClick={() => handleDeleteAddedCourse(index)}
-                className="w-7 transition-all duration-300 active:scale-95 active:shadow-lg"
+                className="text-sm bg-primary rounded-md text-white px-4 font-semibold"
+                onClick={handleSearch}
               >
-                <img src={trash_button} alt="Remove" />
+                Search
               </button>
-            </section>
-          ))}
-          <div className="flex flex-col">
-            {statusMessage.type && (
-              <div
-                className={`mx-auto mt-6 p-3 rounded-md text-center font-medium flex justify-between items-center ${
-                  statusMessage.type === "success"
-                    ? "bg-green-100 text-green-800 border border-green-300"
-                    : "bg-red-100 text-red-800 border border-red-300"
-                }`}
-              >
-                <span className="flex-grow">{statusMessage.text}</span>
-                <button
-                  onClick={clearStatusMessage}
-                  className="text-gray-600 hover:text-gray-900 ml-5 flex items-center"
-                  type="button"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                  </svg>
-                </button>
-              </div>
-            )}
+            </div>
 
-            <div className="mx-auto flex gap-4">
-              <div>
-                <button
-                  onClick={handleSave}
-                  className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
-                >
-                  Save
-                </button>
-              </div>
-              <div>
-                <button
-                  onClick={handleAddCourse}
-                  className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
-                >
-                  Add
-                  <img src={add_button_white} className="w-4" alt="Add" />
-                </button>
-              </div>
+            <div className="flex gap-x-2 items-center">
+              <h1 className="text-sm">Filter By Years</h1>
+              <select
+                name="yearFilter"
+                id="yearFilter"
+                value={yearFilter}
+                onChange={(e) => setYearFilter(parseInt(e.target.value))}
+                className="rounded-md px-2 text-sm py-1 w-[5rem]"
+              >
+                <option value="0">No Filter</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+              <button
+                className="text-sm bg-primary rounded-md text-white px-4 font-semibold py-1"
+                onClick={handleFilter}
+              >
+                Filter
+              </button>
             </div>
           </div>
-        </form>
+        </div>
+
+        {(searchValue.length > 0 || yearFilter > 0) && (
+          <div className="flex flex-col justify-center">
+            {searchResults.map((course, index) => (
+              <CourseOffering
+                yearLevel={parseInt(course.yearLevel)}
+                course={course}
+                key={index}
+                handleCourseCodeChange={handleCourseCodeChange}
+                handleCourseCategoryChange={handleCourseCategoryChange}
+                handleCourseTitleChange={handleCourseTitleChange}
+                handleCourseTypeChange={handleCourseTypeChange}
+                handleCourseUnitChange={handleCourseUnitChange}
+                handleCourseYearLevelChange={handleCourseYearLevelChange}
+                handleDeleteCourse={handleDeleteCourse}
+              />
+            ))}
+          </div>
+        )}
+
+        {searchResults.length === 0 && (
+          <form className="flex flex-col">
+            {/* FIRST YEAR COURSES */}
+            {/* <h1>First Year Courses</h1> */}
+            {MemoizedFirstYearCourseList}
+
+            {/* SECOND YEAR COURSES */}
+            {/* <h1>Second Year Courses</h1> */}
+            {MemoizedSecondYearCourseList}
+
+            {/* THIRD YEAR COURSES */}
+            {/* <h1>Third Year Courses</h1> */}
+            {MemoizedThirdYearCourseList}
+
+            {/* FOURTH YEAR COURSES */}
+            {/* <h1>Fourth Year Courses</h1> */}
+            {MemoizedFourthYearCourseList}
+
+            {addedCourses.map((course, index) => (
+              <section
+                key={index}
+                className="flex mx-auto gap-7 font-semibold mb-5"
+              >
+                <div className=" bg-[rgba(241,250,255,0.5)] p-6 shadow-md rounded-xl font-Manrope">
+                  {/* <label>Course {firstYearCourses.length + index + 1}</label> */}
+                  <div className="flex text-primary font-bold mb-2">
+                    <div className="ml-20 mr-2">Course Name</div>
+                    <div className="ml-32 mr-4">Code</div>
+                    <div className="ml-20 mr-2">Units</div>
+                    <div className="ml-16">Lab/Lec</div>
+                    <div className="ml-24">Type</div>
+                    <div className="ml-20">Yr. Level</div>
+                  </div>
+                  <div className="flex items-center gap-10  text-sm">
+                    <input
+                      type="text"
+                      className="border border-primary h-[39px] w-[250px] rounded-md pl-2"
+                      value={course.title}
+                      onChange={(e) => handleAddedCourseTitleChange(index, e)}
+                      placeholder="Enter"
+                    />
+
+                    <input
+                      type="text"
+                      className="border border-primary h-[39px] w-[110px] rounded-md pl-2"
+                      value={course.code}
+                      onChange={(e) => handleAddedCourseCodeChange(index, e)}
+                      placeholder="Enter"
+                    />
+                    <input
+                      type="number"
+                      className="border border-primary h-[39px] w-[80px] rounded-md p-3"
+                      value={course.unit}
+                      onChange={(e) => handleAddedCourseUnitChange(index, e)}
+                      placeholder="Enter"
+                      min="0"
+                      max="3"
+                      step="0.5"
+                    />
+                    <Select
+                      options={courseType}
+                      placeholder="Select"
+                      styles={{
+                        control: (provided: any) => ({
+                          ...provided,
+                          border: "1px solid #02296D",
+                          borderRadius: "6px",
+                        }),
+                      }}
+                      value={
+                        courseType.find(
+                          (option) => option.value === course.type
+                        ) || null
+                      }
+                      onChange={(option) =>
+                        handleAddedCourseTypeChange(index, option as Option)
+                      }
+                      className="w-[100px] rounded-[5px]"
+                    />
+                    <Select
+                      options={courseCategory}
+                      placeholder="Select"
+                      styles={{
+                        control: (provided: any) => ({
+                          ...provided,
+                          border: "1px solid #02296D",
+                          borderRadius: "6px",
+                        }),
+                      }}
+                      value={
+                        courseCategory.find(
+                          (option) => option.value === course.category
+                        ) || null
+                      }
+                      onChange={(option) =>
+                        handleAddedCourseCategoryChange(index, option as Option)
+                      }
+                      className="w-[110px] rounded-[5px]"
+                    />
+                    <Select
+                      options={yearLevelOptions}
+                      placeholder="Select"
+                      styles={{
+                        control: (provided: any) => ({
+                          ...provided,
+                          border: "1px solid #02296D",
+                          borderRadius: "6px",
+                        }),
+                      }}
+                      value={
+                        yearLevelOptions.find(
+                          (option) =>
+                            option.value === course.yearLevel.toString()
+                        ) || null
+                      }
+                      onChange={(option) =>
+                        handleAddedCourseYearLevelChange(
+                          index,
+                          option as Option
+                        )
+                      }
+                      className="w-[70px] rounded-[5px]"
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteAddedCourse(index)}
+                  className="w-7 transition-all duration-300 active:scale-95 active:shadow-lg"
+                >
+                  <img src={trash_button} alt="Remove" />
+                </button>
+              </section>
+            ))}
+            <div className="flex flex-col">
+              {statusMessage.type && (
+                <div
+                  className={`mx-auto mt-6 p-3 rounded-md text-center font-medium flex justify-between items-center ${
+                    statusMessage.type === "success"
+                      ? "bg-green-100 text-green-800 border border-green-300"
+                      : "bg-red-100 text-red-800 border border-red-300"
+                  }`}
+                >
+                  <span className="flex-grow">{statusMessage.text}</span>
+                  <button
+                    onClick={clearStatusMessage}
+                    className="text-gray-600 hover:text-gray-900 ml-5 flex items-center"
+                    type="button"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                  </button>
+                </div>
+              )}
+
+              <div className="mx-auto flex gap-4">
+                <div>
+                  <button
+                    onClick={handleSave}
+                    className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-20 mb-24 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+                  >
+                    Save
+                  </button>
+                </div>
+                <div>
+                  <button
+                    onClick={handleAddCourse}
+                    className="flex justify-center items-center gap-2 border-2 border-primary bg-primary text-white py-1 px-1 w-36 font-semibold mt-20 mb-24 rounded-sm transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+                  >
+                    Add
+                    <img src={add_button_white} className="w-4" alt="Add" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        )}
       </div>
     </>
   );
