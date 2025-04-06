@@ -104,7 +104,7 @@ const ViewSchedule = ({
       const keys = Object.keys(profDetails);
       const index = keys.findIndex((tasId) => tasId === currentValue.label);
 
-      let nextIndex: number = index === (keys.length - 1) ? 0 : index + 1;
+      let nextIndex: number = index === keys.length - 1 ? 0 : index + 1;
 
       setCurrentValue({
         label: keys[nextIndex],
@@ -114,7 +114,7 @@ const ViewSchedule = ({
       const keys = Object.keys(roomDetails);
       const index = keys.findIndex((roomId) => roomId === currentValue.label);
 
-      let nextIndex: number = index === (keys.length - 1) ? 0 : index + 1;
+      let nextIndex: number = index === keys.length - 1 ? 0 : index + 1;
 
       setCurrentValue({
         label: keys[nextIndex],
@@ -140,9 +140,9 @@ const ViewSchedule = ({
   // const currentSection = sections[currentIndex];
 
   useEffect(() => {
-    console.log('prof details')
-    console.log(profDetails)
-  }, [profDetails])
+    console.log("prof details");
+    console.log(profDetails);
+  }, [profDetails]);
 
   useEffect(() => {
     if (filter === "Professor") {
@@ -376,7 +376,7 @@ const ViewSchedule = ({
   }, [yearSections]);
 
   return (
-    <div className="w-full bg-transparent py-4 px-16">
+    <div className="w-full bg-transparent pt-4 px-16">
       <div className="flex items-center justify-between">
         {/* Section Code and Label */}
         <div className="flex items-center gap-3">

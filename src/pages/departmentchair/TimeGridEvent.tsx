@@ -31,10 +31,14 @@ const TimeGridEvent = ({ calendarEvent }: Props) => {
       title.includes("fil")
     ) {
       baseColor = "bg-teal-400";
-    } else if (desc.type === "lec") {
-      baseColor = "bg-blue-500";
-    } else if (desc.type === "lab") {
-      baseColor = "bg-green-400";
+    }
+
+    if (title.includes("lb")) {
+      baseColor = "bg-orange-400";
+    }
+
+    if (title.includes("lc")) {
+      baseColor = "bg-purple-400";
     }
 
     return baseColor;
@@ -50,7 +54,7 @@ const TimeGridEvent = ({ calendarEvent }: Props) => {
         violations.length > 0 && role === "Department Chair"
           ? "border-2 border-red-600"
           : ""
-      } m-0.5 rounded-xl`}
+      } m-0.5 rounded-xl shadow-lg`}
     >
       <div
         className={`${
