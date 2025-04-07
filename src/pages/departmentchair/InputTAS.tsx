@@ -227,7 +227,7 @@ const InputTAS: React.FC = () => {
       updated[tasIndex] = {
         ...updated[tasIndex],
         courses: selectedOptions
-          ? selectedOptions.map((option) => `${option.value.split('_')[0]}`)
+          ? selectedOptions.map((option) => `${option.value.split("_")[0]}`)
           : [],
       };
       return updated;
@@ -1177,18 +1177,19 @@ const InputTAS: React.FC = () => {
         }
       }
 
-      let allCourseOptions = 
-        allCourses
-          .filter((course) => course.category !== 'gened')
-          .map((course, index) => {
+      let allCourseOptions = allCourses
+        .filter((course) => course.category !== "gened")
+        .map((course, index) => {
           return {
             value: `${course.code}_${index}`,
-            label: `${course.title} (${course.type.charAt(0).toUpperCase() + course.type.slice(1).toLowerCase()})`
+            label: `${course.title} (${
+              course.type.charAt(0).toUpperCase() +
+              course.type.slice(1).toLowerCase()
+            })`,
           };
-        })
+        });
 
-      setCourseOptions(allCourseOptions)
-      
+      setCourseOptions(allCourseOptions);
     };
     fetchCourses();
   }, []);
@@ -1226,22 +1227,24 @@ const InputTAS: React.FC = () => {
       return;
     }
 
-    console.log('filtering')
-    console.log(courseFilter.split('_')[0])
-    
+    console.log("filtering");
+    console.log(courseFilter.split("_")[0]);
+
     let matches = [];
     matches.push(
-      ...tasList.filter((tas) => tas.courses.includes(courseFilter.split('_')[0]))
+      ...tasList.filter((tas) =>
+        tas.courses.includes(courseFilter.split("_")[0])
+      )
     );
 
-    console.log('matches', matches)
+    console.log("matches", matches);
 
     if (searchValue.length > 0) {
       let fuzzyMatches = matches.filter(
         (tas) =>
           fuzzyMatch(searchValue, tas.name) ||
           fuzzyMatch(searchValue, tas.email)
-      )
+      );
 
       setSearchResults(fuzzyMatches);
       return;
@@ -1309,7 +1312,11 @@ const InputTAS: React.FC = () => {
               >
                 <option value="">No Filter</option>
                 {courseOptions.map((opt, index) => {
-                  return <option key={index} value={opt.value}>{opt.label}</option>;
+                  return (
+                    <option key={index} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  );
                 })}
                 {/* <option value="1">1</option>
                 <option value="2">2</option>
@@ -1326,7 +1333,7 @@ const InputTAS: React.FC = () => {
           </div>
         </div>
 
-        {searchResults.length  > 0 && courseFilter.length > 0 && (
+        {searchResults.length > 0 && courseFilter.length > 0 && (
           <div className="flex mx-auto gap-5 font-Manrope font-semibold mt-5">
             {/* <div className="flex flex-col"> */}
             <form onSubmit={handleSave}>
@@ -1689,361 +1696,368 @@ const InputTAS: React.FC = () => {
           <div className="flex mx-auto gap-5 font-Manrope font-semibold mt-5">
             <form onSubmit={handleSave}>
               {tasList.map((tas, tasIndex) => {
-              // if (tas.email === 'acgernale@ust.edu.ph'){
-              //   console.log(tas)
-              //   console.log(courseOptions)
-              // }
-              return(
-                <div key={tasIndex} className="mb-7 flex gap-3">
-                  {/* <div className="gap-5 bg-[#F1FAFF] px-5 py-5 rounded-xl shadow-sm border w-full"> */}
-                  <div className="gap-5 bg-[#F1FAFF]/60 px-5 py-5 rounded-xl shadow-sm border w-full">
-                    <div className="flex text-primary font-bold mb-2">
-                      <div className="ml-20">Name</div>
-                      <div className="ml-24">Units</div>
-                      <div className="ml-16">Specialization</div>
-                      <div className="ml-32">Email</div>
-                    </div>
-                    <div className="flex flex-col gap-5 lg:flex-row lg:gap-3">
-                      {/* TAS name, units and specialization */}
-                      <div className="flex gap-3">
-                        {/* TAS name */}
-                        <div>
-                          <input
-                            type="text"
-                            name="name"
-                            value={tas.name}
-                            onChange={(e) => handleTASFieldChange(tasIndex, e)}
-                            placeholder="Enter full name"
-                            className={`py-1 border text-sm ${
-                              nameErrors[tasIndex]
-                                ? "border-red-500"
-                                : "border-primary"
-                            } rounded-[5px] px-2 w-[200px]`}
-                          />
-                          {nameErrors[tasIndex] && (
-                            <div className="text-red-500 text-xs mt-1">
-                              {nameErrors[tasIndex]}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* TAS units */}
-                        <div>
-                          <input
-                            type="number"
-                            name="units"
-                            value={tas.units}
-                            onChange={(e) =>
-                              handleUnitsFieldChange(
-                                tasIndex,
-                                parseInt(e.target.value)
-                              )
-                            }
-                            placeholder="Units"
-                            className="py-1 text-sm border border-primary rounded-[5px] px-2 w-[60px]"
-                          />
-                        </div>
-
-                        {/* TAS specialization*/}
-                        <div>
-                        <Select
-                            options={courseOptions}
-                            placeholder="Select"
-                            isMulti
-                            isClearable={false}
-                            closeMenuOnSelect={false}
-                            className="w-[200px] text-sm py-1"
-                            value={courseOptions.filter((opt) =>
-                              tas.courses.includes(opt.value.split('_')[0])
-                            )}
-                            onChange={(selectedOptions) =>
-                              handleTASSpecialtiesChange(
-                                tasIndex,
-                                selectedOptions
-                              )
-                            }
-                            styles={customStyles}
-                          />
-                        </div>
-
-                        {/* email */}
-                        <div>
-                          <input
-                            type="text"
-                            name="email"
-                            value={tas.email}
-                            onChange={(e) => handleTASFieldChange(tasIndex, e)}
-                            placeholder="Enter full name"
-                            className={`py-1 border ${
-                              nameErrors[tasIndex]
-                                ? "border-red-500"
-                                : "border-primary"
-                            } rounded-[5px] px-2 w-[200px] text-sm`}
-                          />
-                          {nameErrors[tasIndex] && (
-                            <div className="text-red-500 text-xs mt-1">
-                              {nameErrors[tasIndex]}
-                            </div>
-                          )}
-                        </div>
+                // if (tas.email === 'acgernale@ust.edu.ph'){
+                //   console.log(tas)
+                //   console.log(courseOptions)
+                // }
+                return (
+                  <div key={tasIndex} className="mb-7 flex gap-3">
+                    {/* <div className="gap-5 bg-[#F1FAFF] px-5 py-5 rounded-xl shadow-sm border w-full"> */}
+                    <div className="gap-5 bg-[#F1FAFF]/60 px-5 py-5 rounded-xl shadow-sm border w-full">
+                      <div className="flex text-primary font-bold mb-2">
+                        <div className="ml-20">Name</div>
+                        <div className="ml-24">Units</div>
+                        <div className="ml-16">Specialization</div>
+                        <div className="ml-32">Email</div>
                       </div>
+                      <div className="flex flex-col gap-5 lg:flex-row lg:gap-3">
+                        {/* TAS name, units and specialization */}
+                        <div className="flex gap-3">
+                          {/* TAS name */}
+                          <div>
+                            <input
+                              type="text"
+                              name="name"
+                              value={tas.name}
+                              onChange={(e) =>
+                                handleTASFieldChange(tasIndex, e)
+                              }
+                              placeholder="Enter full name"
+                              className={`py-1 border text-sm ${
+                                nameErrors[tasIndex]
+                                  ? "border-red-500"
+                                  : "border-primary"
+                              } rounded-[5px] px-2 w-[200px]`}
+                            />
+                            {nameErrors[tasIndex] && (
+                              <div className="text-red-500 text-xs mt-1">
+                                {nameErrors[tasIndex]}
+                              </div>
+                            )}
+                          </div>
 
-                      {/* Day and Time Restriction */}
-                      <div className="w-full">
-                        {tas.restrictions.length > 0 ? (
-                          tas.restrictions.map((request, reqIndex) => (
-                            <div
-                              key={reqIndex}
-                              // className="bg-[#BFDDF6] p-3 rounded-md mb-5"
-                              className="bg-primary/15 p-3 rounded-md mb-5"
-                            >
-                              <div className="flex flex-col gap-2">
-                                <div className="flex gap-3">
-                                  <div className="flex flex-col">
-                                    <label className="mb-1 text-sm font-medium">
-                                      Day
-                                    </label>
-                                    <Select
-                                      className="text-sm"
-                                      options={getAvailableDayOptions(
-                                        tasIndex,
-                                        reqIndex
-                                      )}
-                                      placeholder="Select"
-                                      value={
-                                        dayOptions.find(
-                                          (opt) => opt.value === request.day
-                                        ) || null
-                                      }
-                                      onChange={(selectedOption) =>
-                                        handleTASRequestDayChange(
+                          {/* TAS units */}
+                          <div>
+                            <input
+                              type="number"
+                              name="units"
+                              value={tas.units}
+                              onChange={(e) =>
+                                handleUnitsFieldChange(
+                                  tasIndex,
+                                  parseInt(e.target.value)
+                                )
+                              }
+                              placeholder="Units"
+                              className="py-1 text-sm border border-primary rounded-[5px] px-2 w-[60px]"
+                            />
+                          </div>
+
+                          {/* TAS specialization*/}
+                          <div>
+                            <Select
+                              options={courseOptions}
+                              placeholder="Select"
+                              isMulti
+                              isClearable={false}
+                              closeMenuOnSelect={false}
+                              className="w-[200px] text-sm py-1"
+                              value={courseOptions.filter((opt) =>
+                                tas.courses.includes(opt.value.split("_")[0])
+                              )}
+                              onChange={(selectedOptions) =>
+                                handleTASSpecialtiesChange(
+                                  tasIndex,
+                                  selectedOptions
+                                )
+                              }
+                              styles={customStyles}
+                            />
+                          </div>
+
+                          {/* email */}
+                          <div>
+                            <input
+                              type="text"
+                              name="email"
+                              value={tas.email}
+                              onChange={(e) =>
+                                handleTASFieldChange(tasIndex, e)
+                              }
+                              placeholder="Enter full name"
+                              className={`py-1 border ${
+                                nameErrors[tasIndex]
+                                  ? "border-red-500"
+                                  : "border-primary"
+                              } rounded-[5px] px-2 w-[200px] text-sm`}
+                            />
+                            {nameErrors[tasIndex] && (
+                              <div className="text-red-500 text-xs mt-1">
+                                {nameErrors[tasIndex]}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Day and Time Restriction */}
+                        <div className="w-full">
+                          {tas.restrictions.length > 0 ? (
+                            tas.restrictions.map((request, reqIndex) => (
+                              <div
+                                key={reqIndex}
+                                // className="bg-[#BFDDF6] p-3 rounded-md mb-5"
+                                className="bg-primary/15 p-3 rounded-md mb-5"
+                              >
+                                <div className="flex flex-col gap-2">
+                                  <div className="flex gap-3">
+                                    <div className="flex flex-col">
+                                      <label className="mb-1 text-sm font-medium">
+                                        Day
+                                      </label>
+                                      <Select
+                                        className="text-sm"
+                                        options={getAvailableDayOptions(
                                           tasIndex,
-                                          reqIndex,
-                                          selectedOption
-                                        )
-                                      }
-                                      styles={selectStyles}
-                                    />
-                                  </div>
+                                          reqIndex
+                                        )}
+                                        placeholder="Select"
+                                        value={
+                                          dayOptions.find(
+                                            (opt) => opt.value === request.day
+                                          ) || null
+                                        }
+                                        onChange={(selectedOption) =>
+                                          handleTASRequestDayChange(
+                                            tasIndex,
+                                            reqIndex,
+                                            selectedOption
+                                          )
+                                        }
+                                        styles={selectStyles}
+                                      />
+                                    </div>
 
-                                  <div className="flex flex-col">
-                                    {request.startEndTimes?.length > 0 ? (
-                                      request.startEndTimes.map(
-                                        (time, timeIndex) => (
-                                          <div
-                                            key={timeIndex}
-                                            className="mb-3 flex gap-3"
-                                          >
-                                            <div className="flex flex-col">
-                                              <label className="mb-1 text-sm font-medium">
-                                                Start
-                                              </label>
-                                              <input
-                                                type="time"
-                                                name="start"
-                                                value={time.start}
-                                                onChange={(e) =>
-                                                  handleTASTimeChange(
-                                                    tasIndex,
-                                                    reqIndex,
-                                                    timeIndex,
-                                                    e
-                                                  )
-                                                }
-                                                className={`text-sm border w-[130px] ${
-                                                  timeErrors[tasIndex]?.[
-                                                    reqIndex
-                                                  ]?.[timeIndex]
-                                                    ? "border-red-500"
-                                                    : "border-primary"
-                                                } rounded-[5px] py-1 px-2`}
-                                              />
-                                            </div>
+                                    <div className="flex flex-col">
+                                      {request.startEndTimes?.length > 0 ? (
+                                        request.startEndTimes.map(
+                                          (time, timeIndex) => (
+                                            <div
+                                              key={timeIndex}
+                                              className="mb-3 flex gap-3"
+                                            >
+                                              <div className="flex flex-col">
+                                                <label className="mb-1 text-sm font-medium">
+                                                  Start
+                                                </label>
+                                                <input
+                                                  type="time"
+                                                  name="start"
+                                                  value={time.start}
+                                                  onChange={(e) =>
+                                                    handleTASTimeChange(
+                                                      tasIndex,
+                                                      reqIndex,
+                                                      timeIndex,
+                                                      e
+                                                    )
+                                                  }
+                                                  className={`text-sm border w-[130px] ${
+                                                    timeErrors[tasIndex]?.[
+                                                      reqIndex
+                                                    ]?.[timeIndex]
+                                                      ? "border-red-500"
+                                                      : "border-primary"
+                                                  } rounded-[5px] py-1 px-2`}
+                                                />
+                                              </div>
 
-                                            <div className="flex flex-col">
-                                              <label className="mb-1 text-sm font-medium">
-                                                End
-                                              </label>
-                                              <input
-                                                type="time"
-                                                name="end"
-                                                value={time.end}
-                                                onChange={(e) =>
-                                                  handleTASTimeChange(
-                                                    tasIndex,
-                                                    reqIndex,
-                                                    timeIndex,
-                                                    e
-                                                  )
-                                                }
-                                                className={`border w-[130px] ${
-                                                  timeErrors[tasIndex]?.[
-                                                    reqIndex
-                                                  ]?.[timeIndex]
-                                                    ? "border-red-500"
-                                                    : "border-primary"
-                                                } rounded-[5px] text-sm py-1 px-2`}
-                                              />
-                                            </div>
+                                              <div className="flex flex-col">
+                                                <label className="mb-1 text-sm font-medium">
+                                                  End
+                                                </label>
+                                                <input
+                                                  type="time"
+                                                  name="end"
+                                                  value={time.end}
+                                                  onChange={(e) =>
+                                                    handleTASTimeChange(
+                                                      tasIndex,
+                                                      reqIndex,
+                                                      timeIndex,
+                                                      e
+                                                    )
+                                                  }
+                                                  className={`border w-[130px] ${
+                                                    timeErrors[tasIndex]?.[
+                                                      reqIndex
+                                                    ]?.[timeIndex]
+                                                      ? "border-red-500"
+                                                      : "border-primary"
+                                                  } rounded-[5px] text-sm py-1 px-2`}
+                                                />
+                                              </div>
 
-                                            <div className="flex items-end gap-2 mb-1">
-                                              {request.startEndTimes.length >
-                                                1 && (
+                                              <div className="flex items-end gap-2 mb-1">
+                                                {request.startEndTimes.length >
+                                                  1 && (
+                                                  <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                      handleTASDeleteTime(
+                                                        tasIndex,
+                                                        reqIndex,
+                                                        timeIndex
+                                                      )
+                                                    }
+                                                    className="h-[38px] flex items-center justify-center"
+                                                  >
+                                                    <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                                                  </button>
+                                                )}
+
                                                 <button
                                                   type="button"
                                                   onClick={() =>
-                                                    handleTASDeleteTime(
+                                                    handleTASAddTime(
                                                       tasIndex,
-                                                      reqIndex,
-                                                      timeIndex
+                                                      reqIndex
                                                     )
                                                   }
-                                                  className="h-[38px] flex items-center justify-center"
+                                                  className="w-7 h-[38px] flex items-center justify-center transition-all duration-300 active:scale-95 active:shadow-lg"
                                                 >
-                                                  <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                                                  <img
+                                                    src={add_button}
+                                                    alt="Add"
+                                                  />
                                                 </button>
-                                              )}
-
-                                              <button
-                                                type="button"
-                                                onClick={() =>
-                                                  handleTASAddTime(
-                                                    tasIndex,
-                                                    reqIndex
-                                                  )
-                                                }
-                                                className="w-7 h-[38px] flex items-center justify-center transition-all duration-300 active:scale-95 active:shadow-lg"
-                                              >
-                                                <img
-                                                  src={add_button}
-                                                  alt="Add"
-                                                />
-                                              </button>
-                                            </div>
-
-                                            {timeErrors[tasIndex]?.[reqIndex]?.[
-                                              timeIndex
-                                            ] && (
-                                              <div className="text-red-500 text-xs absolute mt-[70px] ml-1">
-                                                {
-                                                  timeErrors[tasIndex][
-                                                    reqIndex
-                                                  ][timeIndex]
-                                                }
                                               </div>
-                                            )}
-                                          </div>
-                                        )
-                                      )
-                                    ) : (
-                                      <div className="mb-3 flex gap-5">
-                                        <div className="flex flex-col">
-                                          <label className="mb-1 text-sm font-medium">
-                                            Start
-                                          </label>
-                                          <input
-                                            type="time"
-                                            name="start"
-                                            onChange={(e) =>
-                                              handleTASTimeChange(
-                                                tasIndex,
-                                                reqIndex,
-                                                0,
-                                                e
-                                              )
-                                            }
-                                            className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                                          />
-                                        </div>
 
-                                        <div className="flex flex-col">
-                                          <label className="mb-1 text-sm font-medium">
-                                            End
-                                          </label>
-                                          <input
-                                            type="time"
-                                            name="end"
-                                            onChange={(e) =>
-                                              handleTASTimeChange(
-                                                tasIndex,
-                                                reqIndex,
-                                                0,
-                                                e
-                                              )
-                                            }
-                                            className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
-                                          />
-                                        </div>
-
-                                        <div className="flex items-end mb-1">
-                                          <button
-                                            type="button"
-                                            onClick={() =>
-                                              handleTASAddTime(
-                                                tasIndex,
+                                              {timeErrors[tasIndex]?.[
                                                 reqIndex
-                                              )
-                                            }
-                                            className="w-7 h-[38px] flex items-center justify-center transition-all duration-300 active:scale-95 active:shadow-lg"
-                                          >
-                                            <img src={add_button} alt="Add" />
-                                          </button>
+                                              ]?.[timeIndex] && (
+                                                <div className="text-red-500 text-xs absolute mt-[70px] ml-1">
+                                                  {
+                                                    timeErrors[tasIndex][
+                                                      reqIndex
+                                                    ][timeIndex]
+                                                  }
+                                                </div>
+                                              )}
+                                            </div>
+                                          )
+                                        )
+                                      ) : (
+                                        <div className="mb-3 flex gap-5">
+                                          <div className="flex flex-col">
+                                            <label className="mb-1 text-sm font-medium">
+                                              Start
+                                            </label>
+                                            <input
+                                              type="time"
+                                              name="start"
+                                              onChange={(e) =>
+                                                handleTASTimeChange(
+                                                  tasIndex,
+                                                  reqIndex,
+                                                  0,
+                                                  e
+                                                )
+                                              }
+                                              className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                                            />
+                                          </div>
+
+                                          <div className="flex flex-col">
+                                            <label className="mb-1 text-sm font-medium">
+                                              End
+                                            </label>
+                                            <input
+                                              type="time"
+                                              name="end"
+                                              onChange={(e) =>
+                                                handleTASTimeChange(
+                                                  tasIndex,
+                                                  reqIndex,
+                                                  0,
+                                                  e
+                                                )
+                                              }
+                                              className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
+                                            />
+                                          </div>
+
+                                          <div className="flex items-end mb-1">
+                                            <button
+                                              type="button"
+                                              onClick={() =>
+                                                handleTASAddTime(
+                                                  tasIndex,
+                                                  reqIndex
+                                                )
+                                              }
+                                              className="w-7 h-[38px] flex items-center justify-center transition-all duration-300 active:scale-95 active:shadow-lg"
+                                            >
+                                              <img src={add_button} alt="Add" />
+                                            </button>
+                                          </div>
                                         </div>
-                                      </div>
-                                    )}
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex justify-center gap-3 mt-1">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        handleTASDeleteDay(tasIndex, reqIndex)
+                                      }
+                                      className="border border-primary text-primary py-1 px-4 text-xs rounded-md transition-all duration-300 active:scale-95  active:shadow-lg"
+                                    >
+                                      Delete
+                                    </button>
                                   </div>
                                 </div>
-                                <div className="flex justify-center gap-3 mt-1">
+                              </div>
+                            ))
+                          ) : (
+                            <div className="w-full flex justify-center items-center my-4">
+                              <button
+                                onClick={(e) =>
+                                  handleAddFirstRestriction(tasIndex, e)
+                                }
+                                className="bg-primary text-white py-2 px-6 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
+                              >
+                                Add Day and Time Restriction
+                              </button>
+                            </div>
+                          )}
+                          {tas.restrictions.length > 0 &&
+                            tas.restrictions.length < 6 && (
+                              <div className="w-full flex justify-center pb-4 items-center">
+                                <div className="w-full flex justify-center items-center my-4">
                                   <button
-                                    type="button"
-                                    onClick={() =>
-                                      handleTASDeleteDay(tasIndex, reqIndex)
+                                    onClick={(e) =>
+                                      handleTASAddDay(tasIndex, e)
                                     }
-                                    className="border border-primary text-primary py-1 px-4 text-xs rounded-md transition-all duration-300 active:scale-95  active:shadow-lg"
+                                    className="bg-primary text-white py-2 px-6 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
                                   >
-                                    Delete
+                                    Add Day and Time Restriction
                                   </button>
                                 </div>
                               </div>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="w-full flex justify-center items-center my-4">
-                            <button
-                              onClick={(e) =>
-                                handleAddFirstRestriction(tasIndex, e)
-                              }
-                              className="bg-primary text-white py-2 px-6 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
-                            >
-                              Add Day and Time Restriction
-                            </button>
-                          </div>
-                        )}
-                        {tas.restrictions.length > 0 &&
-                          tas.restrictions.length < 6 && (
-                            <div className="w-full flex justify-center pb-4 items-center">
-                              <div className="w-full flex justify-center items-center my-4">
-                                <button
-                                  onClick={(e) => handleTASAddDay(tasIndex, e)}
-                                  className="bg-primary text-white py-2 px-6 text-xs rounded-md transition-all duration-300 active:scale-95 active:bg-primary active:text-white active:shadow-lg"
-                                >
-                                  Add Day and Time Restriction
-                                </button>
-                              </div>
-                            </div>
-                          )}
+                            )}
+                        </div>
                       </div>
                     </div>
+                    <button onClick={() => handleDeleteTAS(tasIndex)}>
+                      <img
+                        src={trash_button}
+                        alt="Delete"
+                        className="w-7 transition-all duration-300 active:scale-95 active:shadow-lg"
+                      />
+                    </button>
                   </div>
-                  <button onClick={() => handleDeleteTAS(tasIndex)}>
-                    <img
-                      src={trash_button}
-                      alt="Delete"
-                      className="w-7 transition-all duration-300 active:scale-95 active:shadow-lg"
-                    />
-                  </button>
-                </div>
-              )})}
+                );
+              })}
               <div className="flex flex-col items-center justify-center">
                 {statusMessage.type && (
                   <div
