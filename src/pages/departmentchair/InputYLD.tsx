@@ -176,6 +176,23 @@ const InputYLD: React.FC = () => {
       return;
     }
 
+    const yearLevelsWithNoDaysSelected = yearLevels.filter((level) =>
+      Object.values(level.allowedDays).every((day) => !day)
+    );
+
+    if (yearLevelsWithNoDaysSelected.length > 0) {
+      const yearNumbers = yearLevelsWithNoDaysSelected
+        .map((level) => level.year)
+        .join(", ");
+      setStatusMessage({
+        type: "error",
+        text: `Please select Allowed Days for Year Level${
+          yearLevelsWithNoDaysSelected.length > 1 ? "s" : ""
+        } ${yearNumbers}.`,
+      });
+      return;
+    }
+
     // handle updates
     const updateYLDData = async () => {
       let isSuccess = false;
