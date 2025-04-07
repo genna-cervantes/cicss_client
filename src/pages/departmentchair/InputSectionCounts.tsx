@@ -530,10 +530,10 @@ const InputSectionCounts: React.FC = () => {
                       sectionCounts.thirdSC > 0 &&
                       Array.from({ length: sectionCounts.thirdSC }).map(
                         (_, i) => {
-                          thirdYearSections[i] = {
-                            ...thirdYearSections[i],
-                            specialization: "Data Science",
-                          };
+                          // thirdYearSections[i] = {
+                          //   ...thirdYearSections[i],
+                          //   specialization: "Data Science",
+                          // };
                           return (
                             <div
                               key={i}
@@ -666,10 +666,10 @@ const InputSectionCounts: React.FC = () => {
                       sectionCounts.fourthSC > 0 &&
                       Array.from({ length: sectionCounts.fourthSC }).map(
                         (_, i) => {
-                          fourthYearSections[i] = {
-                            ...fourthYearSections[i],
-                            specialization: "Data Science",
-                          };
+                          // fourthYearSections[i] = {
+                          //   ...fourthYearSections[i],
+                          //   // specialization: "Data Science",
+                          // };
                           return (
                             <div
                               key={i}

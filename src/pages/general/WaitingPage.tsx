@@ -119,7 +119,7 @@ const WaitingPage = () => {
           console.log("error with fetching data", dataIS);
         }
       } catch (err) {
-        setError(`may error sa pag fetch ng sections sis: ${err}`);
+        setError(`error in generating schedule: ${err}`);
         return;
       }
     };

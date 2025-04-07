@@ -444,12 +444,12 @@ const Ratings = () => {
 
   return (
     <div>
-      <div className="py-16 font-Helvetica-Neue-Heavy flex justify-center">
+      {/* <div className="py-16 font-Helvetica-Neue-Heavy flex justify-center">
         <div className="space-y-8 flex flex-col items-center">
           <StarRating rating={3.5} totalRatings={142} size="large" />
           <img src={star_label} alt="" className="w-2/5" />
         </div>
-      </div>
+      </div> */}
 
       <div className="space-y-8">
         {/* Student */}
