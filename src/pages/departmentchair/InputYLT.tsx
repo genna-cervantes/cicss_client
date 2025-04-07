@@ -129,9 +129,9 @@ const InputYLT = () => {
       } else if (endMinutes - startMinutes < 30) {
         //depende pa
         error = "Time slot must be at least 30 minutes";
-      } else if (endMinutes - startMinutes > 300) {
+      } else if (endMinutes - startMinutes > 840) {
         //depende pa
-        error = "Time slot cannot exceed 5 hours";
+        error = "Time slot cannot exceed 14 hours";
       }
 
       // Check for time window (7am-9pm)
@@ -393,7 +393,7 @@ const InputYLT = () => {
 
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
-    localStorage.setItem('hasChanges', 'true')
+    localStorage.setItem("hasChanges", "true");
 
     if (hasTimeValidationErrors()) {
       setStatusMessage({

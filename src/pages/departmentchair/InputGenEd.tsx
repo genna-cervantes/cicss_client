@@ -601,7 +601,7 @@ const InputGenEd = () => {
 
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
-    localStorage.setItem("hasChanges", "true")
+    localStorage.setItem("hasChanges", "true");
 
     // Validate before saving
     if (!validateBeforeSave()) {
@@ -1102,7 +1102,7 @@ const DayRestriction = React.memo(
                           } rounded-[5px] py-1 px-2`}
                         />
                       </div>
-                      <div className="flex items-end gap-1">
+                      <div className="flex items-center gap-3 mt-8">
                         {restriction.startEndTimes.length > 1 && (
                           <button
                             type="button"
@@ -1113,9 +1113,9 @@ const DayRestriction = React.memo(
                                 timeIndex
                               )
                             }
-                            className="mb-[6px]"
+                            className="mb-[6px] flex justify-center items-center"
                           >
-                            <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                            <div className="h-[5px] w-[17px] bg-primary rounded-2xl flex justify-center items-center"></div>
                           </button>
                         )}
 
@@ -1144,8 +1144,8 @@ const DayRestriction = React.memo(
                   );
                 })
               ) : (
-                <div className="flex flex-col">
-                  <div className="mb-3 flex gap-3 justify-center">
+                <div className="flex flex-col items-center justify-center">
+                  <div className="mb-3 flex gap-3 justify-center items-center">
                     <div className="flex flex-col">
                       <label className="text-left mb-1">Start</label>
                       <input
@@ -1173,15 +1173,15 @@ const DayRestriction = React.memo(
                         className="h-[38px] border w-[130px] border-primary rounded-[5px] py-1 px-2"
                       />
                     </div>
-                    <div className="flex items-center justify-center gap-1">
+                    <div className="flex items-center justify-center gap-1  mx-auto">
                       <button
                         type="button"
                         onClick={() =>
                           handleDeleteTimeRestriction(genEdIndex, 0, 0)
                         }
-                        className="mb-[6px]"
+                        className="mb-[6px] flex items-center justify-center"
                       >
-                        <div className="h-[5px] w-[17px] bg-primary rounded-2xl"></div>
+                        <div className="h-[5px] w-[17px] bg-primary rounded-2xl flex items-center justify-center"></div>
                       </button>
 
                       <button

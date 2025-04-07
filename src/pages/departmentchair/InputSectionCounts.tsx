@@ -147,7 +147,7 @@ const InputSectionCounts: React.FC = () => {
 
   const handleSave = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    localStorage.setItem("hasChanges", "true")
+    localStorage.setItem("hasChanges", "true");
 
     setStatusMessage({ type: null, text: "" });
 
@@ -549,6 +549,7 @@ const InputSectionCounts: React.FC = () => {
                                     newSections[i] = {
                                       ...newSections[i],
                                       section: e.target.value,
+                                      specialization: "Data Science",
                                     };
                                     return newSections;
                                   })
@@ -561,7 +562,7 @@ const InputSectionCounts: React.FC = () => {
                                   className="appearance-none border border-primary rounded-md w-full h-11 p-2 pr-8 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                   value={
                                     thirdYearSections[i]?.specialization ??
-                                    "none"
+                                    "Data Science"
                                   }
                                   onChange={(e) => {
                                     setThirdYearSections((prev) => {
@@ -685,6 +686,7 @@ const InputSectionCounts: React.FC = () => {
                                     newSections[i] = {
                                       ...newSections[i],
                                       section: e.target.value,
+                                      specialization: "Data Science",
                                     };
                                     return newSections;
                                   })
@@ -697,7 +699,7 @@ const InputSectionCounts: React.FC = () => {
                                   className="appearance-none border border-primary rounded-md w-full h-11 p-2 pr-8 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all duration-200"
                                   value={
                                     fourthYearSections[i]?.specialization ??
-                                    "none"
+                                    "Data Science"
                                   }
                                   onChange={(e) => {
                                     setFourthYearSections((prev) => {
