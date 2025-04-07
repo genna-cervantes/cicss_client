@@ -15,6 +15,8 @@ const Dashboard = () => {
   const [semester, setSemester] = useState("");
   const { isNewSemester, setPrevSemester, isReady } = useAppContext();
 
+  console.log(isReady)
+
   useEffect(() => {
     setSemester(localStorage.getItem("semester") ?? "");
   }, []);
@@ -117,7 +119,7 @@ const Dashboard = () => {
                 </div>
               </div>
             )}
-            {hasChanges === "true" && (
+            {hasChanges === "true" && !isReady && (
               <div className="flex items-center justify-between bg-primary/20 px-8 py-2 rounded-lg border-[1px] border-primary/30">
                 <h1 className="text-sm">
                   Are there new changes? Generate a new schedule here:

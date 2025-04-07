@@ -32,8 +32,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [semester, setSemester] = useState<string>(getCurrentSemester());
   const [prevSemester, setPrevSemester] = useState<string>(localStorage.getItem("semester") ?? "");
   const [isNewSemester, setIsNewSemester] = useState(false);
-  const [isLocked, setIsLocked] = useState<boolean>(localStorage.getItem("isLocked") === "true" ? true : false)
-  const [isReady, setIsReady] = useState<boolean>(localStorage.getItem("isReady") === "true" ? true : false)
+  const [isLocked, setIsLocked] = useState<boolean>((localStorage.getItem("isLocked") ?? "false") === "true" ? true : false)
+  const [isReady, setIsReady] = useState<boolean>((localStorage.getItem("isReady") ?? "false") === "true" ? true : false)
 
   useEffect(() => {
     setSemester(getCurrentSemester());

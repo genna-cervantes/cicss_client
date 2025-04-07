@@ -103,11 +103,11 @@ const InputSectionCounts: React.FC = () => {
     if (sectionCounts.firstSC === "") {
       errors.firstSC = "First year section count is required";
     }
-
+    
     if (sectionCounts.secondSC === "") {
       errors.secondSC = "Second year section count is required";
     }
-
+    
     if (sectionCounts.thirdSC === "") {
       errors.thirdSC = "Third year section count is required";
     }
@@ -115,6 +115,31 @@ const InputSectionCounts: React.FC = () => {
     if (sectionCounts.fourthSC === "") {
       errors.fourthSC = "Fourth year section count is required";
     }
+    
+    firstYearSections.forEach((sec) => {
+      if (sec.section.trim() === ""){
+        errors.firstSC = "First year section is required";
+
+      }
+    })
+    secondYearSections.forEach((sec) => {
+      if (sec.section.trim() === ""){
+        errors.secondSC = "Second year section is required";
+
+      }
+    })
+    thirdYearSections.forEach((sec) => {
+      if (sec.section.trim() === ""){
+        errors.thirdCS = "Third year section is required";
+
+      }
+    })
+    fourthYearSections.forEach((sec) => {
+      if (sec.section.trim() === ""){
+        errors.firstSC = "Fourth year section is required";
+
+      }
+    })
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -505,6 +530,10 @@ const InputSectionCounts: React.FC = () => {
                       sectionCounts.thirdSC > 0 &&
                       Array.from({ length: sectionCounts.thirdSC }).map(
                         (_, i) => {
+                          thirdYearSections[i] = {
+                            ...thirdYearSections[i],
+                            specialization: "Data Science",
+                          };
                           return (
                             <div
                               key={i}
@@ -637,6 +666,10 @@ const InputSectionCounts: React.FC = () => {
                       sectionCounts.fourthSC > 0 &&
                       Array.from({ length: sectionCounts.fourthSC }).map(
                         (_, i) => {
+                          fourthYearSections[i] = {
+                            ...fourthYearSections[i],
+                            specialization: "Data Science",
+                          };
                           return (
                             <div
                               key={i}
@@ -677,6 +710,7 @@ const InputSectionCounts: React.FC = () => {
                                     });
                                   }}
                                 >
+                                  {/* should be dynamic huhu */}
                                   <option value="Data Science">
                                     Data Science
                                   </option>
