@@ -134,8 +134,8 @@ const InputYLD: React.FC = () => {
         ? "1"
         : numValue < 1
         ? "1"
-        : numValue > 7
-        ? "7"
+        : numValue > 6
+        ? "6"
         : value;
 
     setYearLevels((prevState) => {
@@ -158,7 +158,7 @@ const InputYLD: React.FC = () => {
   // Handle form submission
   const handleSave = (e: FormEvent) => {
     e.preventDefault();
-    localStorage.setItem('hasChanges', 'true')
+    localStorage.setItem("hasChanges", "true");
 
     const hasInvalidMaxDays = yearLevels.some(
       (level) =>
@@ -171,7 +171,7 @@ const InputYLD: React.FC = () => {
     if (hasInvalidMaxDays) {
       setStatusMessage({
         type: "error",
-        text: "Please specify Maximum Days for all year levels. Values must be between 1 and 7.",
+        text: "Please specify Maximum Days for all year levels. Values must be between 1 and 6.",
       });
       return;
     }
@@ -376,9 +376,9 @@ const InputYLD: React.FC = () => {
                         }
                       }}
                       min="1"
-                      max="7"
+                      max="6"
                       step="1"
-                      placeholder="1-7"
+                      placeholder="1-6"
                     />
                   </div>
                 </div>
