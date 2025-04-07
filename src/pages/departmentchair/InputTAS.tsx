@@ -1221,6 +1221,10 @@ const InputTAS: React.FC = () => {
     setSearchResults(fuzzyMatches);
   };
 
+  // useEffect(() => {
+  //   console.log(searchResults);
+  // }, [searchResults]);
+
   const handleFilter = () => {
     if (courseFilter === "") {
       setSearchResults([]);
@@ -1333,7 +1337,7 @@ const InputTAS: React.FC = () => {
           </div>
         </div>
 
-        {searchResults.length > 0 && courseFilter.length > 0 && (
+        {(searchResults.length > 0 || courseFilter.length > 0) && (
           <div className="flex mx-auto gap-5 font-Manrope font-semibold mt-5">
             {/* <div className="flex flex-col"> */}
             <form onSubmit={handleSave}>

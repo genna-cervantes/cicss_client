@@ -758,6 +758,10 @@ const InputCourseOfferings = () => {
     }
   };
 
+  useEffect(() => {
+    console.log(searchResults);
+  }, [searchResults]);
+
   const handleSearch = () => {
     if (searchValue.length === 0) {
       setSearchResults([]);
@@ -870,20 +874,23 @@ const InputCourseOfferings = () => {
 
         {(searchValue.length > 0 || yearFilter > 0) && (
           <div className="flex flex-col justify-center">
-            {searchResults.map((course, index) => (
-              <CourseOffering
-                yearLevel={parseInt(course.yearLevel)}
-                course={course}
-                key={index}
-                handleCourseCodeChange={handleCourseCodeChange}
-                handleCourseCategoryChange={handleCourseCategoryChange}
-                handleCourseTitleChange={handleCourseTitleChange}
-                handleCourseTypeChange={handleCourseTypeChange}
-                handleCourseUnitChange={handleCourseUnitChange}
-                handleCourseYearLevelChange={handleCourseYearLevelChange}
-                handleDeleteCourse={handleDeleteCourse}
-              />
-            ))}
+            {searchResults.map((course: any, index) => {
+              console.log(course);
+              return (
+                <CourseOffering
+                  yearLevel={course.yearLevel}
+                  course={course}
+                  key={index}
+                  handleCourseCodeChange={handleCourseCodeChange}
+                  handleCourseCategoryChange={handleCourseCategoryChange}
+                  handleCourseTitleChange={handleCourseTitleChange}
+                  handleCourseTypeChange={handleCourseTypeChange}
+                  handleCourseUnitChange={handleCourseUnitChange}
+                  handleCourseYearLevelChange={handleCourseYearLevelChange}
+                  handleDeleteCourse={handleDeleteCourse}
+                />
+              );
+            })}
           </div>
         )}
 
@@ -1138,10 +1145,8 @@ const CourseOffering: React.FC<{
       [course.category]
     );
 
-    const yearLevelValue = useMemo(
-      () =>
-        yearLevelOptions.find((option) => option.value === String(yearLevel)),
-      []
+    const yearLevelValue = yearLevelOptions.find(
+      (option) => option.value === String(yearLevel)
     );
 
     return (

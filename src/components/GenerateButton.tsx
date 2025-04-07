@@ -14,7 +14,6 @@ function GenerateButton({
   regenerate?: boolean;
   className?: string;
 }) {
-
   const [scheduleExists, setScheduleExists] = useState(false);
   const navigate = useNavigate();
   const [error, setError] = useState("");
@@ -71,7 +70,10 @@ function GenerateButton({
   return (
     <div>
       <div>
-        <button onClick={handleClick} className={cn(className, getButtonClassName())}>
+        <button
+          onClick={handleClick}
+          className={cn(className, getButtonClassName())}
+        >
           {regenerate ? (
             "Regenerate Schedule"
           ) : scheduleExists &&
