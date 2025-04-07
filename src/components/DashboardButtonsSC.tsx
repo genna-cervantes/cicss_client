@@ -19,7 +19,9 @@ const DashboardButtonsSC: React.FC<DashboardButtonsSCProps> = ({
 
   return (
     <div>
-      <div className={`flex font-Manrope font-bold bg-custom_lightblue items-center justify-between py-4 px-5 rounded-xl shadow-md `}>
+      <div
+        className={`flex font-Manrope font-bold bg-custom_lightblue items-center justify-between py-7 px-4 rounded-xl shadow-md `}
+      >
         <div>{Label}</div>
         <button
           disabled={disabled}
