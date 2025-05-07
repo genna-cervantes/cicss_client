@@ -31,6 +31,7 @@ import LockPage from "./pages/departmentchair/LockPage";
 import ReadyPage from "./pages/departmentchair/ReadyPage";
 import ManualEditViewSchedule from "./components/ManualEditViewSchedule";
 import View from "./pages/general/View";
+import ChangeTerm from "./pages/departmentchair/ChangeTerm";
 
 const App: React.FC = () => {
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
@@ -77,6 +78,10 @@ const App: React.FC = () => {
 
             <Route path="terms-conditions" element={<TermsAndConditions />} />
             <Route path="help" element={<Help />} />
+
+            {/* admin stuff */}
+
+            <Route path="edit-term" element={<ChangeTerm />} />
 
             {/* catch all */}
             <Route

@@ -28,12 +28,13 @@ const ManualEdit = ({
   filter: string;
   value: string;
 }) => {
+  
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
     filter = searchParams.get("filter") || "Section";
     value = searchParams.get("value") || "1CSA";
-  }, []);
+  }, [])
 
   const schedBlockRef = useRef<any>(null);
   const violationsRef = useRef<any>(null);
@@ -226,9 +227,9 @@ const ManualEdit = ({
 
   const handleCancelViolations = () => {
     setAcceptViolationsModal(false);
-    navigate(`/departmentchair/manual-edit?filter=${filter}&value=${value}`);
+    navigate(`/departmentchair/manual-edit?filter=${filter}&value=${value}`)
     // window.location.reload();
-  };
+  }
 
   const handleAcceptViolations = async () => {
     console.log("accept violations");
@@ -274,13 +275,13 @@ const ManualEdit = ({
         end: "21:00",
       },
       weekOptions: { eventOverlap: false, nDays: 6 },
-      plugins: filter === "Section" ? [createDragAndDropPlugin(30)] : [],
+      plugins: filter === 'Section' ? [createDragAndDropPlugin(30)] : [],
       callbacks: {
         onEventUpdate(updatedEvent) {
           console.log("onEventUpdate", updatedEvent);
         },
         onBeforeEventUpdate(oldEvent, newEvent, $app) {
-          console.log("before event updated");
+          console.log('before event updated')
           const parseDateTime = (dateTimeStr: string) =>
             new Date(dateTimeStr.replace(" ", "T"));
 
@@ -289,12 +290,8 @@ const ManualEdit = ({
 
           if (filter === "Section") {
             let date: string = newEvent.start.split(" ")[0];
-            let start: string = `${newEvent.start
-              .split(" ")[1]
-              .slice(0, 2)}${newEvent.start.split(" ")[1].slice(3)}`;
-            let end: string = `${newEvent.end
-              .split(" ")[1]
-              .slice(0, 2)}${newEvent.end.split(" ")[1].slice(3)}`;
+            let start: string = `${newEvent.start.split(" ")[1].slice(0, 2)}${newEvent.start.split(" ")[1].slice(3)}`;
+            let end: string = `${newEvent.end.split(" ")[1].slice(0, 2)}${newEvent.end.split(" ")[1].slice(3)}`;
 
             // "{"type":"lec","violations":[]}"
             let description = JSON.parse(newEvent?.description ?? "");
@@ -351,9 +348,9 @@ const ManualEdit = ({
             fetchViolations();
           }
 
-          console.log("violations ref");
-          console.log(violationsRef);
-          if (violationsRef.current.type === "hard") {
+          console.log('violations ref')
+          console.log(violationsRef)
+          if (violationsRef.current.type === 'hard'){
             return false;
           }
           return true;
@@ -430,8 +427,6 @@ const ManualEdit = ({
 
   // on event update ndi inaaccept ??
 
-  const handleExport = () => {};
-
   return (
     <>
       {acceptViolationsModal && (
@@ -503,13 +498,8 @@ const ManualEdit = ({
                           {addedViol.course.current})
                           <span className="pl-1 text-gray-600">on</span>{" "}
                           <strong>{addedViol.time.day}</strong> from{" "}
-                          <strong>
-                            {formatMilitaryTime(addedViol.time?.time?.start)}
-                          </strong>{" "}
-                          to{" "}
-                          <strong>
-                            {formatMilitaryTime(addedViol.time?.time?.end)}
-                          </strong>
+                          <strong>{formatMilitaryTime(addedViol.time?.time?.start)}</strong> to{" "}
+                          <strong>{formatMilitaryTime(addedViol.time?.time?.end)}</strong>
                         </p>
                       </div>
                     )
@@ -534,13 +524,8 @@ const ManualEdit = ({
                           {removedViol.course.current})
                           <span className="pl-1 text-gray-600">on</span>{" "}
                           <strong>{removedViol.time.day}</strong> from{" "}
-                          <strong>
-                            {formatMilitaryTime(removedViol.time?.time?.start)}
-                          </strong>{" "}
-                          to{" "}
-                          <strong>
-                            {formatMilitaryTime(removedViol.time?.time?.end)}
-                          </strong>
+                          <strong>{formatMilitaryTime(removedViol.time?.time?.start)}</strong> to{" "}
+                          <strong>{formatMilitaryTime(removedViol.time?.time?.end)}</strong>
                         </p>
                       </div>
                     )
@@ -582,21 +567,13 @@ const ManualEdit = ({
             <div className="flex gap-x-3">
               <button
                 onClick={() => setViolationFilter("perSchedBlock")}
-                className={`${
-                  violationFitler === "perSchedBlock"
-                    ? "bg-primary"
-                    : "bg-slate-500/50"
-                } px-3 py-2 rounded-lg text-white text-xs font-bold`}
+                className={`${violationFitler === "perSchedBlock" ? "bg-primary" : "bg-slate-500/50"} px-3 py-2 rounded-lg text-white text-xs font-bold`}
               >
                 Per Schedule Block
               </button>
               <button
                 onClick={() => setViolationFilter("perFilter")}
-                className={`${
-                  violationFitler === "perFilter"
-                    ? "bg-primary"
-                    : "bg-slate-500/50"
-                } px-3 py-2 rounded-lg text-white text-xs font-bold`}
+                className={`${violationFitler === "perFilter" ? "bg-primary" : "bg-slate-500/50"} px-3 py-2 rounded-lg text-white text-xs font-bold`}
               >
                 Per Section
               </button>
@@ -670,19 +647,13 @@ const ManualEdit = ({
           <div className="flex gap-x-3">
             <button
               onClick={() => setViolationFilter("perSchedBlock")}
-              className={`${
-                violationFitler === "perSchedBlock"
-                  ? "bg-primary"
-                  : "bg-primary/70"
-              } px-3 py-2 rounded-lg text-white text-sm font-bold`}
+              className={`${violationFitler === "perSchedBlock" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
             >
               Per Schedule Block
             </button>
             <button
               onClick={() => setViolationFilter("perFilter")}
-              className={`${
-                violationFitler === "perFilter" ? "bg-primary" : "bg-primary/70"
-              } px-3 py-2 rounded-lg text-white text-sm font-bold`}
+              className={`${violationFitler === "perFilter" ? "bg-primary" : "bg-primary/70"} px-3 py-2 rounded-lg text-white text-sm font-bold`}
             >
               Per Section
             </button>
@@ -697,27 +668,8 @@ const ManualEdit = ({
         customComponents={memoizedCustomComponents}
         // timeGridEvent={TimeGridEvent}
       />
-
-      <div className="flex justify-center gap-x-6 mt-16 mb-16">
-        <button
-          onClick={handleExport}
-          className="bg-green-900 font-Manrope font-extrabold text-white px-7 py-1 rounded-md"
-        >
-          Export
-        </button>
-        <button
-          onClick={handleSave}
-          className="bg-primary font-Manrope font-extrabold text-white px-7 py-1 rounded-md"
-        >
-          Save
-        </button>
-        <button
-          onClick={handleDeploy}
-          className="bg-[#FFBA21] font-Manrope font-extrabold text-gray-600 border border-gray-600 px-7 py-1 rounded-md"
-        >
-          Deploy
-        </button>
-      </div>
+      <button onClick={handleSave}>Save</button>
+      <button onClick={handleDeploy}>Deploy</button>
     </>
   );
 };
