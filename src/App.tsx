@@ -85,7 +85,7 @@ const App: React.FC = () => {
 
             <Route path="edit-term" element={<ChangeTerm />} />
             <Route path="edit-programs" element={<EditPrograms />} />
-            <Route path="edit-specialization" element={<EditSpecializations />} />
+            <Route path="edit-specializations" element={<EditSpecializations />} />
 
             {/* catch all */}
             <Route
