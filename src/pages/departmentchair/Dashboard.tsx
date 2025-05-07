@@ -98,7 +98,7 @@ const Dashboard = () => {
             />
             <DashboardButtonsSC
               Label="Edit Programs"
-              Path="edit-specializations"
+              Path="edit-programs"
               disabled={isReady}
             />
             <DashboardButtonsSC

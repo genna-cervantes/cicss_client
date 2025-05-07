@@ -32,6 +32,8 @@ import ReadyPage from "./pages/departmentchair/ReadyPage";
 import ManualEditViewSchedule from "./components/ManualEditViewSchedule";
 import View from "./pages/general/View";
 import ChangeTerm from "./pages/departmentchair/ChangeTerm";
+import EditPrograms from "./pages/departmentchair/EditPrograms";
+import EditSpecializations from "./pages/departmentchair/EditSpecializations";
 
 const App: React.FC = () => {
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID ?? "";
@@ -82,6 +84,8 @@ const App: React.FC = () => {
             {/* admin stuff */}
 
             <Route path="edit-term" element={<ChangeTerm />} />
+            <Route path="edit-programs" element={<EditPrograms />} />
+            <Route path="edit-specialization" element={<EditSpecializations />} />
 
             {/* catch all */}
             <Route
