@@ -1,27 +1,52 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import add_button_white from "../../assets/add_button_white.png";
 import trash_button from "../../assets/trash_button.png";
 
 const EditPrograms = () => {
+  //   const [programs, setPrograms] = useState<
+  //     { name: string; years: number; depchair: string }[]
+  //   >([
+  //     {
+  //       name: "Computer Science",
+  //       years: 4,
+  //       depchair: "genna.cervantes.cics@ust.edu.ph",
+  //     },
+  //     {
+  //       name: "Information Technology",
+  //       years: 4,
+  //       depchair: "genna.cervantes.cics@ust.edu.ph",
+  //     },
+  //     {
+  //       name: "Information Systems",
+  //       years: 4,
+  //       depchair: "genna.cervantes.cics@ust.edu.ph",
+  //     },
+  //   ]);
+
   const [programs, setPrograms] = useState<
-    { name: string; years: number; depchair: string }[]
-  >([
-    {
-      name: "Computer Science",
-      years: 4,
-      depchair: "genna.cervantes.cics@ust.edu.ph",
-    },
-    {
-      name: "Information Technology",
-      years: 4,
-      depchair: "genna.cervantes.cics@ust.edu.ph",
-    },
-    {
-      name: "Information Systems",
-      years: 4,
-      depchair: "genna.cervantes.cics@ust.edu.ph",
-    },
-  ]);
+    { id?: number; name: string; years: number; depchair: string }[]
+  >([]);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/programs", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+        "Content-type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((item: any) => ({
+          id: item.id,
+          name: item.programName,
+          years: item.noYears,
+          depchair: item.dcEmail,
+        }));
+        setPrograms(formatted);
+      })
+      .catch((err) => console.error("Failed to fetch programs:", err));
+  }, []);
 
   const handleChange = (
     index: number,
@@ -44,16 +69,59 @@ const EditPrograms = () => {
     ]);
   };
 
-  const handleDelete = (index: number) => {
+  const handleDelete = async (index: number) => {
+    const program = programs[index];
+
+    if (program.id) {
+      await fetch(`http://localhost:8080/programs/${program.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          "Content-type": "application/json",
+        },
+      });
+    }
+
     const updated = [...programs];
     updated.splice(index, 1);
     setPrograms(updated);
   };
 
-  const handleSave = () => {
-    console.log("Saved programs:", programs);
+  const handleSave = async () => {
+    for (const program of programs) {
+      const payload = {
+        programName: program.name,
+        noYears: program.years,
+        dcEmail: program.depchair,
+      };
+
+      if (program.id) {
+        // Update existing
+        await fetch(`http://localhost:8080/programs/${program.id}`, {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        // Create new
+        await fetch("http://localhost:8080/programs", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+      }
+    }
+
     alert("Programs saved!");
   };
+
+  console.log(localStorage.getItem("token"))
 
   return (
     <div className="w-full flex items-center justify-center h-[600px] flex-col">
@@ -77,7 +145,9 @@ const EditPrograms = () => {
                   <input
                     type="number"
                     value={program.years}
-                    onChange={(e) => handleChange(index, "years", e.target.value)}
+                    onChange={(e) =>
+                      handleChange(index, "years", e.target.value)
+                    }
                     className="w-16 bg-transparent border px-2 py-1 rounded"
                   />
                   <span>Years</span>
@@ -85,11 +155,17 @@ const EditPrograms = () => {
                 <input
                   type="text"
                   value={program.depchair}
-                  onChange={(e) => handleChange(index, "depchair", e.target.value)}
+                  onChange={(e) =>
+                    handleChange(index, "depchair", e.target.value)
+                  }
                   className="bg-transparent border px-2 py-1 rounded w-full"
                 />
               </div>
-              <button type="button" className="w-7" onClick={() => handleDelete(index)}>
+              <button
+                type="button"
+                className="w-7"
+                onClick={() => handleDelete(index)}
+              >
                 <img src={trash_button} alt="Remove" />
               </button>
             </div>
