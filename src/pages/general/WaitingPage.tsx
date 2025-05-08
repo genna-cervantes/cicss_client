@@ -14,7 +14,7 @@ const WaitingPage = () => {
     searchParams.get("exists") === "true"
   );
 
-  const { setIsLocked, setIsReady, prevSemester } = useAppContext();
+  const { setIsLocked, setIsReady, semester } = useAppContext();
 
   const [runningGenerator, setRunningGenerator] = useState(false);
   const [error, setError] = useState<string>();
@@ -141,13 +141,13 @@ const WaitingPage = () => {
             CSSections,
             ITSections,
             ISSections,
-            semester: prevSemester === "First Semester" ? 1 : 2,
+            semester: semester === "First Semester" ? 1 : 2,
           };
 
           console.log("req");
           console.log(reqBody);
 
-          const res = await fetch("http://localhost:3000/generate-schedule", {
+          const res = await fetch("http://localhost:3001/generate-schedule", {
             method: "POST",
             headers: {
               "Content-type": "application/json",

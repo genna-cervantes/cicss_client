@@ -1,107 +1,204 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import add_button_white from "../../assets/add_button_white.png";
 import trash_button from "../../assets/trash_button.png";
 
-const programNames = ["Computer Science", "Information Technology", "Information Systems"];
-
-const initialSpecializations: { [key: string]: string[] } = {
-  "Computer Science": ["Core Computer Science", "Game Development", "Data Science"],
-  "Information Technology": ["Web Dev", "Network and Security", "IT Automation"],
-  "Information Systems": ["Business Analytics", "Service Management"],
-};
+// Interface for the Program model
+interface Program {
+  id: number;
+  programName: string;
+  specializations: string[] | null;
+  noYears?: number;
+  dcEmail?: string;
+}
 
 const EditSpecializations = () => {
-    const [specializations, setSpecializations] = useState(initialSpecializations);
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
   
-    const [newSpecs, setNewSpecs] = useState<{ [key: string]: string }>(() =>
-      programNames.reduce((acc, name) => {
-        acc[name] = "";
-        return acc;
-      }, {} as { [key: string]: string })
-    );
+  // For new specialization inputs
+  const [newSpecs, setNewSpecs] = useState<{ [key: number]: string }>({});
   
-    const handleAddSpecialization = (program: string) => {
-      const newSpec = newSpecs[program].trim();
-      if (!newSpec) return;
-      setSpecializations((prev) => ({
-        ...prev,
-        [program]: [...prev[program], newSpec],
-      }));
-      setNewSpecs((prev) => ({ ...prev, [program]: "" }));
-    };
+  // Fetch all programs on component mount
+  useEffect(() => {
+    fetchPrograms();
+  }, []);
   
-    const handleRemoveSpecialization = (program: string, index: number) => {
-      setSpecializations((prev) => {
-        const updated = [...prev[program]];
-        updated.splice(index, 1);
-        return { ...prev, [program]: updated };
+  // Function to fetch all programs
+  const fetchPrograms = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:8080/programs", {
+        method: "GET",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            "Content-type": "application/json",
+          },
       });
-    };
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      
+      const data: Program[] = await response.json();
+      setPrograms(data);
+      
+      // Initialize newSpecs state with empty strings for each program
+      const initialNewSpecs = data.reduce((acc, program) => {
+        acc[program.id] = "";
+        return acc;
+      }, {} as { [key: number]: string });
+      
+      setNewSpecs(initialNewSpecs);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch programs. Please try again later.");
+      console.error("Failed to fetch programs:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   
-    const handleSave = () => {
-      console.log("Saved specializations:", specializations);
-      alert("Specializations saved!");
-    };
+  // Function to add a specialization
+  const handleAddSpecialization = async (programId: number) => {
+    const newSpec = newSpecs[programId]?.trim();
+    if (!newSpec) return;
+    
+    try {
+      const response = await fetch(`http://localhost:8080/programs/${programId}/specializations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain", // Changed to text/plain
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+          
+        },
+        body: newSpec, // Send plain text instead of JSON
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      
+      const updatedProgram: Program = await response.json();
+      
+      // Update the programs state with the updated program
+      setPrograms(prevPrograms => 
+        prevPrograms.map(prog => 
+          prog.id === programId ? updatedProgram : prog
+        )
+      );
+      
+      // Clear the input field
+      setNewSpecs(prev => ({ ...prev, [programId]: "" }));
+    } catch (err) {
+      setError("Failed to add specialization. Please try again.");
+      console.error("Failed to add specialization:", err);
+    }
+  };
   
+  // Function to remove a specialization
+  const handleRemoveSpecialization = async (programId: number, specialization: string) => {
+    try {
+      const response = await fetch(`http://localhost:8080/programs/${programId}/specializations/${encodeURIComponent(specialization)}`, {
+        method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
+            "Content-type": "application/json",
+          },
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+      
+      const updatedProgram: Program = await response.json();
+      
+      // Update the programs state with the updated program
+      setPrograms(prevPrograms => 
+        prevPrograms.map(prog => 
+          prog.id === programId ? updatedProgram : prog
+        )
+      );
+    } catch (err) {
+      setError("Failed to remove specialization. Please try again.");
+      console.error("Failed to remove specialization:", err);
+    }
+  };
+  
+  if (loading) {
+    return <div className="text-center py-8">Loading programs...</div>;
+  }
+  
+  if (error) {
     return (
-      <div className="w-full flex items-center justify-center flex-col py-12">
-        <div className="bg-[rgba(241,250,255,0.5)] rounded-xl shadow-md p-6 space-y-6 w-[80%]">
-          <div className="grid grid-cols-2 gap-3 items-center font-bold text-primary text-lg">
-            <div>Program Name</div>
-            <div>Specializations</div>
-          </div>
-  
-          {programNames.map((program) => (
-            <div key={program} className="grid grid-cols-2 gap-10 items-start">
-              <div className="font-bold text-primary mt-2">{program}</div>
-              <div className="flex flex-col gap-2">
-                {specializations[program]?.map((spec, index) => (
-                  <div className="flex items-center gap-2" key={index}>
-                    <span className="bg-white border px-2 py-1 rounded w-full">{spec}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSpecialization(program, index)}
-                      className="w-6"
-                    >
-                      <img src={trash_button} alt="Remove" />
-                    </button>
-                  </div>
-                ))}
-                <div className="flex items-center gap-2 mt-2">
-                  <input
-                    type="text"
-                    value={newSpecs[program]}
-                    onChange={(e) =>
-                      setNewSpecs((prev) => ({
-                        ...prev,
-                        [program]: e.target.value,
-                      }))
-                    }
-                    placeholder="New specialization"
-                    className="border px-2 py-1 rounded w-full"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleAddSpecialization(program)}
-                    className="bg-primary text-white px-4 py-1 rounded hover:bg-opacity-90 transition flex items-center gap-2"
-                  >
-                    Add
-                    <img src={add_button_white} className="w-4 mr-1" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-  
-        <button
-          onClick={handleSave}
-          className="border-2 border-primary py-1 px-1 w-36 font-semibold text-primary mt-10 mb-8 rounded-sm hover:bg-primary hover:text-white transition-all duration-300 active:scale-95"
+      <div className="text-center py-8 text-red-500">
+        {error}
+        <button 
+          onClick={fetchPrograms}
+          className="ml-4 bg-primary text-white px-4 py-1 rounded"
         >
-          Save
+          Retry
         </button>
       </div>
     );
-  };
+  }
   
-  export default EditSpecializations;
+  return (
+    <div className="w-full flex items-center justify-center flex-col py-12">
+      <div className="bg-[rgba(241,250,255,0.5)] rounded-xl shadow-md p-6 space-y-6 w-[80%]">
+        <div className="grid grid-cols-2 gap-3 items-center font-bold text-primary text-lg">
+          <div>Program Name</div>
+          <div>Specializations</div>
+        </div>
+        
+        {programs.map((program) => (
+          <div key={program.id} className="grid grid-cols-2 gap-10 items-start">
+            <div className="font-bold text-primary mt-2">{program.programName}</div>
+            <div className="flex flex-col gap-2">
+              {program.specializations && program.specializations.map((spec, index) => (
+                <div className="flex items-center gap-2" key={index}>
+                  <span className="bg-white border px-2 py-1 rounded w-full">{spec}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveSpecialization(program.id, spec)}
+                    className="w-6"
+                  >
+                    <img src={trash_button} alt="Remove" />
+                  </button>
+                </div>
+              ))}
+              <div className="flex items-center gap-2 mt-2">
+                <input
+                  type="text"
+                  value={newSpecs[program.id] || ""}
+                  onChange={(e) =>
+                    setNewSpecs((prev) => ({
+                      ...prev,
+                      [program.id]: e.target.value,
+                    }))
+                  }
+                  placeholder="New specialization"
+                  className="border px-2 py-1 rounded w-full"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleAddSpecialization(program.id);
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => handleAddSpecialization(program.id)}
+                  className="bg-primary text-white px-4 py-1 rounded hover:bg-opacity-90 transition flex items-center gap-2"
+                >
+                  Add
+                  <img src={add_button_white} className="w-4 mr-1" alt="Add" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default EditSpecializations;

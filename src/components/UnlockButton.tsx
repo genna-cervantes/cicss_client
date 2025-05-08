@@ -11,7 +11,7 @@ const UnlockButton = () => {
 
   const handleClick = async () => {
     const res = await fetch(
-      `http://localhost:3000/schedule/unlock/${department}`
+      `http://localhost:3001/schedule/unlock/${department}`
     );
 
     if (res.ok) {
