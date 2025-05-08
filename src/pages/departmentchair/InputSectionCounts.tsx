@@ -103,11 +103,11 @@ const InputSectionCounts: React.FC = () => {
     if (sectionCounts.firstSC === "") {
       errors.firstSC = "First year section count is required";
     }
-    
+
     if (sectionCounts.secondSC === "") {
       errors.secondSC = "Second year section count is required";
     }
-    
+
     if (sectionCounts.thirdSC === "") {
       errors.thirdSC = "Third year section count is required";
     }
@@ -115,31 +115,27 @@ const InputSectionCounts: React.FC = () => {
     if (sectionCounts.fourthSC === "") {
       errors.fourthSC = "Fourth year section count is required";
     }
-    
+
     firstYearSections.forEach((sec) => {
-      if (sec.section.trim() === ""){
+      if (sec.section.trim() === "") {
         errors.firstSC = "First year section is required";
-
       }
-    })
+    });
     secondYearSections.forEach((sec) => {
-      if (sec.section.trim() === ""){
+      if (sec.section.trim() === "") {
         errors.secondSC = "Second year section is required";
-
       }
-    })
+    });
     thirdYearSections.forEach((sec) => {
-      if (sec.section.trim() === ""){
+      if (sec.section.trim() === "") {
         errors.thirdCS = "Third year section is required";
-
       }
-    })
+    });
     fourthYearSections.forEach((sec) => {
-      if (sec.section.trim() === ""){
+      if (sec.section.trim() === "") {
         errors.firstSC = "Fourth year section is required";
-
       }
-    })
+    });
 
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -205,6 +201,71 @@ const InputSectionCounts: React.FC = () => {
     }
   };
 
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{
+    isOpen: boolean;
+    yearIndex: number; // 1, 2, 3, or 4 for year
+    sectionIndex: number;
+  }>({
+    isOpen: false,
+    yearIndex: 0,
+    sectionIndex: -1,
+  });
+
+  const DeleteConfirmationDialog = () => {
+    if (!deleteConfirmation.isOpen) return null;
+
+    const handleConfirmDelete = () => {
+      // Perform the actual deletion based on the year
+      switch (deleteConfirmation.yearIndex) {
+        case 1:
+          deleteFirstYearSection(deleteConfirmation.sectionIndex);
+          break;
+        case 2:
+          deleteSecondYearSection(deleteConfirmation.sectionIndex);
+          break;
+        case 3:
+          deleteThirdYearSection(deleteConfirmation.sectionIndex);
+          break;
+        case 4:
+          deleteFourthYearSection(deleteConfirmation.sectionIndex);
+          break;
+      }
+      // Close the dialog
+      setDeleteConfirmation({ isOpen: false, yearIndex: 0, sectionIndex: -1 });
+    };
+
+    const handleCancelDelete = () => {
+      setDeleteConfirmation({ isOpen: false, yearIndex: 0, sectionIndex: -1 });
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-lg shadow-lg p-6 w-80 max-w-md">
+          <h3 className="text-lg font-bold text-primary mb-4">
+            Confirm Deletion
+          </h3>
+          <p className="mb-6">Are you sure you want to delete this section?</p>
+          <div className="flex justify-end space-x-4">
+            <button
+              type="button"
+              onClick={handleCancelDelete}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmDelete}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const clearStatusMessage = () => {
     setStatusMessage({ type: null, text: "" });
   };
@@ -243,6 +304,22 @@ const InputSectionCounts: React.FC = () => {
       fourthSC:
         typeof prev.fourthSC === "number" ? prev.fourthSC - 1 : prev.fourthSC,
     }));
+  };
+
+  const initiateDeleteFirstYearSection = (index: number) => {
+    setDeleteConfirmation({ isOpen: true, yearIndex: 1, sectionIndex: index });
+  };
+
+  const initiateDeleteSecondYearSection = (index: number) => {
+    setDeleteConfirmation({ isOpen: true, yearIndex: 2, sectionIndex: index });
+  };
+
+  const initiateDeleteThirdYearSection = (index: number) => {
+    setDeleteConfirmation({ isOpen: true, yearIndex: 3, sectionIndex: index });
+  };
+
+  const initiateDeleteFourthYearSection = (index: number) => {
+    setDeleteConfirmation({ isOpen: true, yearIndex: 4, sectionIndex: index });
   };
 
   return (
@@ -355,7 +432,9 @@ const InputSectionCounts: React.FC = () => {
                               />
                               <button
                                 type="button"
-                                onClick={() => deleteFirstYearSection(i)}
+                                onClick={() =>
+                                  initiateDeleteFirstYearSection(i)
+                                }
                                 className="text-primary hover:text-red-700"
                               >
                                 <svg
@@ -457,7 +536,9 @@ const InputSectionCounts: React.FC = () => {
                               />
                               <button
                                 type="button"
-                                onClick={() => deleteSecondYearSection(i)}
+                                onClick={() =>
+                                  initiateDeleteSecondYearSection(i)
+                                }
                                 className="text-primary hover:text-red-700"
                               >
                                 <svg
@@ -597,7 +678,9 @@ const InputSectionCounts: React.FC = () => {
                               </div>
                               <button
                                 type="button"
-                                onClick={() => deleteThirdYearSection(i)}
+                                onClick={() =>
+                                  initiateDeleteThirdYearSection(i)
+                                }
                                 className="text-primary hover:text-red-700"
                               >
                                 <svg
@@ -735,7 +818,9 @@ const InputSectionCounts: React.FC = () => {
                               </div>
                               <button
                                 type="button"
-                                onClick={() => deleteFourthYearSection(i)}
+                                onClick={() =>
+                                  initiateDeleteFourthYearSection(i)
+                                }
                                 className="text-primary hover:text-red-700"
                               >
                                 <svg
@@ -803,6 +888,8 @@ const InputSectionCounts: React.FC = () => {
         >
           Save
         </button>
+
+        <DeleteConfirmationDialog />
       </form>
     </>
   );

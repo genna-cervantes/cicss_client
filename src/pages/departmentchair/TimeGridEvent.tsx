@@ -52,7 +52,7 @@ const TimeGridEvent = ({ calendarEvent }: Props) => {
           : ""
       } ${getBlockColor()} font-Manrope font-semibold px-8 py-6 flex flex-col justify-between h-full ${
         violations.length > 0 && role === "Department Chair"
-          ? "border-2 border-red-600"
+          ? "border-[6px] border-red-600"
           : ""
       } m-0.5 rounded-xl shadow-lg`}
     >
