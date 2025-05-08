@@ -88,6 +88,24 @@ const Dashboard = () => {
               Path="input-YLT"
               disabled={isReady}
             />
+
+            <h1 className="text-sm font-bold text-center text-primary">Admin Stuff</h1>
+
+            <DashboardButtonsSC
+              Label="Change Term"
+              Path="edit-term"
+              disabled={isReady}
+            />
+            <DashboardButtonsSC
+              Label="Edit Programs"
+              Path="edit-programs"
+              disabled={isReady}
+            />
+            <DashboardButtonsSC
+              Label="Edit Specializations"
+              Path="edit-specializations"
+              disabled={isReady}
+            />
           </div>
 
           {/* Right */}
