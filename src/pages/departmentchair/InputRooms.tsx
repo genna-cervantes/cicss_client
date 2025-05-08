@@ -165,18 +165,35 @@ const InputRooms = () => {
 
   // Delete a specific form.
   const handleDeleteRoom = (index: number) => {
-    setRooms((prev) => prev.filter((_, i) => i !== index));
-    setDeletedRooms((prev) => [...prev, rooms[index].roomId]);
+    setRoomToDelete(index);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (roomToDelete !== null) {
+      setRooms((prev) => prev.filter((_, i) => i !== roomToDelete));
+      setDeletedRooms((prev) => [...prev, rooms[roomToDelete].roomId]);
+      setShowDeleteModal(false);
+      setRoomToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setRoomToDelete(null);
   };
 
   const clearStatusMessage = () => {
     setStatusMessage({ type: null, text: "" });
   };
 
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [roomToDelete, setRoomToDelete] = useState<number | null>(null);
+
   // Save handler for demonstration (logs the rooms array).
   const handleSave = async (e: FormEvent) => {
     e.preventDefault();
-    localStorage.setItem("hasChanges", "true")
+    localStorage.setItem("hasChanges", "true");
 
     try {
       let isSuccess = false;
@@ -554,6 +571,32 @@ const InputRooms = () => {
           </div>
         </form>
       </div>
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-80 max-w-md">
+            <h3 className="text-lg font-bold text-primary mb-4">
+              Confirm Deletion
+            </h3>
+            <p className="mb-6">Are you sure you want to delete?</p>
+            <div className="flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={handleCancelDelete}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 };
