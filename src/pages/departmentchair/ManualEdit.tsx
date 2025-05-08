@@ -20,6 +20,8 @@ import timeGridEvent from "./TimeGridEvent";
 import { constants } from "node:http2";
 import TimeGridEvent from "./TimeGridEvent";
 import { transformToOriginalEvents, uniqueByKey } from "../../utils/utils";
+import * as XLSX from "xlsx";
+import Papa from "papaparse";
 
 const ManualEdit = ({
   filter = "Section",
@@ -430,7 +432,289 @@ const ManualEdit = ({
 
   // on event update ndi inaaccept ??
 
-  const handleExport = () => {};
+  const handleExport = async () => {
+    // Check if we have current schedule data
+    if (!transformedScheduleEvents || transformedScheduleEvents.length === 0) {
+      alert("No schedule data available to export");
+      return;
+    }
+
+    // Show loading indicator
+    setError("Exporting schedule data...");
+
+    try {
+      // Define type for event
+      interface ScheduleEvent {
+        id: string;
+        title: string;
+        start: string;
+        end: string;
+        description?: string;
+        location?: string;
+        people?: string[];
+        color?: string;
+      }
+
+      // Array to store all sections data
+      const allSections = [];
+
+      // First, add current section/filter data
+      allSections.push({
+        name:
+          filter === "Section"
+            ? `${value}`
+            : filter === "Professor"
+            ? `Prof_${value}`
+            : `Room_${value}`,
+        events: transformedScheduleEvents,
+      });
+
+      // If we're not already viewing by Section (which would mean we're viewing by Professor or Room),
+      // fetch additional sections data
+      if (filter !== "Section") {
+        // For demonstration, we'll get data for all sections in year 1 CS
+        const sectionsToFetch = ["1CSA", "1CSB", "1CSC", "1CSD"];
+
+        // Fetch data for each section
+        for (const section of sectionsToFetch) {
+          try {
+            const department = localStorage.getItem("department") ?? "CS";
+            const year = section.slice(0, 1);
+            const sectionCode = section.slice(1);
+
+            const res = await fetch(
+              `http://localhost:3000/schedule/class/${department}/${year}/${sectionCode}`
+            );
+
+            if (res.ok) {
+              const data = await res.json();
+              if (!data.error) {
+                const transformedEvents = transformToScheduleEvents(
+                  data,
+                  "Section",
+                  section
+                );
+
+                allSections.push({
+                  name: section,
+                  events: transformedEvents,
+                });
+              }
+            }
+          } catch (error) {
+            console.error(`Error fetching data for section ${section}:`, error);
+          }
+        }
+      }
+
+      // Create a workbook with multiple sheets (one per section/filter)
+      const workbook = XLSX.utils.book_new();
+
+      for (const sectionData of allSections) {
+        // Format data into a calendar-like view
+        // We'll create a weekly schedule view with days as columns and time slots as rows
+
+        // Get days from weekDates (assumed to be defined elsewhere in the code)
+        const days = [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+
+        // Create time slots from 7:00 to 21:00 in 30-minute intervals
+        const timeSlots = [];
+        for (let hour = 7; hour <= 21; hour++) {
+          for (let minute = 0; minute < 60; minute += 30) {
+            const formattedHour = hour.toString().padStart(2, "0");
+            const formattedMinute = minute.toString().padStart(2, "0");
+            timeSlots.push(`${formattedHour}:${formattedMinute}`);
+          }
+        }
+
+        // Create a 2D grid for the calendar view (timeSlots × days)
+        const calendarGrid = [];
+
+        // Add header row with day names
+        const headerRow = ["Time Slot", ...days];
+        calendarGrid.push(headerRow);
+
+        // For each time slot, create a row
+        timeSlots.forEach((timeSlot) => {
+          const row = [timeSlot];
+
+          // For each day, find events that occur during this time slot
+          days.forEach((day) => {
+            // Convert day name to date from your dateToDay mapping (inverse)
+            const dayDate = Object.keys(dateToDay).find(
+              (date) => dateToDay[date] === day
+            );
+
+            if (!dayDate) {
+              row.push(""); // No date mapping found
+              return;
+            }
+
+            // Find events for this day and time slot
+            const eventsForDayAndTime = sectionData.events.filter(
+              (event: ScheduleEvent) => {
+                // Extract date and time from event
+                const [eventDate, eventStartTime] = event.start.split(" ");
+                const [eventEndDate, eventEndTime] = event.end.split(" ");
+
+                // Check if event is on this day
+                if (eventDate !== dayDate) return false;
+
+                // Parse time slots
+                const [timeSlotHour, timeSlotMinute] = timeSlot
+                  .split(":")
+                  .map(Number);
+                const timeSlotTotalMinutes = timeSlotHour * 60 + timeSlotMinute;
+
+                // Parse event times
+                const [eventStartHour, eventStartMinute] = eventStartTime
+                  .split(":")
+                  .map(Number);
+                const eventStartTotalMinutes =
+                  eventStartHour * 60 + eventStartMinute;
+
+                const [eventEndHour, eventEndMinute] = eventEndTime
+                  .split(":")
+                  .map(Number);
+                const eventEndTotalMinutes = eventEndHour * 60 + eventEndMinute;
+
+                // Check if time slot falls within event duration
+                return (
+                  timeSlotTotalMinutes >= eventStartTotalMinutes &&
+                  timeSlotTotalMinutes < eventEndTotalMinutes
+                );
+              }
+            );
+
+            // Format cell content for events
+            if (eventsForDayAndTime.length > 0) {
+              const event = eventsForDayAndTime[0]; // Take the first event if multiple
+              let cellContent = `${event.title}`;
+
+              // Add room if available
+              if (event.location) {
+                cellContent += ` | ${event.location}`;
+              }
+
+              // Add professor if available
+              if (event.people && event.people.length > 0) {
+                cellContent += ` | ${event.people[0]}`;
+              }
+
+              row.push(cellContent);
+            } else {
+              row.push(""); // No event for this slot
+            }
+          });
+
+          calendarGrid.push(row);
+        });
+
+        // Convert the grid to a worksheet
+        const worksheet = XLSX.utils.aoa_to_sheet(calendarGrid);
+
+        // Adjust column widths
+        const colWidths = [10, 30, 30, 30, 30, 30, 30]; // Adjust as needed
+        worksheet["!cols"] = colWidths.map((width) => ({ width }));
+
+        // Add the worksheet to the workbook
+        XLSX.utils.book_append_sheet(workbook, worksheet, sectionData.name);
+      }
+
+      // Generate detailed events list as an additional sheet
+      const detailedEvents = allSections.flatMap((sectionData) =>
+        sectionData.events.map((event: ScheduleEvent) => {
+          // Extract date and time components
+          const startDateTime = event.start.split(" ");
+          const endDateTime = event.end.split(" ");
+          const date = startDateTime[0];
+          const startTime = startDateTime[1];
+          const endTime = endDateTime[1];
+
+          // Extract additional data from description if available
+          let type = "";
+          let category = "";
+
+          try {
+            if (event.description) {
+              const descriptionObj = JSON.parse(event.description);
+              type = descriptionObj.type || "";
+              category = descriptionObj.category || "";
+            }
+          } catch (error) {
+            console.error("Error parsing event description:", error);
+          }
+
+          // Map day from date
+          const day = dateToDay[date] || "";
+
+          // Return formatted row
+          return {
+            Sheet: sectionData.name,
+            "Subject Code": event.title,
+            Day: day,
+            "Start Time": startTime,
+            "End Time": endTime,
+            Room: event.location || "",
+            Professor: event.people?.[0] || "",
+            Type: type,
+            Category: category,
+          };
+        })
+      );
+
+      // Add detailed events sheet
+      const detailedWorksheet = XLSX.utils.json_to_sheet(detailedEvents);
+      XLSX.utils.book_append_sheet(
+        workbook,
+        detailedWorksheet,
+        "Detailed Events"
+      );
+
+      // Export the workbook
+      const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "binary" });
+
+      // Convert to Blob
+      const buf = new ArrayBuffer(wbout.length);
+      const view = new Uint8Array(buf);
+      for (let i = 0; i < wbout.length; i++)
+        view[i] = wbout.charCodeAt(i) & 0xff;
+      const blob = new Blob([buf], { type: "application/octet-stream" });
+
+      // Create download link
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+
+      // Create filename based on the current filter
+      let filename = "schedule_export";
+      if (filter === "Section") {
+        filename = `section_${value}_schedule.xlsx`;
+      } else if (filter === "Professor") {
+        filename = `professor_${value}_schedule.xlsx`;
+      } else if (filter === "Room") {
+        filename = `room_${value}_schedule.xlsx`;
+      }
+
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      // Clear loading message
+      setError("");
+    } catch (error) {
+      console.error("Export error:", error);
+      setError("Error exporting schedule data");
+    }
+  };
 
   return (
     <>
