@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { useState } from "react";
-import star_label from "../../assets/star_label.png";
 import thumbs_up from "../../assets/thumbs_up.png";
 import excellent from "../../assets/excellent.png";
 import StudentChart from "../../components/StudentChart";
@@ -19,32 +18,32 @@ interface StarProps {
   size?: "small" | "medium" | "large";
 }
 
-interface CourseOption {
-  value: string;
-  label: string;
-}
+// interface CourseOption {
+//   value: string;
+//   label: string;
+// }
 
-interface ProfOption {
-  value: string;
-  label: string;
-}
+// interface ProfOption {
+//   value: string;
+//   label: string;
+// }
 
-// Dummy Options
-const COURSE_OPTIONS: CourseOption[] = [
-  { value: "3CSA", label: "3CSA" },
-  { value: "3CSB", label: "3CSB" },
-  { value: "3CSC", label: "3CSC" },
-  { value: "3CSD", label: "3CSD" },
-  { value: "3CSE", label: "3CSE" },
-  { value: "3CSF", label: "3CSF" },
-];
+// // Dummy Options
+// const COURSE_OPTIONS: CourseOption[] = [
+//   { value: "3CSA", label: "3CSA" },
+//   { value: "3CSB", label: "3CSB" },
+//   { value: "3CSC", label: "3CSC" },
+//   { value: "3CSD", label: "3CSD" },
+//   { value: "3CSE", label: "3CSE" },
+//   { value: "3CSF", label: "3CSF" },
+// ];
 
-const PROF_OPTIONS: ProfOption[] = [
-  { value: "Estabillo, Cherry Rose", label: "Estabillo, Cherry Rose" },
-  { value: "Decamora, Lawrence", label: "Decamora, Lawrence" },
-  { value: "Cabero, Jonathan", label: "Cabero, Jonathan" },
-  { value: "Eleazar, Mia", label: "Eleazar, Mia" },
-];
+// const PROF_OPTIONS: ProfOption[] = [
+//   { value: "Estabillo, Cherry Rose", label: "Estabillo, Cherry Rose" },
+//   { value: "Decamora, Lawrence", label: "Decamora, Lawrence" },
+//   { value: "Cabero, Jonathan", label: "Cabero, Jonathan" },
+//   { value: "Eleazar, Mia", label: "Eleazar, Mia" },
+// ];
 
 const Star: React.FC<StarProps> = ({
   type,
@@ -188,12 +187,12 @@ const Ratings = () => {
   const [currentSectionRatingsCount5, setCurrentSectionRatingsCount5] = useState(0);
   
   const [currentTASRatings, setCurrentTASRatings] = useState(0);
-  const [currentTASNumberOfRatings, setCurrentTASNumberOfRatings] = useState(0);
-  const [currentTASRatingsCount1, setCurrentTASRatingsCount1] = useState(0);
-  const [currentTASRatingsCount2, setCurrentTASRatingsCount2] = useState(0);
-  const [currentTASRatingsCount3, setCurrentTASRatingsCount3] = useState(0);
-  const [currentTASRatingsCount4, setCurrentTASRatingsCount4] = useState(0);
-  const [currentTASRatingsCount5, setCurrentTASRatingsCount5] = useState(0);
+  const [_, setCurrentTASNumberOfRatings] = useState(0);
+  const [__, setCurrentTASRatingsCount1] = useState(0);
+  const [___, setCurrentTASRatingsCount2] = useState(0);
+  const [____, setCurrentTASRatingsCount3] = useState(0);
+  const [_____, setCurrentTASRatingsCount4] = useState(0);
+  const [_______, setCurrentTASRatingsCount5] = useState(0);
 
   const [yearSections, setYearSections] = useState<{
     [key: string]: { next: string; prev: string; specialization: string };

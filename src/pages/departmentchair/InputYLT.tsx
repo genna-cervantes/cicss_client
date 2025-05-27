@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import Navbar from "../../components/Navbar";
 import add_button from "../../assets/add_button.png";
 
@@ -280,11 +280,11 @@ const InputYLT = () => {
     yearDataIndex: number,
     _timeIndex: number // timeIndex is not strictly needed here but kept for signature consistency if ever
   ) => {
-    const hasExistingErrors = timeErrors[year]?.[yearDataIndex]
-      ? Object.values(timeErrors[year][yearDataIndex]).some(
-          (err) => err !== undefined && err !== ""
-        )
-      : false;
+    // const hasExistingErrors = timeErrors[year]?.[yearDataIndex]
+    //   ? Object.values(timeErrors[year][yearDataIndex]).some(
+    //       (err) => err !== undefined && err !== ""
+    //     )
+    //   : false;
 
     const currentDayTimes =
       yearLevels[year as keyof YearLevels][yearDataIndex].startEndTimes;
@@ -509,17 +509,17 @@ const InputYLT = () => {
       return;
     }
 
-    const changesToSave = updatedYearLevels.filter((yearEntry) => {
-      const key = Object.keys(yearEntry)[0];
-      // Ensure there's actual data to save, not just empty structures if all were deleted
-      return yearEntry[key].some(
-        (dayData) =>
-          dayData.startEndTimes.length > 0 ||
-          (yearLevels[
-            this.getYearNameFromLevel(parseInt(key)) as keyof YearLevels
-          ].find((d) => d.day === dayData.day)?.startEndTimes.length ?? 0) > 0
-      );
-    });
+    // const changesToSave = updatedYearLevels.filter((yearEntry) => {
+    //   const key = Object.keys(yearEntry)[0];
+    //   // Ensure there's actual data to save, not just empty structures if all were deleted
+    //   return yearEntry[key].some(
+    //     (dayData) =>
+    //       dayData.startEndTimes.length > 0 ||
+    //       (yearLevels[
+    //         this.getYearNameFromLevel(parseInt(key)) as keyof YearLevels
+    //       ].find((d) => d.day === dayData.day)?.startEndTimes.length ?? 0) > 0
+    //   );
+    // });
 
     if (
       updatedYearLevels.length === 0 &&
@@ -533,7 +533,7 @@ const InputYLT = () => {
       return;
     }
     if (localStorage.getItem("hasChanges") !== "true") {
-      let noActualChanges = true;
+      // let noActualChanges = true;
       // A more robust check might be needed here if initial state vs current state needs comparison
       // For now, if updatedYearLevels is populated, we assume a change.
       if (updatedYearLevels.length === 0) {
@@ -556,9 +556,9 @@ const InputYLT = () => {
       const department = localStorage.getItem("department") ?? "CS";
 
       // Determine which year levels actually have changes to be sent
-      const yearLevelsToSend = updatedYearLevels.map(
-        (item) => Object.keys(item)[0]
-      );
+      // const yearLevelsToSend = updatedYearLevels.map(
+      //   (item) => Object.keys(item)[0]
+      // );
 
       // If updatedYearLevels is empty, but hasChanges was true (e.g. all deleted), we might need to send empty restrictions for all.
       // For now, let's assume updatedYearLevels tracks what needs to be PUT.
@@ -683,20 +683,20 @@ const InputYLT = () => {
     }
   };
 
-  const getYearNameFromLevel = (level: number): string => {
-    switch (level) {
-      case 1:
-        return "First Year";
-      case 2:
-        return "Second Year";
-      case 3:
-        return "Third Year";
-      case 4:
-        return "Fourth Year";
-      default:
-        return "";
-    }
-  };
+  // const getYearNameFromLevel = (level: number): string => {
+  //   switch (level) {
+  //     case 1:
+  //       return "First Year";
+  //     case 2:
+  //       return "Second Year";
+  //     case 3:
+  //       return "Third Year";
+  //     case 4:
+  //       return "Fourth Year";
+  //     default:
+  //       return "";
+  //   }
+  // };
 
   const sortDays = (
     days: { day: string; startEndTimes: any }[]

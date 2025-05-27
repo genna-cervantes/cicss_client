@@ -1,12 +1,10 @@
 import {
-  CalendarApp,
   createCalendar,
   createViewWeek,
 } from "@schedule-x/calendar";
-import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { ScheduleXCalendar } from "@schedule-x/react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { weekDates } from "../utils/constants";
-import timeGridEvent from "../pages/departmentchair/TimeGridEvent";
 import TimeGridEvent from "../pages/departmentchair/TimeGridEvent";
 
 export const dayKeysToFull: any = {
@@ -38,7 +36,7 @@ export const getViolations = (rawSchedule: any) => {
     // call the generate function again - error
 
     let daySched = rawSchedule[dayKeys[i]];
-    let schoolDay = dayKeysToFull[dayKeys[i]];
+    // let schoolDay = dayKeysToFull[dayKeys[i]];
 
     for (let j = 0; j < daySched.length; j++) {
       let schedBlock = daySched[j];
@@ -54,8 +52,7 @@ export const getViolations = (rawSchedule: any) => {
 
 export const transformToScheduleEvents = (
   rawSchedule: any,
-  filter: string,
-  value: string
+  filter: string
 ) => {
   let transformedEvents = [];
 
@@ -112,7 +109,7 @@ const ScheduleView = ({
   const [scheduleEvents, setScheduleEvents] = useState<any>();
   const [transformedScheduleEvents, setTransformedScheduleEvents] =
     useState<any>();
-  const [error, setError] = useState("");
+  const [_, setError] = useState("");
 
   // default schedule to show
   useEffect(() => {
@@ -148,8 +145,7 @@ const ScheduleView = ({
     if (scheduleEvents) {
       let transformedEvents = transformToScheduleEvents(
         scheduleEvents,
-        filter,
-        value
+        filter
       );
       setTransformedScheduleEvents(transformedEvents);
     }
@@ -243,7 +239,7 @@ const ScheduleView = ({
     }
   }, [filter, value]);
 
-  let calendar: CalendarApp;
+  // let calendar: CalendarApp;
   
   if (!calendarRef.current) {
     calendarRef.current = 

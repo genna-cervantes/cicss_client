@@ -16,7 +16,7 @@ function GenerateButton({
 }) {
   const [scheduleExists, setScheduleExists] = useState(false);
   const navigate = useNavigate();
-  const [error, setError] = useState("");
+  const [error] = useState("");
   const [isHovered, setIsHovered] = useState(false);
 
   const handleClick = async () => {
@@ -44,7 +44,7 @@ function GenerateButton({
       });
 
       if (res.ok) {
-        const data = await res.json();
+        // const data = await res.json();
 
         setScheduleExists(true);
       }

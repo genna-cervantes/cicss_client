@@ -734,10 +734,10 @@ const InputCourseOfferings = () => {
   //   console.log(searchResults); // Keep for debugging if needed
   // }, [searchResults]);
 
-  const handleSearch = () => {
-    // Simplified, relies on handleFilter
-    handleFilter();
-  };
+  // const handleSearch = () => {
+  //   // Simplified, relies on handleFilter
+  //   handleFilter();
+  // };
 
   // useEffect to auto-filter when searchValue or yearFilter changes
   useEffect(() => {

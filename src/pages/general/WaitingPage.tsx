@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useLocation,
   useNavigate,
-  useParams,
   useSearchParams,
 } from "react-router-dom";
 import { useAppContext } from "../../context/AppContext";
 import cicss_gear_icon from "../../assets/cicss_gear_icon.png";
 
 const WaitingPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [scheduleExists, setScheduleExists] = useState<boolean>(
+  const [searchParams, _] = useSearchParams();
+  const [scheduleExists, __] = useState<boolean>(
     searchParams.get("exists") === "true"
   );
 
@@ -58,7 +57,7 @@ const WaitingPage = () => {
     // generate / regenerate
     const fetchSections = async () => {
       try {
-        const department = localStorage.getItem("department") ?? "CS";
+        // const department = localStorage.getItem("department") ?? "CS";
         const res = await fetch(`/api/year_sections/CS`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import add_button_white from "../../assets/add_button_white.png";
 import trash_button from "../../assets/trash_button.png";
 

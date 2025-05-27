@@ -1,27 +1,20 @@
-import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
+import { ScheduleXCalendar } from "@schedule-x/react";
 import {
-  CalendarApp,
   createCalendar,
   createViewWeek,
 } from "@schedule-x/calendar";
 import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
-import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
-import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
-import Select from "react-select";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import "../../components/custom-calendar.css";
 import "../../components/custom-event.css";
-import { dateToDay, weekDates } from "../../utils/constants";
+import { dateToDay } from "../../utils/constants";
 import {
   getViolations,
   transformToScheduleEvents,
 } from "../../components/ScheduleView";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import timeGridEvent from "./TimeGridEvent";
-import { constants } from "node:http2";
+import { useEffect, useMemo, useRef, useState } from "react";
 import TimeGridEvent from "./TimeGridEvent";
-import { transformToOriginalEvents, uniqueByKey } from "../../utils/utils";
-import * as XLSX from "xlsx";
-import Papa from "papaparse";
+import { transformToOriginalEvents } from "../../utils/utils";
 
 const ManualEdit = ({
   filter = "Section",
@@ -58,7 +51,7 @@ const ManualEdit = ({
 
   const [changedScheduleBlocks, setChangedSchedBlocks] = useState<any>([]);
 
-  const [error, setError] = useState("");
+  const [_, setError] = useState("");
 
   const navigate = useNavigate();
 
@@ -111,8 +104,7 @@ const ManualEdit = ({
     if (scheduleEvents) {
       let transformedEvents = transformToScheduleEvents(
         scheduleEvents,
-        filter,
-        value
+        filter
       );
       let violations = getViolations(scheduleEvents);
 
@@ -281,13 +273,13 @@ const ManualEdit = ({
         onEventUpdate(updatedEvent) {
           console.log("onEventUpdate", updatedEvent);
         },
-        onBeforeEventUpdate(oldEvent, newEvent, $app) {
+        onBeforeEventUpdate(_, newEvent, __) {
           console.log("before event updated");
-          const parseDateTime = (dateTimeStr: string) =>
-            new Date(dateTimeStr.replace(" ", "T"));
+          // const parseDateTime = (dateTimeStr: string) =>
+          //   new Date(dateTimeStr.replace(" ", "T"));
 
-          const newStart = parseDateTime(newEvent.start);
-          const newEnd = parseDateTime(newEvent.end);
+          // const newStart = parseDateTime(newEvent.start);
+          // const newEnd = parseDateTime(newEvent.end);
 
           if (filter === "Section") {
             let date: string = newEvent.start.split(" ")[0];

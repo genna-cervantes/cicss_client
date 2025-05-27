@@ -1,11 +1,9 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import {
-  checkIfCICSStudent,
-  checkIfCICSTAS,
   fetchUserInfo,
 } from "../../utils/utils";
 import { useAppContext } from "../../context/AppContext";
-import { Navigate, redirect, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import USTLogo from "../../assets/ust_logo.png";
 import CICSLogo from "../../assets/cics_logo.png";

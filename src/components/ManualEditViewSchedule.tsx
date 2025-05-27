@@ -1,26 +1,21 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
 import merge from "lodash.merge";
-import { useNavigate } from "react-router-dom";
-import ScheduleView from "./ScheduleView";
-import GenerateViewButton from "./GenerateButton";
-import LockButton from "./LockButton";
-import ManualEditScheduleView from "./ManualEditScheduleView";
 import ManualEdit from "../pages/departmentchair/ManualEdit";
 
-const sections = [
-  { code: "1CSA", next: "1CSB" },
-  { code: "1CSB", next: "1CSC" },
-  { code: "1CSC", next: "1CSD" },
-  { code: "1CSD", next: "1CSD" },
-  { code: "1CSE", next: "1CSE" },
-  { code: "3CSA", label: "Core Computer Science", next: "3CSB" },
-  { code: "3CSB", label: "Game Development" },
-  { code: "3CSC", label: "Data Science" },
-  { code: "3CSD", label: "Data Science" },
-  { code: "3CSE", label: "Data Science" },
-  { code: "3CSF", label: "Data Science" },
-];
+// const sections = [
+//   { code: "1CSA", next: "1CSB" },
+//   { code: "1CSB", next: "1CSC" },
+//   { code: "1CSC", next: "1CSD" },
+//   { code: "1CSD", next: "1CSD" },
+//   { code: "1CSE", next: "1CSE" },
+//   { code: "3CSA", label: "Core Computer Science", next: "3CSB" },
+//   { code: "3CSB", label: "Game Development" },
+//   { code: "3CSC", label: "Data Science" },
+//   { code: "3CSD", label: "Data Science" },
+//   { code: "3CSE", label: "Data Science" },
+//   { code: "3CSF", label: "Data Science" },
+// ];
 
 const ManualEditViewSchedule = () => {
   const [currentFilter, setCurrentFilter] = useState("Section");
@@ -47,7 +42,7 @@ const ManualEditViewSchedule = () => {
           : { label: "" }
   );
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // Navigate to the previous section
   const goToPrevious = () => {

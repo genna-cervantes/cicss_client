@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useAppContext } from "../../context/AppContext";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import Header from "../../components/Header";

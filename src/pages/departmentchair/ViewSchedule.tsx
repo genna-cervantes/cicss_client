@@ -5,21 +5,20 @@ import GenerateButton from "../../components/GenerateButton";
 import merge from "lodash.merge";
 import { useNavigate } from "react-router-dom";
 import LockButton from "../../components/LockButton";
-import { useAppContext } from "../../context/AppContext";
 
-const sections = [
-  { code: "1CSA", next: "1CSB" },
-  { code: "1CSB", next: "1CSC" },
-  { code: "1CSC", next: "1CSD" },
-  { code: "1CSD", next: "1CSD" },
-  { code: "1CSE", next: "1CSE" },
-  { code: "3CSA", label: "Core Computer Science", next: "3CSB" },
-  { code: "3CSB", label: "Game Development" },
-  { code: "3CSC", label: "Data Science" },
-  { code: "3CSD", label: "Data Science" },
-  { code: "3CSE", label: "Data Science" },
-  { code: "3CSF", label: "Data Science" },
-];
+// const sections = [
+//   { code: "1CSA", next: "1CSB" },
+//   { code: "1CSB", next: "1CSC" },
+//   { code: "1CSC", next: "1CSD" },
+//   { code: "1CSD", next: "1CSD" },
+//   { code: "1CSE", next: "1CSE" },
+//   { code: "3CSA", label: "Core Computer Science", next: "3CSB" },
+//   { code: "3CSB", label: "Game Development" },
+//   { code: "3CSC", label: "Data Science" },
+//   { code: "3CSD", label: "Data Science" },
+//   { code: "3CSE", label: "Data Science" },
+//   { code: "3CSF", label: "Data Science" },
+// ];
 
 const ViewSchedule = ({
   filter,
@@ -152,7 +151,7 @@ const ViewSchedule = ({
           department = "CS";
         }
         const res = await fetch(
-          `http://localhost:8080/tasconstraints/details/${department}`,
+          `/api/tasconstraints/details/${department}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -190,7 +189,7 @@ const ViewSchedule = ({
         if (department == "undefined") {
           department = "CS";
         }
-        const res = await fetch(`http://localhost:8080/rooms/${department}`, {
+        const res = await fetch(`/api/rooms/${department}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           },
@@ -228,7 +227,7 @@ const ViewSchedule = ({
         department = "CS";
       }
       const res = await fetch(
-        `http://localhost:8080/year_sections/${department}`,
+        `/api/year_sections/${department}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,

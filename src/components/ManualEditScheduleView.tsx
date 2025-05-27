@@ -3,10 +3,8 @@ import {
   createCalendar,
   createViewWeek,
 } from "@schedule-x/calendar";
-import { ScheduleXCalendar, useCalendarApp } from "@schedule-x/react";
-import React, { useEffect, useState } from "react";
-import { weekDates } from "../utils/constants";
-import timeGridEvent from "../pages/departmentchair/TimeGridEvent";
+import { ScheduleXCalendar } from "@schedule-x/react";
+import { useEffect, useState } from "react";
 import { transformToScheduleEvents } from "./ScheduleView";
 
 // export const dayKeysToFull: any = {
@@ -81,7 +79,7 @@ const ManualEditScheduleView = ({
   const [scheduleEvents, setScheduleEvents] = useState<any>();
   const [transformedScheduleEvents, setTransformedScheduleEvents] =
     useState<any>();
-  const [error, setError] = useState("");
+  const [_, setError] = useState("");
 
   // default schedule to show
   useEffect(() => {
@@ -117,7 +115,7 @@ const ManualEditScheduleView = ({
 
     if (scheduleEvents) {
 
-      let transformedEvents = transformToScheduleEvents(scheduleEvents, filter, value);
+      let transformedEvents = transformToScheduleEvents(scheduleEvents, filter);
       setTransformedScheduleEvents(transformedEvents);
     }
   }, [scheduleEvents]);

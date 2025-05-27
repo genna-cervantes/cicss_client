@@ -6,8 +6,7 @@ import add_button from "../../assets/add_button.png";
 import trash_button from "../../assets/trash_button.png";
 import add_button_white from "../../assets/add_button_white.png";
 import {
-  fuzzyMatch,
-  getCourseCodesFromInternalRepresentation,
+  fuzzyMatch
 } from "../../utils/utils";
 import { v4 as uuidv4 } from "uuid";
 import ScrollButton from "../../components/ScrollButton";
@@ -124,47 +123,47 @@ const InputTAS: React.FC = () => {
   const [nameErrors, setNameErrors] = useState<{ [key: number]: string }>({});
 
   // Function to validate time entries
-  const validateTimeEntry = (
-    tasIndex: number,
-    requestIndex: number,
-    timeIndex: number,
-    startTime: string,
-    endTime: string
-  ): string => {
-    if (!startTime || !endTime) return "";
+  // const validateTimeEntry = (
+  //   tasIndex: number,
+  //   requestIndex: number,
+  //   timeIndex: number,
+  //   startTime: string,
+  //   endTime: string
+  // ): string => {
+  //   if (!startTime || !endTime) return "";
 
-    const startMinutes = convertTimeToMinutes(startTime);
-    const endMinutes = convertTimeToMinutes(endTime);
+  //   const startMinutes = convertTimeToMinutes(startTime);
+  //   const endMinutes = convertTimeToMinutes(endTime);
 
-    if (endMinutes <= startMinutes) {
-      return "End time must be after start time";
-    }
+  //   if (endMinutes <= startMinutes) {
+  //     return "End time must be after start time";
+  //   }
 
-    // Check for overlapping time slots within the same day
-    const currentRestriction = tasList[tasIndex].restrictions[requestIndex];
-    for (let i = 0; i < currentRestriction.startEndTimes.length; i++) {
-      if (i === timeIndex) continue;
+  //   // Check for overlapping time slots within the same day
+  //   const currentRestriction = tasList[tasIndex].restrictions[requestIndex];
+  //   for (let i = 0; i < currentRestriction.startEndTimes.length; i++) {
+  //     if (i === timeIndex) continue;
 
-      const otherStart = convertTimeToMinutes(
-        currentRestriction.startEndTimes[i].start
-      );
-      const otherEnd = convertTimeToMinutes(
-        currentRestriction.startEndTimes[i].end
-      );
+  //     const otherStart = convertTimeToMinutes(
+  //       currentRestriction.startEndTimes[i].start
+  //     );
+  //     const otherEnd = convertTimeToMinutes(
+  //       currentRestriction.startEndTimes[i].end
+  //     );
 
-      if (
-        otherStart &&
-        otherEnd &&
-        ((startMinutes >= otherStart && startMinutes < otherEnd) ||
-          (endMinutes > otherStart && endMinutes <= otherEnd) ||
-          (startMinutes <= otherStart && endMinutes >= otherEnd))
-      ) {
-        return "Time slots cannot overlap";
-      }
-    }
+  //     if (
+  //       otherStart &&
+  //       otherEnd &&
+  //       ((startMinutes >= otherStart && startMinutes < otherEnd) ||
+  //         (endMinutes > otherStart && endMinutes <= otherEnd) ||
+  //         (startMinutes <= otherStart && endMinutes >= otherEnd))
+  //     ) {
+  //       return "Time slots cannot overlap";
+  //     }
+  //   }
 
-    return "";
-  };
+  //   return "";
+  // };
 
   const convertTimeToMinutes = (timeStr: string): number => {
     if (!timeStr) return 0;

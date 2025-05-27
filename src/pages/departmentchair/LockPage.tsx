@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import UnlockButton from "../../components/UnlockButton";
 import ReadyButton from "../../components/ReadyButton";
 import { useAppContext } from "../../context/AppContext";
-import { useNavigate } from "react-router-dom";
 
 const LockPage = () => {
   const { department } = useAppContext();
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [csReady, setCSReady] = useState(false);
   const [isReady, setISReady] = useState(false);
   const [itReady, setITReady] = useState(false);

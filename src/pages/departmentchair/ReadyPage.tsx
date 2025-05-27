@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppContext } from "../../context/AppContext";
 import cs_readyy from "../../assets/cs_readyy.png";
 import is_readyy from "../../assets/is_readyy.png";
 import it_readyy from "../../assets/it_readyy.png";
