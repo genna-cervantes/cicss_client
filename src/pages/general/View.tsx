@@ -87,7 +87,7 @@ const View = ({ filter, setFilter, role }: { filter: string, setFilter: React.Di
         raterType: role
     }
     
-    const res = await fetch('http://localhost:8080/ratings', {
+    const res = await fetch('/api/ratings', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem("token") ?? ""}`,

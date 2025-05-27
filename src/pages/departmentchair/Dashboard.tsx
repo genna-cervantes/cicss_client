@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Greeting from "../../components/Greeting";
 import Semester from "../../components/Semester";
 import DashboardButtons from "../../components/DashboardButtons";
@@ -9,7 +9,7 @@ import GenerateButton from "../../components/GenerateButton";
 import { useAppContext } from "../../context/AppContext";
 
 const Dashboard = () => {
-  const [hasChanges, setHasChanges] = useState(
+  const [hasChanges, _] = useState(
     localStorage.getItem("hasChanges") ?? ""
   );
   const [semester, setSemester] = useState("");

@@ -1,4 +1,3 @@
-import React from "react";
 import StudentChart from "./StudentChart";
 import ratingLabel from "../assets/ratingLabel.png";
 import { useNavigate } from "react-router-dom";

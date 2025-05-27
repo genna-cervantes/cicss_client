@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 // Define the context type
 interface AppContextType {
@@ -18,10 +18,10 @@ interface AppContextType {
   setIsNewSemester: (isNew: boolean) => void
 }
 
-const getCurrentSemester = (): string => {
-  const currentMonth = new Date().getMonth() + 1; // JavaScript months are 0-based
-  return currentMonth >= 8 ? "First Semester" : "Second Semester";
-};
+// const getCurrentSemester = (): string => {
+//   const currentMonth = new Date().getMonth() + 1; // JavaScript months are 0-based
+//   return currentMonth >= 8 ? "First Semester" : "Second Semester";
+// };
 
 // Create the context with a default value
 const AppContext = createContext<AppContextType | undefined>(undefined);

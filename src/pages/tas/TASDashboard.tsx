@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import cs_schedule_card from "../../assets/cs_schedule_card.png";
 import wave from "../../assets/wave.png";

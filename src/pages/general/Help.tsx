@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { PlusCircle, MinusCircle } from "lucide-react";
 
 const Help = () => {

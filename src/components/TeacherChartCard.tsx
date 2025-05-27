@@ -1,4 +1,3 @@
-import React from "react";
 import TeacherChart from "./TeacherChart";
 import { useNavigate } from "react-router-dom";
 
