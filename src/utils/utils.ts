@@ -64,7 +64,7 @@ export const checkIfCICSTAS = async (email: string) => {
     let rqBody = JSON.stringify({ email }); // {email: email}
 
     let response = await fetch(
-      "http://localhost:8080/departmentchair/authenticate",
+      "/api/departmentchair/authenticate",
       {
         method: "POST",
         headers: {

@@ -36,7 +36,7 @@ function GenerateButton({
 
   useEffect(() => {
     const checkIfScheduleExists = async () => {
-      const res = await fetch("http://localhost:3001/schedule/class/CS/1/CSA", {
+      const res = await fetch("/schedule-api/schedule/class/CS/1/CSA", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           "Content-type": "application/json",

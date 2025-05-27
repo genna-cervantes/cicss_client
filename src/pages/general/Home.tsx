@@ -31,7 +31,7 @@ const Home = () => {
     onSuccess: async (tokenResponse) => {
       let userInfo = await fetchUserInfo(tokenResponse.access_token);
 
-      const res = await fetch("http://localhost:8080/auth/login", {
+      const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-type": "application/json",

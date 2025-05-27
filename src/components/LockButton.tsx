@@ -8,7 +8,7 @@ const LockButton = () => {
 
   const handleClick = async () => {
     const res = await fetch(
-      `http://localhost:3000/schedule/lock/${department}`
+      `/schedule-api/schedule/lock/${department}`
     );
 
     if (res.ok) {

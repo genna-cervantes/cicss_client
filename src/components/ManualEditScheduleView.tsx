@@ -86,7 +86,7 @@ const ManualEditScheduleView = ({
   // default schedule to show
   useEffect(() => {
     const fetchSchedule = async () => {
-      const res = await fetch("http://localhost:3000/schedule/class/CS/1/CSA"); // DEFAULT NA SIMULA
+      const res = await fetch("/schedule-api/schedule/class/CS/1/CSA"); // DEFAULT NA SIMULA
       const data = await res.json();
       let sched = data;
 
@@ -137,7 +137,7 @@ const ManualEditScheduleView = ({
       const fetchSchedule = async () => {
         const department = localStorage.getItem('department') ?? 'CS'
         const res = await fetch(
-          `http://localhost:3000/schedule/class/${department}/${year}/${section}`
+          `/schedule-api/schedule/class/${department}/${year}/${section}`
         ); // DEFAULT NA CS MUNA
         const data = await res.json();
         let sched = data;
@@ -160,7 +160,7 @@ const ManualEditScheduleView = ({
       // console.log('tas', tasId)
       
       const fetchSchedule = async () => {
-        const res = await fetch(`http://localhost:3000/schedule/tas/${tasId}`)
+        const res = await fetch(`/schedule-api/schedule/tas/${tasId}`)
         const data = await res.json()
         let sched = data;
 
@@ -184,7 +184,7 @@ const ManualEditScheduleView = ({
       // console.log('room', roomId)
       
       const fetchSchedule = async () => {
-        const res = await fetch(`http://localhost:3000/schedule/room/${roomId}`)
+        const res = await fetch(`/schedule-api/schedule/room/${roomId}`)
         const data = await res.json()
         let sched = data;
 

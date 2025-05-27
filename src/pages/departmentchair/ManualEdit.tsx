@@ -65,7 +65,7 @@ const ManualEdit = ({
   useEffect(() => {
     const fetchReadyDepartments = async () => {
       const res = await fetch(
-        "http://localhost:3000/schedule/ready/departments"
+        "/schedule-api/schedule/ready/departments"
       );
       if (res.ok) {
         const data = await res.json();
@@ -80,7 +80,7 @@ const ManualEdit = ({
   // default schedule to show
   useEffect(() => {
     const fetchSchedule = async () => {
-      const res = await fetch("http://localhost:3000/schedule/class/CS/1/CSA"); // DEFAULT NA SIMULA
+      const res = await fetch("/schedule-api/schedule/class/CS/1/CSA"); // DEFAULT NA SIMULA
       const data = await res.json();
       let sched = data;
 
@@ -156,7 +156,7 @@ const ManualEdit = ({
       const fetchSchedule = async () => {
         const department = localStorage.getItem("department") ?? "CS";
         const res = await fetch(
-          `http://localhost:3000/schedule/class/${department}/${year}/${section}`
+          `/schedule-api/schedule/class/${department}/${year}/${section}`
         ); // DEFAULT NA CS MUNA
         const data = await res.json();
         let sched = data;
@@ -179,7 +179,7 @@ const ManualEdit = ({
       // console.log('tas', tasId)
 
       const fetchSchedule = async () => {
-        const res = await fetch(`http://localhost:3000/schedule/tas/${tasId}`);
+        const res = await fetch(`/schedule-api/schedule/tas/${tasId}`);
         const data = await res.json();
         let sched = data;
 
@@ -204,7 +204,7 @@ const ManualEdit = ({
 
       const fetchSchedule = async () => {
         const res = await fetch(
-          `http://localhost:3000/schedule/room/${roomId}`
+          `/schedule-api/schedule/room/${roomId}`
         );
         const data = await res.json();
         let sched = data;
@@ -236,7 +236,7 @@ const ManualEdit = ({
     console.log("accept violations");
     console.log(schedBlockRef.current);
     const res = await fetch(
-      "http://localhost:3000/schedule/accept/violations",
+      "/schedule-api/schedule/accept/violations",
       {
         method: "POST",
         headers: {
@@ -329,7 +329,7 @@ const ManualEdit = ({
 
             const fetchViolations = async () => {
               const res = await fetch(
-                "http://localhost:3000/schedule/check/violations",
+                "/schedule-api/schedule/check/violations",
                 {
                   method: "POST",
                   headers: {
@@ -380,7 +380,7 @@ const ManualEdit = ({
       value
     );
 
-    const res = await fetch("http://localhost:3000/schedule/manual-edit/save", {
+    const res = await fetch("/schedule-api/schedule/manual-edit/save", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -400,7 +400,7 @@ const ManualEdit = ({
 
   const handleDeploy = async () => {
     const res = await fetch(
-      "http://localhost:3000/schedule/manual-edit/deploy"
+      "/schedule-api/schedule/manual-edit/deploy"
     );
 
     if (res.ok) {

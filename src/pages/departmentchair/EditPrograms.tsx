@@ -28,7 +28,7 @@ const EditPrograms = () => {
   >([]);
 
   useEffect(() => {
-    fetch("http://localhost:8080/programs", {
+    fetch("/api/programs", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -73,7 +73,7 @@ const EditPrograms = () => {
     const program = programs[index];
 
     if (program.id) {
-      await fetch(`http://localhost:8080/programs/${program.id}`, {
+      await fetch(`/api/programs/${program.id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -97,7 +97,7 @@ const EditPrograms = () => {
 
       if (program.id) {
         // Update existing
-        await fetch(`http://localhost:8080/programs/${program.id}`, {
+        await fetch(`/api/programs/${program.id}`, {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -107,7 +107,7 @@ const EditPrograms = () => {
         });
       } else {
         // Create new
-        await fetch("http://localhost:8080/programs", {
+        await fetch("/api/programs", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,

@@ -16,7 +16,7 @@ const ReadyPage = () => {
   useEffect(() => {
     const fetchReadyDepartments = async () => {
       const res = await fetch(
-        "http://localhost:3000/schedule/ready/departments"
+        "/schedule-api/schedule/ready/departments"
       );
       if (res.ok) {
         const data = await res.json();

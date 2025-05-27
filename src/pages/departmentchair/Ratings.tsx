@@ -212,7 +212,7 @@ const Ratings = () => {
 
   useEffect(() => {
     const getCurrentSectionRatings = async () => {
-      const res = await fetch(`http://localhost:8080/ratings/section/${currentSection.label}`, {
+      const res = await fetch(`/api/ratings/section/${currentSection.label}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("token") ?? ""}`
         }
@@ -234,7 +234,7 @@ const Ratings = () => {
 
   useEffect(() => {
     const getCurrentSectionRatings = async () => {
-      const res = await fetch(`http://localhost:8080/ratings/tas/${currentTAS.label}`, {
+      const res = await fetch(`/api/ratings/tas/${currentTAS.label}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("token") ?? ""}`
         }
@@ -261,7 +261,7 @@ const Ratings = () => {
         department = "CS";
       }
       const res = await fetch(
-        `http://localhost:8080/year_sections/${department}`,
+        `/api/year_sections/${department}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -405,7 +405,7 @@ const Ratings = () => {
         department = "CS";
       }
       const res = await fetch(
-        `http://localhost:8080/tasconstraints/details/${department}`,
+        `/api/tasconstraints/details/${department}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,

@@ -605,7 +605,7 @@ const InputYLT = () => {
 
         try {
           const res = await fetch(
-            `http://localhost:8080/yltconstraints/${department}/${yearLevelStr}`,
+            `/api/yltconstraints/${department}/${yearLevelStr}`,
             {
               method: "PUT",
               headers: {
@@ -732,7 +732,7 @@ const InputYLT = () => {
       for (const { name, level } of yearLevelsToFetch) {
         try {
           const res = await fetch(
-            `http://localhost:8080/yltconstraints/${department}/${level}`,
+            `/api/yltconstraints/${department}/${level}`,
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,

@@ -218,7 +218,7 @@ const InputYLD: React.FC = () => {
 
         try {
           const res = await fetch(
-            `http://localhost:8080/yldconstraint/${department}/${updYearLevel.year}`,
+            `/api/yldconstraint/${department}/${updYearLevel.year}`,
             {
               method: "PUT",
               headers: {
@@ -275,7 +275,7 @@ const InputYLD: React.FC = () => {
       const department = localStorage.getItem("department") ?? "CS";
       for (let i = 1; i < 5; i++) {
         const res = await fetch(
-          `http://localhost:8080/yldconstraint/${department}/${i}`,
+          `/api/yldconstraint/${department}/${i}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,

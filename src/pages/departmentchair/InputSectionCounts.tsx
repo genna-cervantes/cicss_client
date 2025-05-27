@@ -64,7 +64,7 @@ const InputSectionCounts: React.FC = () => {
     const fetchYearSectionsData = async () => {
       const department = localStorage.getItem("department") ?? "CS";
       const res = await fetch(
-        `http://localhost:8080/year_sections/${department}`,
+        `/api/year_sections/${department}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -170,7 +170,7 @@ const InputSectionCounts: React.FC = () => {
     console.log(reqBody);
 
     try {
-      const res = await fetch("http://localhost:8080/year_sections", {
+      const res = await fetch("/api/year_sections", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,

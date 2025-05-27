@@ -124,7 +124,7 @@ const ManualEditViewSchedule = () => {
       const fetchTASData = async () => {
         const department = localStorage.getItem("department") ?? "CS";
         const res = await fetch(
-          `http://localhost:8080/tasconstraints/details/${department}`,
+          `/api/tasconstraints/details/${department}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -159,7 +159,7 @@ const ManualEditViewSchedule = () => {
     if (filter === "Room") {
       const fetchRoomData = async () => {
         const department = localStorage.getItem("department") ?? "CS";
-        const res = await fetch(`http://localhost:8080/rooms/${department}`, {
+        const res = await fetch(`/api/rooms/${department}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           },
@@ -194,7 +194,7 @@ const ManualEditViewSchedule = () => {
     const fetchYearSectionsData = async () => {
       const department = localStorage.getItem("department") ?? "CS";
       const res = await fetch(
-        `http://localhost:8080/year_sections/${department}`,
+        `/api/year_sections/${department}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,

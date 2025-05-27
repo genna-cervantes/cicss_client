@@ -221,7 +221,7 @@ const InputRooms = () => {
 
           try {
             console.log("Sending PUT request:", reqObj);
-            const res = await fetch("http://localhost:8080/rooms", {
+            const res = await fetch("/api/rooms", {
               method: "PUT",
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -279,7 +279,7 @@ const InputRooms = () => {
 
           try {
             console.log("Sending POST request:", reqObj);
-            const res = await fetch("http://localhost:8080/rooms", {
+            const res = await fetch("/api/rooms", {
               method: "POST",
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -313,7 +313,7 @@ const InputRooms = () => {
         for (let i = 0; i < deletedRooms.length; i++) {
           try {
             console.log("Sending DELETE request for:", deletedRooms[i]);
-            const res = await fetch("http://localhost:8080/rooms", {
+            const res = await fetch("/api/rooms", {
               method: "DELETE",
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -377,7 +377,7 @@ const InputRooms = () => {
   useEffect(() => {
     const getRooms = async () => {
       const department = localStorage.getItem("department") ?? "CS";
-      const res = await fetch(`http://localhost:8080/rooms/${department}`, {
+      const res = await fetch(`/api/rooms/${department}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
         },

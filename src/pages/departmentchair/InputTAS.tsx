@@ -884,7 +884,7 @@ const InputTAS: React.FC = () => {
           }
         }
 
-        const res = await fetch("http://localhost:8080/tasconstraints", {
+        const res = await fetch("/api/tasconstraints", {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -943,7 +943,7 @@ const InputTAS: React.FC = () => {
           // email: "sample@email.com", // WALA PANG EMAIL FORM DON SA ANO
         };
 
-        const res = await fetch("http://localhost:8080/tasconstraints", {
+        const res = await fetch("/api/tasconstraints", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -966,7 +966,7 @@ const InputTAS: React.FC = () => {
       // DELETING
       console.log("DELETING");
       for (let i = 0; i < deletedTAS.length; i++) {
-        const res = await fetch("http://localhost:8080/tasconstraints", {
+        const res = await fetch("/api/tasconstraints", {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -1038,7 +1038,7 @@ const InputTAS: React.FC = () => {
       console.log("getting tas constraints");
       const department = localStorage.getItem("department") ?? "CS";
       const res = await fetch(
-        `http://localhost:8080/tasconstraints/${department}`,
+        `/api/tasconstraints/${department}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -1103,7 +1103,7 @@ const InputTAS: React.FC = () => {
       const department = localStorage.getItem("department") ?? "CS";
       for (let i = 1; i < 5; i++) {
         const res = await fetch(
-          `http://localhost:8080/courseofferings/${i}/2/${department}`,
+          `/api/courseofferings/${i}/2/${department}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,

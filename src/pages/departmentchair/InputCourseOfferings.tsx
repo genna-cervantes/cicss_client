@@ -412,7 +412,7 @@ const InputCourseOfferings = () => {
           };
           const department = localStorage.getItem("department") ?? "CS";
           const res = await fetch(
-            `http://localhost:8080/courseofferings/${course.yearLevel}/2/${department}`,
+            `/api/courseofferings/${course.yearLevel}/2/${department}`,
             {
               method: "POST",
               headers: {
@@ -452,7 +452,7 @@ const InputCourseOfferings = () => {
 
           const department = localStorage.getItem("department") ?? "CS";
           const res = await fetch(
-            `http://localhost:8080/courseofferings/${currentUpdate.yearLevel}/2/${department}`,
+            `/api/courseofferings/${currentUpdate.yearLevel}/2/${department}`,
             {
               method: "PUT",
               headers: {
@@ -479,7 +479,7 @@ const InputCourseOfferings = () => {
         for (let i = 0; i < deletedCourses.length; i++) {
           let reqObj = { courseCode: deletedCourses[i].courseCode }; // API might just need courseCode
           const res = await fetch(
-            `http://localhost:8080/courseofferings/${deletedCourses[i].yearLevel}/2/${department}`,
+            `/api/courseofferings/${deletedCourses[i].yearLevel}/2/${department}`,
             {
               method: "DELETE",
               headers: {
@@ -541,7 +541,7 @@ const InputCourseOfferings = () => {
         ];
         for (let i = 1; i <= 4; i++) {
           const res = await fetch(
-            `http://localhost:8080/courseofferings/${i}/2/${department}`,
+            `/api/courseofferings/${i}/2/${department}`,
             {
               headers: {
                 Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,

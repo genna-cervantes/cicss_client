@@ -59,7 +59,7 @@ const WaitingPage = () => {
     const fetchSections = async () => {
       try {
         const department = localStorage.getItem("department") ?? "CS";
-        const res = await fetch(`http://localhost:8080/year_sections/CS`, {
+        const res = await fetch(`/api/year_sections/CS`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           },
@@ -80,7 +80,7 @@ const WaitingPage = () => {
           console.log("error with fetching data", data);
         }
 
-        const resIT = await fetch("http://localhost:8080/year_sections/IT", {
+        const resIT = await fetch("/api/year_sections/IT", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           },
@@ -99,7 +99,7 @@ const WaitingPage = () => {
           console.log("error with fetching data", dataIT);
         }
 
-        const resIS = await fetch("http://localhost:8080/year_sections/IS", {
+        const resIS = await fetch("/api/year_sections/IS", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           },
@@ -147,7 +147,7 @@ const WaitingPage = () => {
           console.log("req");
           console.log(reqBody);
 
-          const res = await fetch("http://localhost:3001/generate-schedule", {
+          const res = await fetch("/schedule-api//generate-schedule", {
             method: "POST",
             headers: {
               "Content-type": "application/json",

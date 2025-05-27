@@ -17,7 +17,7 @@ const ReadyButton = () => {
 
   const handleConfirm = async () => {
     const res = await fetch(
-      `http://localhost:3000/schedule/ready/${department}`
+      `/schedule-api/schedule/ready/${department}`
     );
 
     if (res.ok) {

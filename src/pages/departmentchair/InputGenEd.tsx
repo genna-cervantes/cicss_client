@@ -680,7 +680,7 @@ const InputGenEd = () => {
 
         try {
           const res = await fetch(
-            `http://localhost:8080/genedconstraint/${genedcon.courseCode}`,
+            `/api/genedconstraint/${genedcon.courseCode}`,
             {
               method: "PUT",
               headers: {
@@ -734,7 +734,7 @@ const InputGenEd = () => {
   useEffect(() => {
     const getGenedCourseConstraintData = async () => {
       try {
-        const res = await fetch("http://localhost:8080/genedconstraint", {
+        const res = await fetch("/api/genedconstraint", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
           },

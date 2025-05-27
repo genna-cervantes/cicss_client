@@ -28,7 +28,7 @@ const EditSpecializations = () => {
   const fetchPrograms = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8080/programs", {
+      const response = await fetch("/api/programs", {
         method: "GET",
         headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
@@ -64,7 +64,7 @@ const EditSpecializations = () => {
     if (!newSpec) return;
     
     try {
-      const response = await fetch(`http://localhost:8080/programs/${programId}/specializations`, {
+      const response = await fetch(`/api/programs/${programId}/specializations`, {
         method: "POST",
         headers: {
           "Content-Type": "text/plain", // Changed to text/plain
@@ -98,7 +98,7 @@ const EditSpecializations = () => {
   // Function to remove a specialization
   const handleRemoveSpecialization = async (programId: number, specialization: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/programs/${programId}/specializations/${encodeURIComponent(specialization)}`, {
+      const response = await fetch(`/api/programs/${programId}/specializations/${encodeURIComponent(specialization)}`, {
         method: "DELETE",
         headers: {
             Authorization: `Bearer ${localStorage.getItem("token") ?? ""}`,
