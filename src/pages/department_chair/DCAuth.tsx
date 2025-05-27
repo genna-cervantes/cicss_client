@@ -1,4 +1,3 @@
-import React from 'react'
 import { useAppContext } from '../../context/AppContext'
 import { Navigate, Outlet } from 'react-router-dom';
 
