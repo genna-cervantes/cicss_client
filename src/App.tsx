@@ -21,7 +21,6 @@ import InputSectionCounts from "./pages/departmentchair/InputSectionCounts";
 import InputTAS from "./pages/departmentchair/InputTAS";
 import InputYLD from "./pages/departmentchair/InputYLD";
 import InputYLT from "./pages/departmentchair/InputYLT";
-import ManualEdit from "./pages/departmentchair/ManualEdit";
 import ViewSchedule from "./pages/departmentchair/ViewSchedule";
 import WaitingPage from "./pages/general/WaitingPage";
 import Ratings from "./pages/departmentchair/Ratings";
