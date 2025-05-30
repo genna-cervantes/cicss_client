@@ -38,7 +38,7 @@ const StudentAuth = () => {
     };
 
     const verifyToken = async () => {
-      const res = await fetch("http://localhost:8080/auth/verify-token", {
+      const res = await fetch("/api/auth/verify-token", {
         method: "POST",
         headers: {
           "Content-type": "application/json",

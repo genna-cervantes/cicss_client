@@ -79,7 +79,7 @@ export const transformToScheduleEvents = (
         location: filter !== "Room" ? schedBlock.room.roomId : "",
         people: [
           filter === "Section"
-            ? schedBlock.tas.tas_name
+            ? schedBlock.tas?.tas_name ?? ""
             : `${schedBlock.year}${schedBlock.section}`,
         ], 
         description: JSON.stringify({
