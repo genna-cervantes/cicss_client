@@ -23,7 +23,6 @@ const sections = [
 ];
 
 const ManualEditViewSchedule = () => {
-  const [currentFilter, setCurrentFilter] = useState("Section");
   const [filter, setFilter] = useState("Section");
 
   const [yearSections, setYearSections] = useState<{
@@ -38,11 +37,11 @@ const ManualEditViewSchedule = () => {
     name?: string;
     specialization?: string;
   }>(
-    currentFilter === "Section"
+    filter === "Section"
       ? { label: "1CSA", specialization: "" }
-      : currentFilter === "TAS"
+      : filter === "TAS"
         ? { label: "", name: "" }
-        : currentFilter === "Room"
+        : filter === "Room"
           ? { label: "RM1901" }
           : { label: "" }
   );
@@ -51,9 +50,9 @@ const ManualEditViewSchedule = () => {
 
   // Navigate to the previous section
   const goToPrevious = () => {
-    if (currentFilter === "Section") {
+    if (filter === "Section") {
       setCurrentValue({ label: yearSections[currentValue.label].prev });
-    } else if (currentFilter === "Professor") {
+    } else if (filter === "Professor") {
       const keys = Object.keys(profDetails);
       const index = keys.findIndex((tasId) => tasId === currentValue.label);
 
@@ -63,7 +62,7 @@ const ManualEditViewSchedule = () => {
         label: keys[prevIndex],
         name: profDetails[keys[prevIndex]],
       });
-    } else if (currentFilter === "Room") {
+    } else if (filter === "Room") {
       const keys = Object.keys(roomDetails);
       const index = keys.findIndex((roomId) => roomId === currentValue.label);
 
@@ -78,9 +77,9 @@ const ManualEditViewSchedule = () => {
   };
 
   const goToNext = () => {
-    if (currentFilter === "Section") {
+    if (filter === "Section") {
       setCurrentValue({ label: yearSections[currentValue.label].next });
-    } else if (currentFilter === "Professor") {
+    } else if (filter === "Professor") {
       const keys = Object.keys(profDetails);
       const index = keys.findIndex((tasId) => tasId === currentValue.label);
 
@@ -90,7 +89,7 @@ const ManualEditViewSchedule = () => {
         label: keys[nextIndex],
         name: profDetails[keys[nextIndex]],
       });
-    } else if (currentFilter === "Room") {
+    } else if (filter === "Room") {
       const keys = Object.keys(roomDetails);
       const index = keys.findIndex((roomId) => roomId === currentValue.label);
 
@@ -105,7 +104,7 @@ const ManualEditViewSchedule = () => {
   };
 
   useEffect(() => {
-    if (currentFilter === "Section") {
+    if (filter === "Section") {
       setCurrentValue((prev) => ({
         ...prev,
         specialization:
@@ -142,7 +141,6 @@ const ManualEditViewSchedule = () => {
             label: Object.keys(data[0])[0],
             name: data[0][Object.keys(data[0])[0]],
           });
-          setCurrentFilter(filter);
         }
       };
 
@@ -154,7 +152,6 @@ const ManualEditViewSchedule = () => {
         specialization:
           yearSections[Object.keys(yearSections)[0]]?.specialization,
       });
-      setCurrentFilter(filter);
     }
     if (filter === "Room") {
       const fetchRoomData = async () => {
@@ -181,7 +178,6 @@ const ManualEditViewSchedule = () => {
             name: Object.keys(roomDetails)[0],
             specialization: roomDetails[Object.keys(roomDetails)[0]],
           });
-          setCurrentFilter(filter);
         }
       };
 
@@ -347,7 +343,7 @@ const ManualEditViewSchedule = () => {
         <div className="flex items-center gap-3">
           <div className="font-CyGrotesk text-primary text-[40px] truncate">
             {/* {currentSection.code} */}
-            {currentFilter === "Section"
+            {filter === "Section"
               ? currentValue.label
               : currentValue.name}
           </div>
@@ -384,7 +380,7 @@ const ManualEditViewSchedule = () => {
           <div className="flex items-center border rounded-lg overflow-hidden bg-primary px-3 py-2">
             <button
               className={`px-3 py-1 text-sm rounded-md ${
-                currentFilter === "Section"
+                filter === "Section"
                   ? "bg-white text-primary"
                   : "text-white"
               }`}
@@ -394,7 +390,7 @@ const ManualEditViewSchedule = () => {
             </button>
             <button
               className={`px-3 py-1 text-sm rounded-md ${
-                currentFilter === "Professor"
+                filter === "Professor"
                   ? "bg-white text-primary"
                   : "text-white"
               }`}
@@ -404,7 +400,7 @@ const ManualEditViewSchedule = () => {
             </button>
             <button
               className={`px-3 py-1 text-sm rounded-md  ${
-                currentFilter === "Room"
+                filter === "Room"
                   ? "bg-white text-primary"
                   : "text-white"
               }`}
@@ -416,7 +412,7 @@ const ManualEditViewSchedule = () => {
 
           {/* Dropdown Selector */}
           <div className="relative inline-block">
-            {currentFilter === "Section" && (
+            {filter === "Section" && (
               <select
                 className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
                 value={currentValue.label}
@@ -440,7 +436,7 @@ const ManualEditViewSchedule = () => {
               </select> 
             )}
 
-            {currentFilter === "Professor" && (
+            {filter === "Professor" && (
               <select
                 className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
                 value={currentValue.label}
@@ -466,7 +462,7 @@ const ManualEditViewSchedule = () => {
               </select>
             )}
 
-            {currentFilter === "Room" && (
+            {filter === "Room" && (
               <select
                 className="appearance-none w-[250px] px-4 py-2 bg-white border border-primary rounded text-sm"
                 value={currentValue.label}
@@ -504,8 +500,8 @@ const ManualEditViewSchedule = () => {
         </div>
       </div>
       <div>
-        {/* <ManualEditSched  uleView value={currentValue.label} filter={currentFilter} /> */}
-        <ManualEdit filter={currentFilter} value={currentValue.label} />
+        {/* <ManualEditSched  uleView value={currentValue.label} filter={filter} /> */}
+        <ManualEdit filter={filter} value={currentValue.label} />
       </div>
       {/* <GenerateViewButton regenerate={true} />
       <button onClick={() => navigate("/")} >Save as Draft</button>

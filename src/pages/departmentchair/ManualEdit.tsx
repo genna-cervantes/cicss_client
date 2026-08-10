@@ -6,7 +6,7 @@ import {
 } from "@schedule-x/calendar";
 import { createDragAndDropPlugin } from "@schedule-x/drag-and-drop";
 import { SlArrowLeft, SlArrowRight } from "react-icons/sl";
-import { NavLink, useNavigate, useSearchParams } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import Select from "react-select";
 import "../../components/custom-calendar.css";
 import "../../components/custom-event.css";
@@ -28,13 +28,6 @@ const ManualEdit = ({
   filter: string;
   value: string;
 }) => {
-  const [searchParams] = useSearchParams();
-
-  useEffect(() => {
-    filter = searchParams.get("filter") || "Section";
-    value = searchParams.get("value") || "1CSA";
-  }, []);
-
   const schedBlockRef = useRef<any>(null);
   const violationsRef = useRef<any>(null);
   const calendarRef = useRef<any>(null);
